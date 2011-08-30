@@ -12,6 +12,7 @@
 Structure TestSuiteRunner
     Variable successes
     Variable failures
+    Variable curr_group_idx
     Variable curr_test_idx
     STRUCT TestSuite test_suite
 EndStructure
@@ -22,6 +23,7 @@ Function TSR_init(tsr, ts)
 
     tsr.successes = 0
     tsr.failures = 0
+    tsr.curr_group_idx = 0
     tsr.curr_test_idx = 0
     tsr.test_suite = ts
 End
@@ -73,19 +75,19 @@ End
 Function TSR_printReport(tsr)
     STRUCT TestSuiteRunner &tsr
 
-    Variable test_no = TSR_getNumberOfTests(tsr)
+    Variable test_no = TSR_getTestCount(tsr)
     printf "%d tests run: %d successes, %d failures\r", test_no, tsr.successes, tsr.failures
 End
 
-Function TSR_getNumberOfTests(tsr)
+Function TSR_getTestCount(tsr)
     STRUCT TestSuiteRunner &tsr
-    return TS_getNumberOfTests(tsr.test_suite)
+    return TS_getTestCount(tsr.test_suite)
 End
 
 Function/S TSR_getNextTest(tsr)
     STRUCT TestSuiteRunner &tsr
     
-    String testname = TS_getTestByIndex(tsr.test_suite, tsr.curr_test_idx)
+    String testname = TS_getTestByIndex(tsr.test_suite, tsr.curr_group_idx, tsr.curr_test_idx)
     tsr.curr_test_idx += 1
 
     return testname
@@ -94,7 +96,7 @@ End
 Function TSR_isDone(tsr)
     STRUCT TestSuiteRunner &tsr
 
-    if (tsr.curr_test_idx >= TSR_getNumberOfTests(tsr))
+    if (tsr.curr_test_idx >= TSR_getTestCount(tsr))
         return TRUE
     endif
     return FALSE
