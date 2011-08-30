@@ -9,13 +9,23 @@
 #include "utils"
 
 Structure TestSuite
-    String tests
+    Wave tests
     Variable test_no
 EndStructure
 
 Function TS_init(ts)
     STRUCT TestSuite &ts
     ts.test_no = 0
+    TS_initTestWave(ts)
+End
+
+Function TS_initTestWave(ts)
+    STRUCT TestSuite &ts
+
+    Make/N=(0,2) ts.tests
+    SetDimLabel 0,-1, test_groups, ts.tests
+    SetDimLabel 1, 0, group, ts.tests
+    SetDimLabel 1, 1, tests, ts.tests
 End
 
 Function TS_addTestList(ts, test_list)
@@ -30,14 +40,32 @@ Function TS_addTestList(ts, test_list)
     endfor
 End
 
-Function TS_addTest(ts, testname)
+Function TS_addTest(ts, groupname, testname)
     STRUCT TestSuite &ts
-    String testname
+    String groupname, testname
 
-    if (!TS_hasTest(ts, testname))
+    Variable row_idx
+    if (!TS_hasGroup(ts, groupname))
+        row_idx = Wave_appendRow(ts.tests)
+        ts.tests[row_idx][%group] = groupname
+
+    if (!TS_hasTest(ts, groupname, testname))
         ts.tests = AddListItem(testname, ts.tests, ";", Inf)
         ts.test_no += 1
     endif
+End
+
+Function Wave_appendRow(wave_in)
+    // Add a new row to a wave and return the index of the new row
+    Wave wave_in
+    Variable rowCount = Wave_getRowCount(wave_in)
+    InsertPoints/M=0 rowCount, 1, wave_in
+    return Wave_getRowCount(wave_in)
+End
+
+Function Wave_getRowCount(wave_in)
+    Wave wave_in
+    return DimSize(wave_in, 0)
 End
 
 Function TS_removeTest(ts, testname)
@@ -49,6 +77,14 @@ Function TS_removeTest(ts, testname)
         ts.tests = RemoveListItem(test_idx, ts.tests, ";")
         ts.test_no -= 1
     endif
+End
+
+Function/S TS_getGroupByIndex(ts, group_idx)
+    STRUCT TestSuite &ts
+    Variable group_idx
+
+    String groupname = ts.tests[group_idx][%group]
+    return groupname
 End
 
 Function/S TS_getTestByIndex(ts, test_idx)
@@ -64,7 +100,20 @@ Function/S TS_getTestByIndex(ts, test_idx)
     return testname
 End
 
-Function TS_hasTest(ts, testname)
+Function/S TS_getGroupTests(ts, groupname)
+    // Return a list of tests in a given group
+    STRUCT TestSuite &ts
+    String groupname
+End
+
+Function TS_hasGroup(ts, groupname)
+    STRUCT TestSuite &ts
+    String groupname
+
+    FindValue/TEXT=(groupname)/TXOP=2 ts.tests
+End
+
+Function TS_hasTest(ts, groupname, testname)
     STRUCT TestSuite &ts
     String testname
 
@@ -79,4 +128,12 @@ Function TS_getNumberOfTests(ts)
     return ts.test_no
 End
 
+Function Wave2D_getColumnIndex(orig_index, row_count)
+    // Return the column index in a 2D wave when given a 1D index
+    return floor(orig_index / row_count)
+End
+
+Function Wave2D_getRowIndex(orig_index, row_count, col_index)
+    // Return the row index in a 2D wave when given a 1D index
+    return (orig_index - (col_index * row_count))
 #endif
