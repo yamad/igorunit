@@ -102,9 +102,17 @@ End
 Function/S TS_getGroupTestsByIndex(ts, group_idx)
     // Return a list of tests in a given group
     STRUCT TestSuite &ts
-    String group_idx
+    Variable group_idx
 
     return ts.tests[group_idx]
+End
+
+Function TS_getGroupTestCount(ts, groupname)
+    STRUCT TestSuite &ts
+    String groupname
+
+    String test_list = TS_getGroupTests(ts, groupname)
+    return List_getLength(test_list)
 End
 
 Function TS_hasGroup(ts, groupname)

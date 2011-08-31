@@ -14,6 +14,7 @@ Structure TestSuiteRunner
     Variable successes
     Variable failures
     Variable curr_group_idx
+    Variable curr_grouptest_idx
     Variable curr_test_idx
     STRUCT TestSuite test_suite
 EndStructure
@@ -25,6 +26,7 @@ Function TSR_init(tsr, ts)
     tsr.successes = 0
     tsr.failures = 0
     tsr.curr_group_idx = 0
+    tsr.curr_grouptest_idx = 0
     tsr.curr_test_idx = 0
     tsr.test_suite = ts
 End
@@ -36,7 +38,6 @@ Function TSR_runAllTests(tsr)
         if (!TSR_isDone(tsr))
             break
         endif
-
         TSR_runNextTest(tsr)
     while(1)
 
@@ -87,11 +88,40 @@ End
 
 Function/S TSR_getNextTest(tsr)
     STRUCT TestSuiteRunner &tsr
-    
-    String testname = TS_getTestByIndex(tsr.test_suite, tsr.curr_group_idx, tsr.curr_test_idx)
+
+    if (TSR_isCurrentGroupDone(tsr))
+        TSR_getNextGroup(tsr)
+    endif
+
+    String testname = TS_getTestByIndex(tsr.test_suite, tsr.curr_group_idx, tsr.curr_grouptest_idx)
+    tsr.curr_grouptest_idx += 1
     tsr.curr_test_idx += 1
 
     return testname
+End
+
+Function/S TSR_getCurrentGroup(tsr)
+    STRUCT TestSuiteRunner &tsr
+    return TS_getGroupByIndex(tsr.test_suite, tsr.curr_group_idx)
+End
+
+Function/S TSR_getNextGroup(tsr)
+    STRUCT TestSuiteRunner &tsr
+
+    String groupname = TSR_getCurrentGroup(tsr)
+    tsr.curr_group_idx += 1
+    tsr.curr_grouptest_idx = 0
+    return groupname
+End
+
+Function TSR_isCurrentGroupDone(tsr)
+    STRUCT TestSuiteRunner &tsr
+
+    String groupname = TSR_getCurrentGroup(tsr)
+    if (TS_getGroupTestCount(tsr.test_suite, groupname) == tsr.curr_test_idx)
+        return TRUE
+    endif
+    return FALSE
 End
 
 Function TSR_isDone(tsr)
