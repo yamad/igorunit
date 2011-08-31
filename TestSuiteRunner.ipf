@@ -6,6 +6,7 @@
 #ifndef IGORUNIT_TSR
 #define IGORUNIT_TSR
 
+#include "boolean"
 #include "utils"
 #include "TestSuite"
 

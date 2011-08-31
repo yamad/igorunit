@@ -3,9 +3,6 @@
 #ifndef IGORUNIT_UTILS
 #define IGORUNIT_UTILS
 
-Constant TRUE = 1
-Constant FALSE = 0
-
 Function printTestResult(curr_fn_name, status)
     String curr_fn_name
     Variable status
