@@ -35,14 +35,37 @@ Function runTests()
     printf "%d tests run: %d successes, %d failures", test_no, successes, failures
 End
 
-Function runAutoTests()
-    String testfn_list = discoverTests()
+// Function runAutoTests()
+//     String testfn_list = discoverTests()
 
+//     STRUCT TestSuite ts
+//     TS_init(ts)
+//     TS_addTestList(ts, testfn_list)
+
+//     STRUCT TestSuiteRunner tsr
+//     TSR_init(tsr, ts)
+//     TSR_runAllTests(tsr)
+// End
+
+Function attempt()
     STRUCT TestSuite ts
     TS_init(ts)
-    TS_addTestList(ts, testfn_list)
-
+    TS_addGroup(ts, "default")
+    TS_addTest(ts, "default", "test1")
+    
     STRUCT TestSuiteRunner tsr
     TSR_init(tsr, ts)
     TSR_runAllTests(tsr)
+End
+
+Function default_setup()
+    print "In setup"
+End
+
+Function default_teardown()
+    print "In teardown"
+End
+
+Function test1()
+    print "In test 1..."
 End

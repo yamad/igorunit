@@ -11,9 +11,11 @@
 #include "list"
 #include "wave"
 
+Constant TESTSUITE_GROUP_MAX = 400
+
 Structure TestSuite
     String groups
-    Wave tests
+    String tests[TESTSUITE_GROUP_MAX]
     Variable test_no
 EndStructure
 
@@ -21,14 +23,11 @@ Function TS_init(ts)
     STRUCT TestSuite &ts
     ts.test_no = 0
     ts.groups = ""
-    TS_initTestWave(ts)
-End
 
-Static Function TS_initTestWave(ts)
-    STRUCT TestSuite &ts
-
-    Make/T/N=(0) ts.tests
-    SetDimLabel 0,-1, test_groups, ts.tests
+    // Variable i
+    // for (i=0; i < TESTSUITE_GROUP_MAX; i+=1)
+    //     ts.tests[i] = ""
+    // endfor
 End
 
 Function TS_addGroup(ts, groupname)
@@ -44,9 +43,8 @@ End
 
 Static Function TS_initNewGroupTestList(ts)
     STRUCT TestSuite &ts
-
-    Wave_appendRow(ts.tests)
-    ts.tests[Inf] = ""
+    Variable group_count = TS_getGroupCount(ts)
+    ts.tests[group_count-1] = ""
 End
 
 Function TS_addTest(ts, groupname, testname)
@@ -55,7 +53,6 @@ Function TS_addTest(ts, groupname, testname)
 
     Variable group_idx = TS_addGroup(ts, groupname)
     if (!TS_hasTest(ts, groupname, testname))
-        Variable test_list = 
         ts.tests[group_idx] = AddListItem(testname, ts.tests[group_idx], ";", Inf)
         ts.test_no += 1
     endif
@@ -64,8 +61,9 @@ End
 
 Function TS_removeTest(ts, groupname, testname)
     STRUCT TestSuite &ts
-    String testname
+    String groupname, testname
 
+    Variable group_idx = TS_getGroupIndex(ts, groupname)
     if (TS_hasTest(ts, groupname, testname))
         Variable test_idx = TS_getTestIndex(ts, groupname, testname)
         ts.tests[group_idx] = RemoveListItem(test_idx, ts.tests[group_idx], ";")
@@ -127,7 +125,7 @@ End
 
 Function TS_hasTest(ts, groupname, testname)
     STRUCT TestSuite &ts
-    String testname
+    String groupname, testname
 
     if (TS_getTestIndex(ts, groupname, testname) > -1)
         return TRUE
@@ -157,12 +155,7 @@ End
 
 Function TS_getGroupCount(ts)
     STRUCT TestSuite &ts
-    return ItemsInList(ts.groups)
-End
-
-Function TS_getGroupTestCount(ts, groupname)
-    STRUCT TestSuite &ts
-    return ItemsInList(TS_getGroupTests(ts, groupname))
+    return List_getLength(ts.groups)
 End
 
 #endif
