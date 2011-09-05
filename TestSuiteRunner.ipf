@@ -8,7 +8,9 @@
 
 #include "boolean"
 #include "utils"
+
 #include "TestSuite"
+#include "TestResult"
 
 Structure TestSuiteRunner
     Variable successes
@@ -19,11 +21,15 @@ Structure TestSuiteRunner
     Variable curr_grouptest_idx
     Variable curr_test_idx
     STRUCT TestSuite test_suite
+    STRUCT TestResult test_result
 EndStructure
 
 Function TSR_init(tsr, ts)
     STRUCT TestSuiteRunner &tsr
     STRUCT TestSuite &ts
+
+    STRUCT TestResult tr
+    TR_init(tr)
 
     tsr.successes = 0
     tsr.failures = 0
@@ -33,6 +39,7 @@ Function TSR_init(tsr, ts)
     tsr.curr_grouptest_idx = 0
     tsr.curr_test_idx = 0
     tsr.test_suite = ts
+    tsr.test_result = tr
 End
 
 Function TSR_runAllTests(tsr)

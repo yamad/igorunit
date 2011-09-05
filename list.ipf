@@ -5,29 +5,75 @@
 
 Static Strconstant LISTSEP = ";"
 
-Function List_getLength(list_in)
+Function List_getLength(list_in, [list_sep])
     String list_in
-    return ItemsInList(list_in, LISTSEP)
+    String list_sep
+
+    if (ParamIsDefault(list_sep))
+        list_sep = LISTSEP
+    endif
+    return ItemsInList(list_in, list_sep)
 End
 
-Function/S List_getItemByIndex(list_in, get_idx)
+Function/S List_addItem(list_in, new_item, [list_sep])
+    String list_in
+    String new_item
+    String list_sep
+
+    if (ParamIsDefault(list_sep))
+        list_sep = LISTSEP
+    endif
+    return AddListItem(new_item, list_in, list_sep, Inf)
+End
+
+Function/S List_insertItem(list_in, new_item, insert_idx, [list_sep])
+    // Returns a list with the given item inserted at the given
+    // index `insert_idx`
+    String list_in
+    String new_item
+    Variable insert_idx
+    String list_sep
+
+    if (ParamIsDefault(list_sep))
+        list_sep = LISTSEP
+    endif
+    return AddListItem(new_item, list_in, list_sep, insert_idx)
+End
+
+Function/S List_getItemByIndex(list_in, get_idx, [list_sep])
     String list_in
     Variable get_idx
-    return StringFromList(get_idx, list_in)
+    String list_sep
+
+    if (ParamIsDefault(list_sep))
+        list_sep = LISTSEP
+    endif
+    return StringFromList(get_idx, list_in, list_sep)
 End
 
-Function/S List_removeItemByIndex(list_in, remove_idx)
+Function/S List_removeItemByIndex(list_in, remove_idx, [list_sep])
     String list_in
     Variable remove_idx
-    return RemoveListItem(remove_idx, list_in, LISTSEP)
+    String list_sep
+
+    if (ParamIsDefault(list_sep))
+        list_sep = LISTSEP
+    endif    
+    return RemoveListItem(remove_idx, list_in, list_sep)
 End
 
-Function/S List_pop(list_in)
+// Returns the last item of the list and removes it from the input list
+Function/S List_pop(list_in, [list_sep])
     String &list_in
+    String list_sep
 
-    Variable last_idx = List_getLength(list_in) - 1
-    String popped = List_getItemByIndex(list_in, last_idx)
-    list_in = List_removeItemByIndex(list_in, last_idx)
+    if (ParamIsDefault(list_sep))
+        list_sep = LISTSEP
+    endif    
+
+    Variable last_idx = List_getLength(list_in, list_sep=list_sep) - 1
+    String popped = List_getItemByIndex(list_in, last_idx, list_sep=list_sep)
+    list_in = List_removeItemByIndex(list_in, last_idx, list_sep=list_sep)
     return popped
 End
 

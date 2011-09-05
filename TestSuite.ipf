@@ -15,7 +15,7 @@ Constant TESTSUITE_GROUP_MAX = 400
 
 Structure TestSuite
     String groups
-    String tests[TESTSUITE_GROUP_MAX]
+    Wave/T tests
     Variable test_no
 EndStructure
 
@@ -23,11 +23,7 @@ Function TS_init(ts)
     STRUCT TestSuite &ts
     ts.test_no = 0
     ts.groups = ""
-
-    // Variable i
-    // for (i=0; i < TESTSUITE_GROUP_MAX; i+=1)
-    //     ts.tests[i] = ""
-    // endfor
+    Make/FREE/T/N=0 ts.tests
 End
 
 Function TS_addGroup(ts, groupname)
@@ -44,7 +40,9 @@ End
 Static Function TS_initNewGroupTestList(ts)
     STRUCT TestSuite &ts
     Variable group_count = TS_getGroupCount(ts)
-    ts.tests[group_count-1] = ""
+
+    Wave_appendRow(ts.tests)
+    ts.tests[Inf] = ""
 End
 
 Function TS_addTest(ts, groupname, testname)
