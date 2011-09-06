@@ -19,8 +19,4 @@ Function/S discoverTests()
     return FunctionList("test*", ";", "KIND:2")
 End
 
-// Stub for function references
-Function prototest()
-End
-
 #endif

@@ -13,9 +13,6 @@
 #include "TestResult"
 
 Structure TestSuiteRunner
-    Variable successes
-    Variable failures
-    Variable errors
     Variable tests_run
     Variable curr_group_idx
     Variable curr_grouptest_idx
@@ -31,9 +28,6 @@ Function TSR_init(tsr, ts)
     STRUCT TestResult tr
     TR_init(tr)
 
-    tsr.successes = 0
-    tsr.failures = 0
-    tsr.errors = 0
     tsr.tests_run = 0
     tsr.curr_group_idx = 0
     tsr.curr_grouptest_idx = 0
@@ -52,6 +46,7 @@ Function TSR_runAllTests(tsr)
         TSR_runNextTest(tsr)
     while(1)
 
+    printf "\r"
     TSR_printReport(tsr)
 End
 
@@ -63,32 +58,52 @@ Function TSR_runNextTest(tsr)
     TSR_runTest(tsr, groupname, testname)
 End
 
+// Stub for function references
+Function prototest(tr)
+    STRUCT TestResult &tr
+End
+
+Function protofunc()
+End
+
 Function TSR_runTest(tsr, groupname, testname)
     STRUCT TestSuiteRunner &tsr
     String groupname, testname
 
-    String setupname = groupname + "_setup"
-    String teardownname = groupname + "_teardown"
+    String setupname = getGroupSetupName(groupname)
+    String teardownname = getGroupTeardownName(groupname)
+    String fulltestname = getFullTestName(groupname, testname)
 
-    FUNCREF prototest group_setup = $setupname
-    FUNCREF prototest curr_test = $testname
-    FUNCREF prototest group_teardown = $teardownname
+    FUNCREF protofunc group_setup = $setupname
+    FUNCREF prototest curr_test = $fulltestname
+    FUNCREF protofunc group_teardown = $teardownname
 
-    tsr.tests_run += 1
     TSR_createTestDataFolder(tsr, testname)
     try
         group_setup()
-        curr_test()
+        curr_test(tsr.test_result)
         group_teardown()
     catch
-        print 0
+        Variable err = GetRTError(1)
+        String msg = GetErrMessage(err)
+        TR_addError(tsr.test_result, groupname, testname, msg)
     endtry
-
-    // wrapup test
     TSR_deleteTestDataFolder(tsr, testname)
-    Variable status = 1
-    printTestResult(testname, status)
-    TSR_saveTestResult(tsr, status)
+End
+
+Function/S getGroupSetupName(groupname)
+    String groupname
+    return groupname + "_setup"
+End
+
+Function/S getGroupTeardownName(groupname)
+    String groupname
+    return groupname + "_teardown"
+End
+
+Function/S getFullTestName(groupname, testname)
+    String groupname, testname
+    return groupname + "_" + testname
 End
 
 Function TSR_createTestDataFolder(tsr, testname)
@@ -107,22 +122,18 @@ Function TSR_deleteTestDataFolder(tsr, testname)
     KillDataFolder root:$foldername
 End
 
-Static Function TSR_saveTestResult(tsr, status)
-    STRUCT TestSuiteRunner &tsr
-    Variable status
-
-    if (status == TRUE)
-        tsr.successes += 1
-    else
-        tsr.failures += 1
-    endif
-End
-
 Function TSR_printReport(tsr)
     STRUCT TestSuiteRunner &tsr
 
-    Variable test_no = TSR_getRunTestCount(tsr)
-    printf "%d tests run: %d successes, %d failures\r", test_no, tsr.successes, tsr.failures
+    Variable test_count = TR_getTestRunCount(tsr.test_result)
+    Variable success_count = TR_getSuccessCount(tsr.test_result)
+    Variable failure_count = TR_getFailureCount(tsr.test_result)
+    Variable error_count = TR_getErrorCount(tsr.test_result)
+    printf "%d tests run: %d successes, %d failures, %d errors\r", test_count, success_count, failure_count, error_count
+
+    printf "\r"
+    TR_printAllErrors(tsr.test_result)
+    TR_printAllFailures(tsr.test_result)
 End
 
 Function TSR_getRunTestCount(tsr)
