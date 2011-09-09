@@ -1,5 +1,7 @@
 #pragma rtGlobals=1		// Use modern global access method.
 
+#pragma hide=1
+
 #ifndef LISTUTILS_INCLUDE
 #define LISTUTILS_INCLUDE
 

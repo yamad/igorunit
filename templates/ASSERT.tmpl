@@ -1,0 +1,17 @@
+#def ASSERT($condition)
+    String msg
+    if ($condition)
+        $SUCCEED("msg")
+    else
+        sprintf msg, "%s is not true", "$condition"
+        $FAIL("msg")
+    endif
+#end def
+
+#def SUCCEED($msg)
+    TR_addSuccess(tr, groupname, testname, $msg)
+#end def
+
+#def FAIL($msg)
+    TR_addFailure(tr, groupname, testname, $msg)
+#end def
