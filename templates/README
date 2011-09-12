@@ -1,0 +1,107 @@
+=================================
+ Cheetah_ templates for IgorUnit
+=================================
+
+General Design
+==============
+
+IgorUnit generates valid Igor code using a Python-based toolkit. Tests
+are defined in a structured way using a set of simple macros to make
+writing tests easy. The templating engine Cheetah_ is used as a
+preprocessor to expand the macros.
+
+This general design is similar to unit test libraries built for the C
+language, such as Unity_ and Check_, which use preprocessor macros to
+do their heavy lifting. Unity_ also provides Ruby-based automatic test
+suite generation. Similarly, IgorUnit automatically generates test
+suites and provides convenience functions to make those suites easy to
+run.
+
+Usage
+=====
+
+Starting and ending a test file
+-------------------------------
+
+A test file must extend the `IgorUnit` template and define the
+`IgorUnit` block/def. Thus, each test file must start with the
+following lines::
+
+  #extends IgorUnit
+  #def IgorUnit
+
+To end the test code file, use::
+
+  #end def
+
+Defining a test group
+---------------------
+
+Test groups allow the sharing of setup/teardown methods across several
+unit tests. They can also be used for simple semantic organization of
+tests. For example, it may often make sense to organize all tests
+dealing with one module or idea into a single test group.
+
+To define a setup and teardown routine for a group, use the TEST_SETUP
+and TEST_TEARDOWN macros::
+
+  $TEST_SETUP(<GROUP_NAME>)
+  // setup body
+  $END_SETUP
+
+  $TEST_TEARDOWN(<GROUP_NAME>)
+  // teardown body
+  $END_TEARDOWN
+
+Defining a test
+---------------
+
+An IgorUnit test has a name and must belong to a group. To define a
+test, use the TEST macro::
+
+  $TEST(<GROUP_NAME>, <TEST_NAME>)
+  // test body
+  $END_TEST
+
+where <GROUP_NAME> and <TEST_NAME> are both strings. Each test is
+uniquely defined by its group and name. That is, no two tests should
+have the same group as well as the same name. If this occurs, only one
+of the tests will be run.
+
+Writing the test body
+---------------------
+
+The TEST macro makes several variables available within the test body:
+
+ - `tr` -- reference to a TestResult instance
+ - `groupname` -- the name of the test group
+ - `testname` -- the name of the test
+ - `msg` -- a string variable for defining the error message
+
+To test a condition in a unit test, the test must call one of a set of
+assertion macros. Any number of assertion macros can be defined in a
+test, but at least one is required for the test to be
+meaningful. Using the assertion macros within the TEST environment
+allows IgorUnit to automatically keep track of useful information
+about the results of each test.
+
+
+List of assertion macros
+------------------------
+
+The following assertion macros are available:
+
++-------------------+-------------------------------------------------------------+
+| Macro             | Description                                                 |
++-------------------+-------------------------------------------------------------+
+| SUCCEED()         | Unconditional test success                                  |
++-------------------+-------------------------------------------------------------+
+| FAIL(message)     | Unconditional test failure, stored with the given `message` |
++-------------------+-------------------------------------------------------------+
+| ASSERT(condition) | Checks that the `condition` is true                         |
++-------------------+-------------------------------------------------------------+
+
+
+.. _Cheetah: <www.cheetahtemplate.org>
+.. _Unity: <www.FINDME.org>
+.. _Check: <www.FINDME.org>
