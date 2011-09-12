@@ -11,6 +11,16 @@
 $ASSERT_BASE($condition, "msg")
 #end def
 
+#def VARS_EQUALS($expected, $actual)
+    sprintf msg, "Expected %s, but was %s", num2str($expected), num2str($actual)
+    $ASSERT_BASE("$expected == $actual", "msg")
+#end def
+
+#def STRINGS_EQUALS($expected, $actual)
+    sprintf msg, "Expected %s, but was %s", "$expected", "$actual"
+    $ASSERT_BASE("cmpstr($expected, $actual) == 0", "msg")
+#end def
+
 #def SUCCEED()
     TR_addSuccess(tr, groupname, testname, "")
 #end def
