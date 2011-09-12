@@ -1,15 +1,18 @@
-#def ASSERT($condition)
-    String msg
+#def ASSERT_BASE($condition, $fail_msg)
     if ($condition)
-        $SUCCEED("msg")
+    $SUCCEED()
     else
-        sprintf msg, "%s is not true", "$condition"
-        $FAIL("msg")
+    $FAIL($fail_msg)
     endif
 #end def
 
-#def SUCCEED($msg)
-    TR_addSuccess(tr, groupname, testname, $msg)
+#def ASSERT($condition)
+    sprintf msg, "%s is not true", "$condition"
+$ASSERT_BASE($condition, "msg")
+#end def
+
+#def SUCCEED()
+    TR_addSuccess(tr, groupname, testname, "")
 #end def
 
 #def FAIL($msg)
