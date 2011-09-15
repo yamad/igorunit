@@ -1,3 +1,7 @@
+## Basic assert structure, tests the condition and issues a test
+## failure if it is false. This macro is the basis for most other test
+## macros, which call ASSERT_BASE to implement the basic IgorUnit
+## assertion structure.
 #def ASSERT_BASE($condition, $fail_msg)
     if ($condition)
     $SUCCEED()
@@ -6,25 +10,40 @@
     endif
 #end def
 
+## Tests whether the condition is true
 #def ASSERT($condition)
-    sprintf msg, "%s is not true", "$condition"
-$ASSERT_BASE($condition, "msg")
+#set $msg = "{0} is not true".format($condition)
+$ASSERT_BASE($condition, $msg)
 #end def
 
-#def VARS_EQUALS($expected, $actual)
-    sprintf msg, "Expected %s, but was %s", num2str($expected), num2str($actual)
-    $ASSERT_BASE("$expected == $actual", "msg")
+## Test that two variables (numbers) are equal
+#def VARS_EQUAL($expected, $actual)
+    #set $msg = $EXPECTED_ERROR_MSG($expected, $actual)
+    #set $condition = "{0} == {1}".format($expected, $actual)
+    $ASSERT_BASE($condition, $msg)
 #end def
 
-#def STRINGS_EQUALS($expected, $actual)
-    sprintf msg, "Expected %s, but was %s", "$expected", "$actual"
-    $ASSERT_BASE("cmpstr($expected, $actual) == 0", "msg")
+## Test that two strings are equal
+#def STRINGS_EQUAL($expected, $actual)
+    #set $msg = $EXPECTED_ERROR_MSG($expected, $actual)
+    #set $condition = 'cmpstr("{0}", "{1}") == 0'.format($expected, $actual)
+    $ASSERT_BASE($condition, $msg)
 #end def
 
+## Signal a test success
 #def SUCCEED()
     TR_addSuccess(tr, groupname, testname, "")
 #end def
 
+## Signal a test failure, with a provided failure message (given as a string)
 #def FAIL($msg)
-    TR_addFailure(tr, groupname, testname, $msg)
+    TR_addFailure(tr, groupname, testname, "$msg")
 #end def
+
+## Signal a test failure, with a failure message (given as a string *variable*)
+#def FAIL_MSGVAR($msg_var)
+     TR_addFailure(tr, groupname, testname, $msg_var)
+#end def
+
+## Returns a string indicating that a test variable (actual) did not evaluate to the expected result
+#def EXPECTED_ERROR_MSG($expected, $actual): Expected <$expected.__repr__()>, but was <$actual.__repr__()>
