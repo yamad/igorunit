@@ -7,7 +7,15 @@ class TemplateTest(unittest2.TestCase):
     def verify(self, expected, template_input):
         """Check that the `template_input` string compiles to the `expected` string
 
-        This routine ignores whitespace differences.
+        Both `template_input` and `expected` are passed through
+        Cheetah. This greatly simplifies writing the `expected` string
+        because any long-winded sections can be wrapped in template
+        method calls. This reduces duplication and provides more
+        focused testing of just the aspect of the template that is of
+        interest.
+
+        The comparison between lines ignores whitespace differences at
+        the beginning/end of lines.
         """
         template = Cheetah.Template.Template(template_input)
 

@@ -33,9 +33,9 @@ class testTemplateBaseTest(TemplateTest):
         """
         expected = u"""
         if (condition == other)
-            TR_addSuccess(tr, groupname, testname, "")
+            $SUCCEED()
         else
-            TR_addFailure(tr, groupname, testname, "Failed!")
+            $FAIL("Failed!")
         endif
         """
         self.verify(expected, template_string)
@@ -47,9 +47,9 @@ class testTemplateBaseTest(TemplateTest):
         """
         expected = u"""
         if (condition == other)
-          TR_addSuccess(tr, groupname, testname, "")
+          $SUCCEED()
         else
-          TR_addFailure(tr, groupname, testname, "condition == other is not true")
+          $FAIL("<condition == other> is not true")
         endif
         """
         self.verify(expected, template_string)
@@ -61,9 +61,9 @@ class testTemplateBaseTest(TemplateTest):
         """
         expected = u"""
         if (cmpstr("strings", "different") == 0)
-        TR_addSuccess(tr, groupname, testname, "")
+          $SUCCEED()
         else
-        TR_addFailure(tr, groupname, testname, "Expected <'strings'>, but was <'different'>")
+          $FAIL("Expected <'strings'>, but was <'different'>")
         endif
         """
         self.verify(expected, template_string)
@@ -75,9 +75,9 @@ class testTemplateBaseTest(TemplateTest):
         """
         expected = u"""
         if (1 == 2)
-        $SUCCEED()
+          $SUCCEED()
         else
-        TR_addFailure(tr, groupname, testname, "Expected <1>, but was <2>")
+          $FAIL("Expected <1>, but was <2>")
         endif
         """
         self.verify(expected, template_string)
