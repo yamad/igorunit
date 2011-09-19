@@ -1,34 +1,4 @@
-import Cheetah.Template
-
-from BaseTest import BaseTest
-
-TEST_TEMPLATE_FILE = "TEST_ipf.frag"
-
-class IgorUnitSuite(BaseTest):
-    def __init__(self):
-        self.suite = IgorTestSuite()
-        super(BaseTest, self).__init__()
-
-    def TEST(self, groupname, testname):
-        """ Macro to begin a unit test definition
-
-        Used to define all unit tests. The test group name and test
-        name must be a unique combination. The following variables are
-        available in each test definition environment:
-
-         - `tr` -- a reference to a TestResult instance
-         - `groupname` -- the name of the test group
-         - `testname` -- the name of the test itself
-        """
-        template_string = self.getFileContents(TEST_TEMPLATE_FILE)
-        namespace = {"groupname":groupname, "testname":testname}
-        filled_template = Cheetah.Template.Template(template_string, namespace)
-
-        self.add_test(groupname, testname)
-        return filled_template
-
-    def add_test(self, groupname, testname):
-        self.suite.add_test(groupname, testname)
+import mako.template
 
 class IgorTestSuite(object):
     def __init__(self):

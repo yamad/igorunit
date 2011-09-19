@@ -1,13 +1,19 @@
+import os
+
 import unittest2
 
 import Cheetah.Template
 
+import mako.template
+import mako.lookup
+
 class TemplateTest(unittest2.TestCase):
     """ Base class for test classes that test templating modules"""
-    def verify(self, expected, template_input):
-        """Check that the `template_input` string compiles to the `expected` string
+    def verify(self, expected_output, input):
+        """Check that the `input` template string compiles to the
+        `expected_output` string
 
-        Both `template_input` and `expected` are passed through
+        Both `input` and `expected_output` are passed through
         Cheetah. This greatly simplifies writing the `expected` string
         because any long-winded sections can be wrapped in template
         method calls. This reduces duplication and provides more
@@ -17,13 +23,13 @@ class TemplateTest(unittest2.TestCase):
         The comparison between lines ignores whitespace differences at
         the beginning/end of lines.
         """
-        template = Cheetah.Template.Template(template_input)
+        lookup = mako.lookup.TemplateLookup([os.getcwd()])
 
-        expected = "#extends ASSERT\n" + expected
-        expected_template = Cheetah.Template.Template(expected)
+        template = mako.template.Template(input, lookup=lookup)
+        compiled_no_ws = strip_to_lines(template.render())
 
-        expected_no_ws = strip_to_lines(expected_template.writeBody())
-        compiled_no_ws = strip_to_lines(template.writeBody())
+        expected_template = mako.template.Template(expected_output, lookup=lookup)
+        expected_no_ws = strip_to_lines(expected_template.render())
         self.assertEquals(expected_no_ws, compiled_no_ws)
 
 def strip_to_lines(input_string):
