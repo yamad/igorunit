@@ -1,6 +1,6 @@
 ## Test definition macros
 <%!
-   import IgorUnitSuite
+   from templates import IgorUnitSuite
    suite = IgorUnitSuite.IgorTestSuite()
 %>
 <%def name="TEST(groupname, testname)">\

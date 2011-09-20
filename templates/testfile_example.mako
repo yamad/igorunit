@@ -1,4 +1,3 @@
-<%include file="IgorUnit.mako"/>
 ${TEST_SETUP("A")}
 ${END_SETUP()}
 
