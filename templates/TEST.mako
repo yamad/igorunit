@@ -21,9 +21,7 @@ End
 </%def>
 
 <%def name="MAIN()">\
-<%
-  suite = self.attr.suite
-%>\
+<% suite = self.attr.suite %>\
 Function runAllTests()
   STRUCT TestSuite ts
   TS_init(ts)
