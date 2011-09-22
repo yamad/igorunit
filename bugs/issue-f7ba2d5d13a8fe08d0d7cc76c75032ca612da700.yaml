@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: generated function names must be <=31 characters
+desc: |-
+  Igor has a 31-char limit on object names. Should ensure that any generated objct names (such as test function names in particular) come in under this limit.
+  
+  Perhaps truncate names over 31 chars. Also could randomize some part of the generated name to ensure uniqueness. The observed name of the test function could be divorced from the generated name to maintain readability of test results.
+type: :bugfix
+component: python-scripts
+release: 
+reporter: Jason Yamada-Hanff <jyamada1@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2011-09-22 05:30:09.127504 Z
+references: []
+
+id: f7ba2d5d13a8fe08d0d7cc76c75032ca612da700
+log_events: 
+- - 2011-09-22 05:30:14.407456 Z
+  - Jason Yamada-Hanff <jyamada1@gmail.com>
+  - created
+  - ""
