@@ -3,6 +3,7 @@
 // IgorUnit -- a unit testing framework for IgorPro based on xUnit
 
 #include "utils"
+#include "assert"
 #include "TestSuiteRunner"
 #include "TestSuite"
 #include "TestResult"
@@ -12,7 +13,7 @@ Function test_All()
     TS_init(ts)
     TS_addGroup(ts, "default")
     TS_addTest(ts, "default", "test1")
-    
+
     STRUCT TestSuiteRunner tsr
     TSR_init(tsr, ts)
     TSR_runAllTests(tsr)

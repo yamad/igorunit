@@ -7,11 +7,12 @@
 Function ${groupname}_${testname}(tr)
   STRUCT TestResult &tr
   String groupname = "${groupname}"
-  String testname = "${testname}"\
+  String testname = "${testname}"
+  String msg = ""\
   <%
     suite = self.attr.suite
     suite.add_test(groupname, testname)
-  %>\
+  %>
 </%def>
 
 <%def name="END_TEST()">\

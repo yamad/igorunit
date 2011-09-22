@@ -56,4 +56,10 @@ Function assertIsNaN(number)
     assert(isNaN(number))
 End
 
+Function/S EXPECTED_ERROR_MSG(expected, actual)
+  String expected, actual
+  sprintf msg, "Expected <%s>, but was <%s>", expected, actual
+  return msg
+End
+
 #endif

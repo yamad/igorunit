@@ -6,7 +6,7 @@
   if (${condition})
   ${SUCCEED()}
   else
-  ${FAIL(fail_msg)}
+  ${FAIL_MSGVAR(fail_msg)}
   endif\
 </%def>
 
@@ -22,7 +22,8 @@ ${ASSERT_BASE(condition, msg)}\
   msg = EXPECTED_ERROR_MSG(expected, actual)
   condition = "{0} == {1}".format(expected, actual)
 %>\
-${ASSERT_BASE(condition, msg)}\
+msg = EXPECTED_ERROR_MSG(num2str(${expected}), num2str(${actual}))
+${ASSERT_BASE(condition, "msg")}\
 </%def>
 
 ## Test that two strings are equal
@@ -31,7 +32,8 @@ ${ASSERT_BASE(condition, msg)}\
   msg = "{0}".format(EXPECTED_ERROR_MSG(expected, actual))
   condition = 'cmpstr("{0}", "{1}") == 0'.format(expected, actual)
 %>\
-${ASSERT_BASE(condition, msg)}\
+msg = EXPECTED_ERROR_MSG(${expected}, ${actual})
+${ASSERT_BASE(condition, "msg")}\
 </%def>
 
 ## Signal a test success
