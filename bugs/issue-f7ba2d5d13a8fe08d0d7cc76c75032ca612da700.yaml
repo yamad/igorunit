@@ -8,8 +8,8 @@ type: :bugfix
 component: python-scripts
 release: 
 reporter: Jason Yamada-Hanff <jyamada1@gmail.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2011-09-22 05:30:09.127504 Z
 references: []
 
@@ -18,4 +18,12 @@ log_events:
 - - 2011-09-22 05:30:14.407456 Z
   - Jason Yamada-Hanff <jyamada1@gmail.com>
   - created
+  - ""
+- - 2011-09-23 06:00:23.025250 Z
+  - Jason Yamada-Hanff <jyamada1@gmail.com>
+  - changed status from unstarted to in_progress
+  - Added a function name argument so groupname and testname are now independent from the actual name of the test function itself. For now, a 6-char random tag is added to the end of the concatenated groupname and testname to form the function name. The function name should mostly be invisible when writing tests using IgorUnit.
+- - 2011-09-23 06:06:01.726250 Z
+  - Jason Yamada-Hanff <jyamada1@gmail.com>
+  - closed with disposition fixed
   - ""

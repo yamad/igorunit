@@ -16,6 +16,7 @@ Constant TESTSUITE_GROUP_MAX = 400
 Structure TestSuite
     String groups
     Wave/T tests
+    Wave/T testfuncs
     Variable test_no
 EndStructure
 
@@ -24,6 +25,7 @@ Function TS_init(ts)
     ts.test_no = 0
     ts.groups = ""
     Make/FREE/T/N=0 ts.tests
+    Make/FREE/T/N=0 ts.testfuncs
 End
 
 Function TS_addGroup(ts, groupname)
@@ -43,15 +45,19 @@ Static Function TS_initNewGroupTestList(ts)
 
     Wave_appendRow(ts.tests)
     ts.tests[Inf] = ""
+
+    Wave_appendRow(ts.testfuncs)
+    ts.testfuncs[Inf] = ""
 End
 
-Function TS_addTest(ts, groupname, testname)
+Function TS_addTest(ts, groupname, testname, funcname)
     STRUCT TestSuite &ts
-    String groupname, testname
+    String groupname, testname, funcname
 
     Variable group_idx = TS_addGroup(ts, groupname)
     if (!TS_hasTest(ts, groupname, testname))
         ts.tests[group_idx] = AddListItem(testname, ts.tests[group_idx], ";", Inf)
+        ts.testfuncs[group_idx] = AddListItem(funcname, ts.testfuncs[group_idx], ";", Inf)
         ts.test_no += 1
     endif
     return TS_getTestIndex(ts, groupname, testname)
@@ -103,6 +109,23 @@ Function/S TS_getGroupTestsByIndex(ts, group_idx)
     return ts.tests[group_idx]
 End
 
+Function/S TS_getGroupTestFuncs(ts, groupname)
+    // Return a list of test functions in a given group
+    STRUCT TestSuite &ts
+    String groupname
+
+    Variable group_idx = TS_getGroupIndex(ts, groupname)
+    return TS_getGroupFuncsByIndex(ts, group_idx)
+End
+
+Function/S TS_getGroupFuncsByIndex(ts, group_idx)
+    // Return a list of test functions in a given group
+    STRUCT TestSuite &ts
+    Variable group_idx
+
+    return ts.testfuncs[group_idx]
+End
+
 Function TS_getGroupTestCount(ts, groupname)
     STRUCT TestSuite &ts
     String groupname
@@ -144,6 +167,15 @@ Function TS_getTestIndex(ts, groupname, testname)
 
     String test_list = TS_getGroupTests(ts, groupname)
     return WhichListItem(testname, test_list, ";")
+End
+
+Function/S TS_getTestFuncName(ts, groupname, testname)
+    STRUCT TestSuite &ts
+    String groupname, testname
+
+    Variable test_idx = TS_getTestIndex(ts, groupname, testname)
+    String func_list = TS_getGroupTestFuncs(ts, groupname)
+    return StringFromList(test_idx, func_list)
 End
 
 Function TS_getTestCount(ts)

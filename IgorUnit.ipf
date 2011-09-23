@@ -12,7 +12,7 @@ Function test_All()
     STRUCT TestSuite ts
     TS_init(ts)
     TS_addGroup(ts, "default")
-    TS_addTest(ts, "default", "test1")
+    TS_addTest(ts, "default", "test1", "default_test1")
 
     STRUCT TestSuiteRunner tsr
     TSR_init(tsr, ts)
@@ -29,5 +29,5 @@ End
 
 Function test1(tr)
     STRUCT TestResult &tr
-    TR_addFailure(tr, "default", "test1", "This is a fake test failure")
+    TR_addFailure(tr, "default", "test1", "default_test1", "This is a fake test failure")
 End

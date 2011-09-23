@@ -58,6 +58,7 @@ End
 
 Function/S EXPECTED_ERROR_MSG(expected, actual)
   String expected, actual
+  String msg
   sprintf msg, "Expected <%s>, but was <%s>", expected, actual
   return msg
 End

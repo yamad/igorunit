@@ -72,7 +72,7 @@ Function TSR_runTest(tsr, groupname, testname)
 
     String setupname = getGroupSetupName(groupname)
     String teardownname = getGroupTeardownName(groupname)
-    String fulltestname = getFullTestName(groupname, testname)
+    String fulltestname = TS_getTestFuncName(tsr.test_suite, groupname, testname)
 
     FUNCREF protofunc group_setup = $setupname
     FUNCREF prototest curr_test = $fulltestname
@@ -86,7 +86,7 @@ Function TSR_runTest(tsr, groupname, testname)
     catch
         Variable err = GetRTError(1)
         String msg = GetErrMessage(err)
-        TR_addError(tsr.test_result, groupname, testname, msg)
+        TR_addError(tsr.test_result, groupname, testname, fulltestname, msg)
     endtry
     TSR_deleteTestDataFolder(tsr, testname)
 End

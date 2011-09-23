@@ -4,15 +4,17 @@
    suite = IgorUnitSuite.IgorTestSuite()
 %>
 <%def name="TEST(groupname, testname)">\
-Function ${groupname}_${testname}(tr)
+<%
+   suite = self.attr.suite
+   test = suite.add_test(groupname, testname)
+   funcname = test.get_funcname()
+%>\
+Function ${funcname}(tr)
   STRUCT TestResult &tr
   String groupname = "${groupname}"
   String testname = "${testname}"
-  String msg = ""\
-  <%
-    suite = self.attr.suite
-    suite.add_test(groupname, testname)
-  %>
+  String funcname = "${funcname}"
+  String msg = ""
 </%def>
 
 <%def name="END_TEST()">\
@@ -26,15 +28,16 @@ Function runAllTests()
   STRUCT TestSuite ts
   TS_init(ts)
 
-  STRUCT TestSuiteRunner tsr
-  TSR_init(tsr, ts)
-
   % for group in suite.groups:
   TS_addGroup(ts, "${group.get_name()}")
   % for test in group.tests:
-  TS_addTest(ts, "${group.get_name()}", "${test.get_name()}")
+  TS_addTest(ts, "${group.get_name()}", "${test.get_name()}", "${test.get_funcname()}")
   % endfor
   % endfor
+
+  STRUCT TestSuiteRunner tsr
+  TSR_init(tsr, ts)
+
   TSR_runAllTests(tsr)
 End
 </%def>

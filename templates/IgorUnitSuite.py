@@ -35,7 +35,7 @@ class IgorTestSuite(object):
         group = self.get_group(groupname)
         if group is None:
             group = self.add_group(groupname)
-        group.add_test(testname)
+        return group.add_test(testname)
 
 class IgorTestGroup(object):
     def __init__(self, groupname):
@@ -87,6 +87,7 @@ class IgorTest(object):
     def __init__(self, groupname, testname):
         self.groupname = groupname
         self.name = testname
+        self.funcname = generate_igor_function_name(groupname, testname)
 
     def get_name(self):
         return self.name
@@ -94,10 +95,10 @@ class IgorTest(object):
     def get_groupname(self):
         return self.groupname
 
-    def get_fullname(self):
-        return "{groupname}_{testname}".format(groupname=self.groupname,
-                                               testname=self.name)
-
+    def get_funcname(self):
+        return self.funcname
+#        return "{groupname}_{testname}".format(groupname=self.groupname,
+#                                               testname=self.name)
     def __eq__(self, other):
         if not isinstance(other, IgorTest):
             raise NotImplementedError
@@ -105,6 +106,29 @@ class IgorTest(object):
         if self.groupname == other.groupname:
             return self.name == other.name
         return False
+
+used_ids = []
+def generate_igor_function_name(groupname, testname):
+    fullname = "{0}_{1}".format(groupname, testname)
+    fullname = fullname[:31]
+
+    tag = generate_unique_tag(used_ids)
+    used_ids.append(tag)
+    fullname = fullname[:-len(tag)] + tag
+    return fullname
+
+import random
+def generate_unique_tag(used_ids=[]):
+    """ Create a random tag of 6 alphanumeric characters different
+    from any found in used_ids"""
+    import random
+    import string
+    possible_chars = string.uppercase + string.digits
+
+    result = random.sample(possible_chars, 6)
+    while u''.join(result) in used_ids:
+        result = random.sample(possible_chars, 6)
+    return u''.join(result)
 
 import unittest
 class TestIgorTest(unittest.TestCase):

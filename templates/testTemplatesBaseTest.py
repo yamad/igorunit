@@ -11,7 +11,7 @@ class testTemplateAssert(TemplateTest):
         ${SUCCEED()}
         """
         expected = self.inherit + u"""
-        TR_addSuccess(tr, groupname, testname, "")
+        TR_addSuccess(tr, groupname, testname, funcname, "")
         """
         self.verify(expected, template_string)
 
