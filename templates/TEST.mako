@@ -15,6 +15,9 @@ Function ${funcname}(tr)
   String testname = "${testname}"
   String funcname = "${funcname}"
   String msg = ""
+
+  STRUCT UnitTest test
+  UnitTest_init(test, groupname, testname, funcname)
 </%def>
 
 <%def name="END_TEST()">\
@@ -28,10 +31,12 @@ Function runAllTests()
   STRUCT TestSuite ts
   TS_init(ts)
 
+  STRUCT UnitTest test
   % for group in suite.groups:
   TS_addGroup(ts, "${group.get_name()}")
   % for test in group.tests:
-  TS_addTest(ts, "${group.get_name()}", "${test.get_name()}", "${test.get_funcname()}")
+  UnitTest_set(test, "${group.get_name()}", "${test.get_name()}", "${test.get_funcname()}")
+  TS_addTest(ts, test)
   % endfor
   % endfor
 

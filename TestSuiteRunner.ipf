@@ -19,21 +19,27 @@ Structure TestSuiteRunner
     Variable curr_test_idx
     STRUCT TestSuite test_suite
     STRUCT TestResult test_result
+    STRUCT TestPrinter test_printer
 EndStructure
 
 Function TSR_init(tsr, ts)
     STRUCT TestSuiteRunner &tsr
     STRUCT TestSuite &ts
 
-    STRUCT TestResult tr
-    TR_init(tr)
-
     tsr.tests_run = 0
     tsr.curr_group_idx = 0
     tsr.curr_grouptest_idx = 0
     tsr.curr_test_idx = 0
     tsr.test_suite = ts
+
+    STRUCT TestResult tr
+    TR_init(tr)
     tsr.test_result = tr
+
+    STRUCT TestPrinter tp
+    TP_init(tp)
+    tsr.test_printer = tp
+    TR_setPrinter(tr, tp)
 End
 
 Function TSR_runAllTests(tsr)
@@ -55,7 +61,9 @@ Function TSR_runNextTest(tsr)
 
     String testname = TSR_getNextTest(tsr)
     String groupname = TSR_getCurrentGroup(tsr)
-    TSR_runTest(tsr, groupname, testname)
+    STRUCT UnitTest test
+    TS_getTest(tsr.test_suite, groupname, testname, test)
+    TSR_runTest(tsr, test)
 End
 
 // Stub for function references
@@ -66,19 +74,18 @@ End
 Function protofunc()
 End
 
-Function TSR_runTest(tsr, groupname, testname)
+Function TSR_runTest(tsr, test)
     STRUCT TestSuiteRunner &tsr
-    String groupname, testname
+    STRUCT UnitTest &test
 
-    String setupname = getGroupSetupName(groupname)
-    String teardownname = getGroupTeardownName(groupname)
-    String fulltestname = TS_getTestFuncName(tsr.test_suite, groupname, testname)
+    String setupname = getGroupSetupName(test.groupname)
+    String teardownname = getGroupTeardownName(test.groupname)
 
     FUNCREF protofunc group_setup = $setupname
-    FUNCREF prototest curr_test = $fulltestname
     FUNCREF protofunc group_teardown = $teardownname
+    FUNCREF prototest curr_test = $test.funcname
 
-    TSR_createTestDataFolder(tsr, testname)
+    TSR_createTestDataFolder(tsr, test.funcname)
     try
         group_setup()
         curr_test(tsr.test_result)
@@ -86,9 +93,9 @@ Function TSR_runTest(tsr, groupname, testname)
     catch
         Variable err = GetRTError(1)
         String msg = GetErrMessage(err)
-        TR_addError(tsr.test_result, groupname, testname, fulltestname, msg)
+        TR_addError(tsr.test_result, test, msg)
     endtry
-    TSR_deleteTestDataFolder(tsr, testname)
+    TSR_deleteTestDataFolder(tsr, test.funcname)
 End
 
 Function/S getGroupSetupName(groupname)
@@ -125,15 +132,10 @@ End
 Function TSR_printReport(tsr)
     STRUCT TestSuiteRunner &tsr
 
-    Variable test_count = TR_getTestRunCount(tsr.test_result)
-    Variable success_count = TR_getSuccessCount(tsr.test_result)
-    Variable failure_count = TR_getFailureCount(tsr.test_result)
-    Variable error_count = TR_getErrorCount(tsr.test_result)
-    printf "%d tests run: %d successes, %d failures, %d errors\r", test_count, success_count, failure_count, error_count
-
-    printf "\r"
-    TR_printAllErrors(tsr.test_result)
-    TR_printAllFailures(tsr.test_result)
+    STRUCT TestPrinter tp
+    TR_getPrinter(tsr.test_result, tp)
+    TP_generateReport(tp, tsr.test_result)
+    print TP_getOutput(tp)
 End
 
 Function TSR_getRunTestCount(tsr)

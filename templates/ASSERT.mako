@@ -38,17 +38,17 @@ ${ASSERT_BASE(condition, "msg")}\
 
 ## Signal a test success
 <%def name="SUCCEED()">\
-    TR_addSuccess(tr, groupname, testname, funcname, "")\
+    TR_addSuccess(tr, test, "")\
 </%def>
 
 ## Signal a test failure, with a provided failure message (given as a string)
 <%def name="FAIL(msg)">\
-    TR_addFailure(tr, groupname, testname, funcname, "${msg}")\
+    TR_addFailure(tr, test, "${msg}")\
 </%def>
 
 ## Signal a test failure, with a failure message (given as a string *variable*)
 <%def name="FAIL_MSGVAR(msg_var)">\
-    TR_addFailure(tr, groupname, testname, funcname, ${msg_var})\
+    TR_addFailure(tr, test, ${msg_var})\
 </%def>
 
 ## Returns a string indicating that a test variable (actual) did not

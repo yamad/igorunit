@@ -35,6 +35,11 @@ Function/S Stack_getRow(full_stack, row_idx)
     return List_getItemByIndex(full_stack, row_idx)
 End
 
+Function/S Stack_getLastRow(full_stack)
+    String full_stack
+    return List_getItemByIndex(full_stack, Stack_getLength(full_stack)-1)
+End
+
 Function/S StackRow_getFunctionName(stack_row)
     String stack_row
     return StringFromList(0, stack_row, ",")

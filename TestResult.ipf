@@ -8,15 +8,23 @@
 
 #include "wave"
 #include "stackinfo"
+#include "UnitTest"
+#include "TestPrinter"
+#include "TestDefect"
 
 Structure TestResult
     Wave/T failures
     Wave/T errors
     Variable tests_run
+    STRUCT TestPrinter test_printer
 EndStructure
 
 Function TR_init(tr)
     STRUCT TestResult &tr
+
+    STRUCT TestPrinter tp
+    TP_init(tp)
+    TR_setPrinter(tr, tp)
 
     // Waves hold information about each test that failed
     //   column 0 is the group name
@@ -40,6 +48,18 @@ Function TR_init(tr)
     SetDimLabel 1, 4, stack_info, tr.errors
 End
 
+Function TR_setPrinter(tr, tp)
+    STRUCT TestResult &tr
+    STRUCT TestPrinter &tp
+    tr.test_printer = tp
+End
+
+Function TR_getPrinter(tr, tp)
+    STRUCT TestResult &tr
+    STRUCT TestPrinter &tp
+    tp = tr.test_printer
+End
+
 Function TR_getFailureCount(tr)
     STRUCT TestResult &tr
     return Wave_getRowCount(tr.failures)
@@ -58,98 +78,91 @@ End
 Function TR_getSuccessCount(tr)
     STRUCT TestResult &tr
     Variable total_tests = TR_getTestRunCount(tr)
-    Variable total_failures = TR_getFailureCount(tr) + TR_getErrorCount(tr)
+    Variable total_failures = TR_getDefectCount(tr)
     return total_tests - total_failures
 End
 
-Function TR_addFailure(tr, group_name, test_name, func_name, message)
+Function TR_getDefectCount(tr)
     STRUCT TestResult &tr
-    String group_name, test_name, func_name, message
-    TR_addFailed(tr.failures, group_name, test_name, func_name, message)
-    TR_addRunTest(tr, group_name, test_name, func_name, message)
-    printf "F"
+    return TR_getFailureCount(tr) + TR_getErrorCount(tr)
 End
 
-Function TR_addError(tr, group_name, test_name, func_name, message)
+Function TR_addFailure(tr, test, message)
     STRUCT TestResult &tr
-    String group_name, test_name, func_name, message
-    TR_addFailed(tr.errors, group_name, test_name, func_name, message)
-    TR_addRunTest(tr, group_name, test_name, func_name, message)
-    printf "E"
+    STRUCT UnitTest &test
+    String message
+    TR_addFailed(tr.failures, test, message)
+    TR_addRunTest(tr, test, message)
+    TP_addFailure(tr.test_printer, test, message)
 End
 
-Function TR_addSuccess(tr, group_name, test_name, func_name, message)
+Function TR_addError(tr, test, message)
     STRUCT TestResult &tr
-    String group_name, test_name, func_name, message
-    TR_addRunTest(tr, group_name, test_name, func_name, message)
-    printf "."
+    STRUCT UnitTest &test
+    String message
+    TR_addFailed(tr.errors, test, message)
+    TR_addRunTest(tr, test, message)
+    TP_addError(tr.test_printer, test, message)
 End
 
-Function TR_addRunTest(tr, group_name, test_name, func_name, message)
+Function TR_addSuccess(tr, test, message)
     STRUCT TestResult &tr
-    String group_name, test_name, func_name, message
+    STRUCT UnitTest &test
+    String message
+    TR_addRunTest(tr, test, message)
+    TP_addSuccess(tr.test_printer, test, message)
+End
+
+Function TR_addRunTest(tr, test, message)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    String message
     tr.tests_run += 1
 End
 
-Static Function TR_addFailed(fail_wave, group_name, test_name, func_name, message)
+Static Function TR_addFailed(fail_wave, test, message)
     Wave/T fail_wave
-    String group_name, test_name, func_name, message
+    STRUCT UnitTest &test
+    String message
 
     Wave_appendRow(fail_wave)
-    fail_wave[Inf][%group_name] = group_name
-    fail_wave[Inf][%test_name] = test_name
-    fail_wave[Inf][%func_name] = func_name
+    fail_wave[Inf][%group_name] = test.groupname
+    fail_wave[Inf][%test_name] = test.testname
+    fail_wave[Inf][%func_name] = test.funcname
     fail_wave[Inf][%message] = message
     fail_wave[Inf][%stack_info] = Stack_getPartialNegativeIndex(2)
 End
 
-Function/S TR_printAllFailures(tr)
+Function TR_getFailureByIndex(tr, fail_idx, output_defect)
     STRUCT TestResult &tr
-
-    Variable failure_count = TR_getFailureCount(tr)
-    if (failure_count == 0)
-        return ""
-    endif
-
-    printf "Test Failures\r"
-    printf "======================================\r"
-    Variable i
-    for (i=0; i < failure_count; i+=1)
-        TR_printFailureByIndex(tr.failures, i)
-        printf "--------------------------------------\r"
-    endfor
+    Variable fail_idx
+    STRUCT TestDefect &output_defect
+    TR_getDefectByIndex(tr.failures, fail_idx, output_defect)
 End
 
-Function/S TR_printAllErrors(tr)
+Function TR_getErrorByIndex(tr, fail_idx, output_defect)
     STRUCT TestResult &tr
-
-    Variable error_count = TR_getErrorCount(tr)
-    if (error_count == 0)
-        return ""
-    endif
-
-    printf "Test Errors\r"
-    printf "======================================\r"
-    Variable i
-    for (i=0; i < error_count; i+=1)
-        TR_printFailureByIndex(tr.errors, i)
-        printf "--------------------------------------\r"
-    endfor
+    Variable fail_idx
+    STRUCT TestDefect &output_defect
+    TR_getDefectByIndex(tr.errors, fail_idx, output_defect)
 End
 
-Function/S TR_printFailureByIndex(fail_wave, fail_idx)
+Function TR_getDefectByIndex(fail_wave, fail_idx, output_defect)
     Wave/T fail_wave
     Variable fail_idx
 
+    STRUCT TestDefect &output_defect
+
     String groupname = fail_wave[fail_idx][%group_name]
     String testname = fail_wave[fail_idx][%test_name]
+    String funcname = fail_wave[fail_idx][%func_name]
+    STRUCT UnitTest test
+    UnitTest_init(test, groupname, testname, funcname)
+
     String message = fail_wave[fail_idx][%message]
     String stack_info = fail_wave[fail_idx][%stack_info]
-
-    String stack_row = Stack_getRow(stack_info, Stack_getLength(stack_info) - 1)
-
-    printf "%s, %s in %s at line %d\r", groupname, testname, StackRow_getFileName(stack_row), StackRow_getLineNumber(stack_row)
-    printf "\t%s\r", message
+    TD_init(output_defect, test, message, stack_info)
+    return 0
 End
 
 #endif

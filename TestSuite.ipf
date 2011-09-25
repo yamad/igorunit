@@ -10,8 +10,7 @@
 #include "utils"
 #include "list"
 #include "wave"
-
-Constant TESTSUITE_GROUP_MAX = 400
+#include "UnitTest"
 
 Structure TestSuite
     String groups
@@ -50,17 +49,27 @@ Static Function TS_initNewGroupTestList(ts)
     ts.testfuncs[Inf] = ""
 End
 
-Function TS_addTest(ts, groupname, testname, funcname)
+Function TS_addTest(ts, test)
     STRUCT TestSuite &ts
-    String groupname, testname, funcname
+    STRUCT UnitTest &test
 
-    Variable group_idx = TS_addGroup(ts, groupname)
-    if (!TS_hasTest(ts, groupname, testname))
-        ts.tests[group_idx] = AddListItem(testname, ts.tests[group_idx], ";", Inf)
-        ts.testfuncs[group_idx] = AddListItem(funcname, ts.testfuncs[group_idx], ";", Inf)
+    Variable group_idx = TS_addGroup(ts, test.groupname)
+    if (!TS_hasTest(ts, test.groupname, test.testname))
+        ts.tests[group_idx] = AddListItem(test.testname, ts.tests[group_idx], ";", Inf)
+        ts.testfuncs[group_idx] = AddListItem(test.funcname, ts.testfuncs[group_idx], ";", Inf)
         ts.test_no += 1
     endif
-    return TS_getTestIndex(ts, groupname, testname)
+    return TS_getTestIndex(ts, test.groupname, test.testname)
+End
+
+// Load UnitTest into output_test
+Function TS_getTest(ts, groupname, testname, output_test)
+    STRUCT TestSuite &ts
+    String groupname, testname
+    STRUCT UnitTest &output_test
+
+    String funcname = TS_getTestFuncName(ts, groupname, testname)
+    UnitTest_set(output_test, groupname, testname, funcname)
 End
 
 Function TS_removeTest(ts, groupname, testname)
