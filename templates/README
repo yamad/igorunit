@@ -72,6 +72,8 @@ The TEST macro makes several variables available within the test body:
  - `tr` -- reference to a TestResult instance
  - `groupname` -- the name of the test group
  - `testname` -- the name of the test
+ - `funcname` -- the name of the test function
+ - `msg` -- string variable for holding an error message
 
 To test a condition in a unit test, the test must call one of a set of
 assertion macros. Any number of assertion macros can be defined in a
