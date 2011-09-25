@@ -108,24 +108,19 @@ Function/S getGroupTeardownName(groupname)
     return groupname + "_teardown"
 End
 
-Function/S getFullTestName(groupname, testname)
-    String groupname, testname
-    return groupname + "_" + testname
-End
-
-Function TSR_createTestDataFolder(tsr, testname)
+Function TSR_createTestDataFolder(tsr, name)
     STRUCT TestSuiteRunner &tsr
-    String testname
+    String name
 
-    String foldername = "Test_" + testname
+    String foldername = "Test_" + name
     NewDataFolder/O/S root:$foldername
 End
 
-Function TSR_deleteTestDataFolder(tsr, testname)
+Function TSR_deleteTestDataFolder(tsr, name)
     STRUCT TestSuiteRunner &tsr
-    String testname
+    String name
 
-    String foldername = "Test_" + testname
+    String foldername = "Test_" + name
     KillDataFolder root:$foldername
 End
 
