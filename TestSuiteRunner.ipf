@@ -11,6 +11,7 @@
 
 #include "TestSuite"
 #include "TestResult"
+#include "TestPrinter"
 
 Structure TestSuiteRunner
     Variable tests_run
@@ -128,6 +129,16 @@ Function TSR_printReport(tsr)
     TR_getPrinter(tsr.test_result, tp)
     TP_generateReport(tp, tsr.test_result)
     print TP_getOutput(tp)
+End
+
+Function TSR_printReportToFile(tsr, fileref)
+    STRUCT TestSuiteRunner &tsr
+    Variable fileref
+
+    STRUCT TestPrinter tp
+    TR_getPrinter(tsr.test_result, tp)
+    TP_generateReport(tp, tsr.test_result)
+    fprintf fileref, "%s", TP_getOutput(tp)
 End
 
 Function TSR_getRunTestCount(tsr)
