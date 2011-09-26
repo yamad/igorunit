@@ -44,15 +44,12 @@ End
 
 Function TSR_runAllTests(tsr)
     STRUCT TestSuiteRunner &tsr
-
     do
         if (TSR_isDone(tsr))
             break
         endif
         TSR_runNextTest(tsr)
     while(1)
-
-    printf "\r"
     TSR_printReport(tsr)
 End
 

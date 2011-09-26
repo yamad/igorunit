@@ -1,4 +1,4 @@
-#pragma rtGlobals=1		// Use modern global access method.
+#pragma rtGlobals=1             // Use modern global access method.
 
 // TestPrinter -- a component of IgorUnit
 //   This interface is responsible for printing the results of a test run
@@ -17,7 +17,7 @@ EndStructure
 Function TP_init(tp)
     STRUCT TestPrinter &tp
     tp.output = ""
-    tp.is_verbose = TRUE
+    tp.is_verbose = FALSE
 End
 
 Function TP_setVerbose(tp, is_verbose)
@@ -122,20 +122,29 @@ Function TP_generateReport(tp, tr)
     STRUCT TestPrinter &tp
     STRUCT TestResult &tr
 
-    tp.output += formatSectionFooter()
+    if (tp.is_verbose == TRUE)
+        tp.output += formatSectionFooter()
+    else
+        tp.output += "\r"
+    endif
     tp.output += formatSummary(tr)
     if (TR_getDefectCount(tr) > 0)
         tp.output += "\r"
         tp.output += formatAllErrors(tr)
         tp.output += formatAllFailures(tr)
     else
-        tp.output += "ALL OK!\r"
+        tp.output += "OK!\r"
     endif
 End
 
 Function/S TP_getOutput(tp)
     STRUCT TestPrinter &tp
     return tp.output
+End
+
+Function TP_clearOutput(tp)
+    STRUCT TestPrinter &tp
+    tp.output = ""
 End
 
 Function/S formatSummary(test_result)
