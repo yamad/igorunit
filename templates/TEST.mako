@@ -35,8 +35,7 @@ Function runAllTests()
   % for group in suite.groups:
   TS_addGroup(ts, "${group.get_name()}")
   % for test in group.tests:
-  UnitTest_set(test, "${group.get_name()}", "${test.get_name()}", "${test.get_funcname()}")
-  TS_addTest(ts, test)
+  TS_addTestByName(ts, "${group.get_name()}", "${test.get_name()}", "${test.get_funcname()}")
   % endfor
   % endfor
 

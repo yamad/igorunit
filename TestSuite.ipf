@@ -62,6 +62,15 @@ Function TS_addTest(ts, test)
     return TS_getTestIndex(ts, test.groupname, test.testname)
 End
 
+Function TS_addTestByName(ts, groupname, testname, funcname)
+    STRUCT TestSuite &ts
+    String groupname, testname, funcname
+
+    STRUCT UnitTest test
+    UnitTest_init(test, groupname, testname, funcname)
+    return TS_addTest(ts, test)
+End
+
 // Load UnitTest into output_test
 Function TS_getTest(ts, groupname, testname, output_test)
     STRUCT TestSuite &ts
