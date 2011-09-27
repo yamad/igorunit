@@ -13,7 +13,7 @@ IgorUnit_ development is tracked in a git_ repository. It has a
 dependency on the igorutils_ package, which is included as a `git
 submodule`_. To get a fully functional IgorUnit distribution::
 
- git clone git://github.com/yamad/igorunit.git
+ git clone git://github.com/yamad/IgorUnit.git
  git submodule init
  git submodule update
 
@@ -166,7 +166,7 @@ The following assertion macros are available:
 .. _Unity: http://throwtheswitch.org/white-papers/unity-intro.html
 .. _Check: http://check.sourceforge.net
 .. _`Igor Pro`: http://www.wavemetrics.com
-.. _`IgorUnit`: http://github.com/yamad/igorunit
+.. _`IgorUnit`: http://github.com/yamad/IgorUnit
 .. _`igorutils`: http://github.com/yamad/igorutils
 .. _git: http://git-scm.com
 .. _`git submodule`: http://schacon.github.com/git/git-submodule.html
