@@ -6,6 +6,22 @@ A unit test framework for `Igor Pro`_
 
 .. contents::
 
+General Design
+==============
+
+IgorUnit_ is an implementation of the xUnit_ test framework for the
+`Igor Pro`_ data analysis language. IgorUnit_ generates valid Igor
+code using a Python_\ -based toolkit. Tests are defined using a set of
+simple macros to make writing tests easy. The templating engine Mako_
+is used as a preprocessor to expand the macros.
+
+This general design is similar to unit test libraries built for the C
+language, such as Unity_ and Check_, which use preprocessor macros to
+do the heavy lifting. Unity_ also provides Ruby-based automatic test
+suite generation. Similarly, `IgorUnit`_ automatically generates test
+suites and provides convenience functions to make those suites easy to
+run.
+
 Install
 =======
 
@@ -24,25 +40,9 @@ Dependencies
 ------------
 
  * Git_ (for obtaining the code)
- * `Igor Pro 6.2 or higher <www.wavemetrics.com>`_
- * `Python 2.7 <www.python.org>`_ (Python 3 support is forthcoming)
+ * `Igor Pro 6.2 <http://www.wavemetrics.com>`_ or higher
+ * `Python 2.7 <http://www.python.org>`_ (Python 3 support is forthcoming)
  * Mako_ templating engine
-
-General Design
-==============
-
-IgorUnit_ is an implementation of the xUnit_ test framework for the
-`Igor Pro`_ data analysis language. IgorUnit_ generates valid Igor
-code using a Python_ -based toolkit. Tests are defined using a set of
-simple macros to make writing tests easy. The templating engine Mako_
-is used as a preprocessor to expand the macros.
-
-This general design is similar to unit test libraries built for the C
-language, such as Unity_ and Check_, which use preprocessor macros to
-do the heavy lifting. Unity_ also provides Ruby-based automatic test
-suite generation. Similarly, `IgorUnit`_ automatically generates test
-suites and provides convenience functions to make those suites easy to
-run.
 
 Usage
 =====
