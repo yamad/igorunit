@@ -2,7 +2,6 @@
 
 // IgorUnit -- a unit testing framework for IgorPro based on xUnit
 
-#include "utils"
 #include "assert"
 #include "UnitTest"
 #include "TestSuiteRunner"

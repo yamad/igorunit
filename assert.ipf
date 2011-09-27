@@ -3,8 +3,6 @@
 #ifndef IGORUNIT_ASSERT
 #define IGORUNIT_ASSERT
 
-#include "utils"
-
 Function/S EXPECTED_ERROR_MSG(expected, actual)
   String expected, actual
   String msg
