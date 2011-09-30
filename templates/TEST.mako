@@ -27,7 +27,7 @@ End
 
 <%def name="MAIN()">\
 <% suite = self.attr.suite %>\
-Function runAllTests()
+Function/S runAllTests_getResults()
   STRUCT TestSuite ts
   TS_init(ts)
 
@@ -42,7 +42,11 @@ Function runAllTests()
   STRUCT TestSuiteRunner tsr
   TSR_init(tsr, ts)
 
-  TSR_runAllTests(tsr)
+  return TSR_runAllTests(tsr)
+End
+
+Function runAllTests()
+  print runAllTests_getResults()
 End
 </%def>
 

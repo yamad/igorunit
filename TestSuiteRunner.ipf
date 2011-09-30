@@ -42,7 +42,7 @@ Function TSR_init(tsr, ts)
     TR_setPrinter(tr, tp)
 End
 
-Function TSR_runAllTests(tsr)
+Function/S TSR_runAllTests(tsr)
     STRUCT TestSuiteRunner &tsr
     do
         if (TSR_isDone(tsr))
@@ -50,7 +50,7 @@ Function TSR_runAllTests(tsr)
         endif
         TSR_runNextTest(tsr)
     while(1)
-    TSR_printReport(tsr)
+    return TSR_printReport(tsr)
 End
 
 Function TSR_runNextTest(tsr)
@@ -121,13 +121,13 @@ Function TSR_deleteTestDataFolder(tsr, name)
     KillDataFolder root:$foldername
 End
 
-Function TSR_printReport(tsr)
+Function/S TSR_printReport(tsr)
     STRUCT TestSuiteRunner &tsr
 
     STRUCT TestPrinter tp
     TR_getPrinter(tsr.test_result, tp)
     TP_generateReport(tp, tsr.test_result)
-    print TP_getOutput(tp)
+    return TP_getOutput(tp)
 End
 
 Function TSR_printReportToFile(tsr, fileref)

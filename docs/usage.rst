@@ -25,11 +25,22 @@ output::
 
 I recommend saving `make_tests` output to an \*.ipf file in a directory
 on the Igor search path. This way, the resulting procedure file can be
-easily included into Igor code. To run the tests, include the
-procedure file into your Igor experiment procedure window::
+easily included into Igor code.
+
+Running tests within Igor
+-------------------------
+
+To run the tests, include the procedure file into your Igor experiment
+procedure window (make sure the file is a folder on your Igor path)::
 
  #include "output_file"
 
 Then, from the Igor command window, call the `runAllTests` function::
 
  runAllTests()
+
+For capturing the test output (instead of spitting it out on the Igor
+command line), use::
+
+ runAllTests_getResults()
+
