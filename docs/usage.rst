@@ -1,6 +1,23 @@
 Usage
 =====
 
+The main program is `igorunit.py`. To use it, run it inside a
+directory on the Igor search path and pass it one or more test files::
+
+ $ cd {path/to/igor/path/dir}
+ $ igorunit {path/to/test_file_1} {path/to/test_file_2}
+
+`igorunit` will compile and run the tests it finds in the test files
+you feed it. It will return the results of the test run directly.
+
+make_tests
+----------
+
+.. note:: `make_tests` contains code to generate Igor code from test
+   files, but does not integrate directly with Igor. `make_tests` will
+   soon be deprecated in favor of `igorunit`, which will provide an
+   option to work just like `make_tests`.
+
 The `make_tests.py` script transforms `IgorUnit`_ test files into
 valid Igor code. The resulting code can be included and run like any
 Igor procedure file (\*.ipf). The rest of this section describes the

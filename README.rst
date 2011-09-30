@@ -43,6 +43,8 @@ Dependencies
  * `Igor Pro 6.2 <http://www.wavemetrics.com>`_ or higher
  * `Python 2.7 <http://www.python.org>`_ (Python 3 support is forthcoming)
  * Mako_ templating engine
+ * appscript_ (for Mac OS X)
+ * pywin32_ (for Windows)
 
 .. _Mako: http://www.makotemplates.org
 .. _Unity: http://throwtheswitch.org/white-papers/unity-intro.html
@@ -54,3 +56,5 @@ Dependencies
 .. _`git submodule`: http://schacon.github.com/git/git-submodule.html
 .. _xUnit: http://www.junit.org
 .. _Python: http://www.python.org
+.. _appscript: http://appscript.sourceforge.net/py-appscript/index.html
+.. _pywin32: http://sourceforge.net/projects/pywin32/
