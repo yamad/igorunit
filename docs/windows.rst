@@ -75,7 +75,7 @@ Now, calling Windows Python is easy::
 
 You may also want to permanently add `~/bin` to your PATH::
  
- $ echo "export PATH=~/bin:PATH" >> ~/.bash_profile
+ $ echo "export PATH=~/bin:$PATH" >> ~/.bash_profile
 
 .. _Python: http://www.python.org
 .. _Cygwin: http://www.cygwin.com
