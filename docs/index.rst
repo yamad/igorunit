@@ -3,8 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to IgorUnit's documentation!
-====================================
+IgorUnit
+========
+
+IgorUnit_ is an implementation of the xUnit_ test framework for the
+`Igor Pro`_ data analysis language. 
+
+IgorUnit_ generates valid Igor code using a Python_\ -based toolkit. Tests are
+defined using a set of simple macros to make writing tests easy.
+
+.. _`IgorUnit`: http://github.com/yamad/igorunit
+.. _`Igor Pro`: http://www.wavemetrics.com
+.. _xUnit: http://www.junit.org
+.. _Python: http://www.python.org
 
 Contents:
 
