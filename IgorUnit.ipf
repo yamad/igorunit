@@ -7,3 +7,10 @@
 #include "TestSuiteRunner"
 #include "TestSuite"
 #include "TestResult"
+
+// Test files are Igor notebooks that start with the string *test*
+Function/S TestFiles_getAll()
+    // Returns a list of all Notebooks (WIN:16) starting with the
+    // string *test*
+    return WinList("test*", ";", "WIN:16")
+End
