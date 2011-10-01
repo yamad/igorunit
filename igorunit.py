@@ -1,6 +1,8 @@
-import make_tests
+#!/usr/bin/env python
 
 import os, sys
+
+import make_tests
 
 def communicator_factory():
     if sys.platform == 'darwin':        # Mac OS X
@@ -25,15 +27,29 @@ class MacIgorCommunicator(IgorCommunicator):
     def execute(self, cmd):
         return self.igorapp.Do_Script(cmd)
 
+    def is_op_queue_empty(self):
+        # As far as I can tell, Igor does not provide a way to
+        # determine the status of the operation queue on Mac. For now,
+        # the op queue appears to block operations until it is done,
+        # so things work. But we are basically crossing our fingers
+        # that the procedure compilation completes before we ask for a
+        # test run.
+        return True
+
 class WinIgorCommunicator(IgorCommunicator):
     def __init__(self):
         import win32com.client
-        self.igorapp = win32com.client.Dispatch("IgorPro.Application")
+        # using gencache.EnsureDispatch instead of Dispatch to load
+        # enumerations
+        self.igorapp = win32com.client.gencache.EnsureDispatch("IgorPro.Application")
+        self.constants = win32com.client.constants
 
     def execute(self, cmd):
-        """ Executes the given Igor command `cmd` and returns the result, if any.
+        """ Executes the given Igor command `cmd` and returns the
+        result, if any.
 
-        For Windows, this command wraps the Execute2 Igor automation function
+        For Windows, this command wraps the Execute2 Igor automation
+        function
         """
         flag_nolog = 0                  # do not log in Igor history area
         code_page = 0                   # use system default code page
@@ -49,6 +65,10 @@ class WinIgorCommunicator(IgorCommunicator):
                                              err_code, err_msg, history, results)
         err_code, err_msg, history, results = result_tuple
         return results
+
+    def is_op_queue_empty(self):
+        return self.igorapp.Status1(
+            self.constants.ipStatusOperationQueueIsEmpty)
 
 class IgorCommandGenerator(object):
     def insert_include(self, include_name):
@@ -111,6 +131,12 @@ class IgorCommand(object):
         self.delete_include(include_name)
         self.compile_procedures()
 
+    def is_compiled(self):
+        # The more direct test for procedure compile status does not
+        # seem to work, so use proxy check that all operations in the
+        # op queue have completed.
+        return bool(self.comm.is_op_queue_empty())
+
 def convert_to_python_newlines(igor_result):
     return igor_result.replace("\r", "\n")
 
@@ -121,6 +147,7 @@ def write_tests_to_file(filepath, test_files):
     proc_file.close()
     return filepath
 
+import time
 def main(argv):
     test_files = argv
     filepath = os.path.join(os.getcwd(), "testfile.ipf")
@@ -131,6 +158,11 @@ def main(argv):
     command = IgorCommand(comm, gen)
 
     command.include_and_compile("testfile")
+    compile_time = 0
+    while command.is_compiled() is not True:
+        time.sleep(0.5)
+        compile_time += 0.5
+    print "Time to compile: {0}sec".format(compile_time)
     res = command.return_result("runAllTests_getResults()")
     command.uninclude_and_compile("testfile")
     return res
