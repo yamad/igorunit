@@ -30,7 +30,7 @@ ${ASSERT_BASE(condition, "msg")}\
 <%def name="STRINGS_EQUAL(expected, actual)">\
 <%
   msg = "{0}".format(EXPECTED_ERROR_MSG(expected, actual))
-  condition = 'cmpstr("{0}", "{1}") == 0'.format(expected, actual)
+  condition = 'cmpstr({0}, {1}) == 0'.format(expected, actual)
 %>\
 msg = EXPECTED_ERROR_MSG(${expected}, ${actual})
 ${ASSERT_BASE(condition, "msg")}\
