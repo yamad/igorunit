@@ -26,12 +26,13 @@ Install
 =======
 
 IgorUnit_ development is tracked in a git_ repository. It has a
-dependency on the igorutils_ package, which is included as a `git
-submodule`_. To get a fully functional IgorUnit distribution::
+dependency on the igorutils_ package, which must be on the Igor search
+path for IgorUnit_ to work.
 
- git clone git://github.com/yamad/igorunit.git
- git submodule init
- git submodule update
+To install, download both the IgorUnit_ and igorutils_ packages and
+place the folders in the User Procedures directory. See the "Shared
+Procedure Files" and "Igor Pro User Files" help topics in the Igor
+help system for more information on installing Igor packages.
 
 You will also need to ensure that a Python_ interpreter is available
 and that the python package Mako_ is installed.
@@ -41,6 +42,7 @@ Dependencies
 
  * Git_ (for obtaining the code)
  * `Igor Pro 6.2 <http://www.wavemetrics.com>`_ or higher
+ * igorutils_
  * `Python 2.7 <http://www.python.org>`_ (Python 3 support is forthcoming)
  * Mako_ templating engine
  * appscript_ (for Mac OS X)
