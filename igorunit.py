@@ -36,6 +36,9 @@ class MacIgorCommunicator(IgorCommunicator):
         # test run.
         return True
 
+    def is_proc_compiled(self):
+        return True
+
 class WinIgorCommunicator(IgorCommunicator):
     def __init__(self):
         import win32com.client
@@ -69,6 +72,10 @@ class WinIgorCommunicator(IgorCommunicator):
     def is_op_queue_empty(self):
         return self.igorapp.Status1(
             self.constants.ipStatusOperationQueueIsEmpty)
+
+    def is_proc_compiled(self):
+        return self.igorapp.Status1(
+            self.constants.ipStatusProceduresCompiled)
 
 class IgorCommandGenerator(object):
     def insert_include(self, include_name):
@@ -135,7 +142,7 @@ class IgorCommand(object):
         # The more direct test for procedure compile status does not
         # seem to work, so use proxy check that all operations in the
         # op queue have completed.
-        return bool(self.comm.is_op_queue_empty())
+        return bool(self.comm.is_proc_compiled())
 
 def convert_to_python_newlines(igor_result):
     return igor_result.replace("\r", "\n")
@@ -150,21 +157,24 @@ def write_tests_to_file(filepath, test_files):
 import time
 def main(argv):
     test_files = argv
-    filepath = os.path.join(os.getcwd(), "testfile.ipf")
+    test_file_rootname = os.path.splitext(os.path.basename(test_files[0]))[0]
+    testfilename = "{0}_tests".format(test_file_rootname)
+    filepath = os.path.join(os.getcwd(), testfilename + ".ipf")
     fpath = write_tests_to_file(filepath, test_files)
+    print "Time to compile: ",
 
     comm = communicator_factory()
     gen = IgorCommandGenerator()
     command = IgorCommand(comm, gen)
 
-    command.include_and_compile("testfile")
+    command.include_and_compile(testfilename)
     compile_time = 0
     while command.is_compiled() is not True:
         time.sleep(0.5)
         compile_time += 0.5
-    print "Time to compile: {0}sec".format(compile_time)
+    print "{0}sec".format(compile_time)
     res = command.return_result("runAllTests_getResults()")
-    command.uninclude_and_compile("testfile")
+    command.uninclude_and_compile(testfilename)
     return res
 
 if __name__ == '__main__':
