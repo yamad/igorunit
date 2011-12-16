@@ -182,7 +182,7 @@ Function TSR_isCurrentGroupDone(tsr)
     STRUCT TestSuiteRunner &tsr
 
     String groupname = TSR_getCurrentGroup(tsr)
-    if (TS_getGroupTestCount(tsr.test_suite, groupname) == tsr.curr_test_idx)
+    if (TS_getGroupTestCount(tsr.test_suite, groupname) == tsr.curr_grouptest_idx)
         return TRUE
     endif
     return FALSE
