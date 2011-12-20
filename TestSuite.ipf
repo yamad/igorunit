@@ -6,9 +6,10 @@
 #ifndef IGORUNIT_TS
 #define IGORUNIT_TS
 
-#include "boolean"
-#include "list"
-#include "wave"
+#include "booleanutils"
+#include "listutils"
+#include "waveutils"
+
 #include "UnitTest"
 
 Structure TestSuite

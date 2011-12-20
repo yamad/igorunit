@@ -6,7 +6,8 @@
 #ifndef IGORUNIT_TESTPRINTER
 #define IGORUNIT_TESTPRINTER
 
-#include "boolean"
+#include "booleanutils"
+
 #include "UnitTest"
 
 Structure TestPrinter

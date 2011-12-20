@@ -6,8 +6,9 @@
 #ifndef IGORUNIT_TESTRESULT
 #define IGORUNIT_TESTRESULT
 
-#include "wave"
-#include "stackinfo"
+#include "waveutils"
+#include "stackinfoutils"
+
 #include "UnitTest"
 #include "TestPrinter"
 #include "TestDefect"
