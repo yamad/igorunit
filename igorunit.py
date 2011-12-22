@@ -54,7 +54,7 @@ class WinIgorCommunicator(IgorCommunicator):
         For Windows, this command wraps the Execute2 Igor automation
         function
         """
-        flag_nolog = 0                  # do not log in Igor history area
+        flag_nolog = 1                  # do not log in Igor history area
         code_page = 0                   # use system default code page
 
         # Igor requires the following dummy output variables to be passed
@@ -168,7 +168,8 @@ def main(argv):
     command = IgorCommand(comm, gen)
 
     command.include_and_compile(testfilename)
-    compile_time = 0
+    compile_time = 2.0
+    time.sleep(2.0)
     while command.is_compiled() is not True:
         time.sleep(0.5)
         compile_time += 0.5
