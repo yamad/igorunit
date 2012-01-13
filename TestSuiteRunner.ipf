@@ -7,6 +7,7 @@
 #define IGORUNIT_TSR
 
 #include "booleanutils"
+#include "datafolderutils"
 
 #include "TestSuite"
 #include "TestResult"
@@ -21,6 +22,41 @@ Structure TestSuiteRunner
     STRUCT TestResult test_result
     STRUCT TestPrinter test_printer
 EndStructure
+
+Function TSR_persist(tsr, to_dfpath)
+    STRUCT TestSuiteRunner &tsr
+    String to_dfpath
+
+    DFREF to_dfref = DataFolder_create(to_dfpath)
+    Variable/G to_dfref:tests_run = tsr.tests_run
+    Variable/G to_dfref:curr_group_idx = tsr.curr_group_idx
+    Variable/G to_dfref:curr_grouptest_idx = tsr.curr_grouptest_idx
+    Variable/G to_dfref:curr_test_idx = tsr.curr_test_idx
+    TS_persist(tsr.test_suite, to_dfpath+":test_suite")
+    TR_persist(tsr.test_result, to_dfpath+":test_result")
+    TP_persist(tsr.test_printer, to_dfpath+":test_printer")
+End
+
+Function TSR_load(tsr, from_dfpath)
+    STRUCT TestSuiteRunner &tsr
+    String from_dfpath
+
+    DFREF from_dfref = DataFolder_getDFRfromPath(from_dfpath)
+    NVAR tests_run = from_dfref:tests_run
+    NVAR curr_group_idx = from_dfref:curr_group_idx
+    NVAR curr_grouptest_idx = from_dfref:curr_grouptest_idx
+    NVAR curr_test_idx = from_dfref:curr_test_idx
+
+    tsr.tests_run = tests_run
+    tsr.curr_group_idx = curr_group_idx
+    tsr.curr_grouptest_idx = curr_grouptest_idx
+    tsr.curr_test_idx = curr_test_idx
+    TS_load(tsr.test_suite, from_dfpath+":test_suite")
+    TR_load(tsr.test_result, from_dfpath+":test_result")
+    TP_load(tsr.test_printer, from_dfpath+":test_printer")
+
+    KillDataFolder from_dfref
+End
 
 Function TSR_init(tsr, ts)
     STRUCT TestSuiteRunner &tsr

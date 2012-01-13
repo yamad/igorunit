@@ -9,6 +9,7 @@
 #include "booleanutils"
 #include "listutils"
 #include "waveutils"
+#include "datafolderutils"
 
 #include "UnitTest"
 
@@ -18,6 +19,34 @@ Structure TestSuite
     Wave/T testfuncs
     Variable test_no
 EndStructure
+
+Function TS_persist(ts, to_dfpath)
+    STRUCT TestSuite &ts
+    String to_dfpath
+    
+    DFREF to_dfref = DataFolder_create(to_dfpath)
+    String/G to_dfref:groups = ts.groups
+    MoveWave ts.tests, to_dfref:tests
+    MoveWave ts.testfuncs, to_dfref:testfuncs
+    Variable/G to_dfref:test_no = ts.test_no
+End
+
+Function TS_load(ts, from_dfpath)
+    STRUCT TestSuite &ts
+    String from_dfpath
+    
+    DFREF from_dfref = DataFolder_getDFRfromPath(from_dfpath)
+    SVAR groups = from_dfref:groups
+    NVAR test_no = from_dfref:test_no
+
+    Wave/T ts.tests = from_dfref:tests
+    Wave/T ts.testfuncs = from_dfref:testfuncs
+
+    ts.groups = groups
+    ts.test_no = test_no
+
+    KillDataFolder from_dfref
+End
 
 Function TS_init(ts)
     STRUCT TestSuite &ts

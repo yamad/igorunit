@@ -20,6 +20,33 @@ Structure TestResult
     STRUCT TestPrinter test_printer
 EndStructure
 
+Function TR_persist(tr, to_dfpath)
+    STRUCT TestResult &tr
+    String to_dfpath
+
+    DFREF to_dfref = DataFolder_create(to_dfpath)
+    Variable/G to_dfref:tests_run = tr.tests_run
+    MoveWave tr.failures, to_dfref:failures
+    MoveWave tr.errors, to_dfref:errors
+    TP_persist(tr.test_printer, to_dfpath+":test_printer")
+End
+
+Function TR_load(tr, from_dfpath)
+    STRUCT TestResult &tr
+    String from_dfpath
+
+    DFREF from_dfref = DataFolder_getDFRfromPath(from_dfpath)
+    NVAR tests_run = from_dfref:tests_run
+
+    Wave/T tr.failures = from_dfref:failures
+    Wave/T tr.errors = from_dfref:errors
+
+    tr.tests_run = tests_run
+    TP_load(tr.test_printer, from_dfpath+":test_printer")
+
+    KillDataFolder from_dfref
+End
+
 Function TR_init(tr)
     STRUCT TestResult &tr
 
