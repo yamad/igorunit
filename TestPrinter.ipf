@@ -15,26 +15,23 @@ Structure TestPrinter
     Variable is_verbose
 EndStructure
 
-Function TP_persist(tp, to_dfpath)
+Function TP_persist(tp, to_dfref)
     STRUCT TestPrinter &tp
-    String to_dfpath
-    DFREF to_dfref = DataFolder_create(to_dfpath)
+    DFREF to_dfref
+
     String/G to_dfref:output = tp.output
     Variable/G to_dfref:is_verbose = tp.is_verbose
 End
 
-Function TP_load(tp, from_dfpath)
+Function TP_load(tp, from_dfref)
     STRUCT TestPrinter &tp
-    String from_dfpath
-    DFREF from_dfref = DataFolder_getDFRfromPath(from_dfpath)
+    DFREF from_dfref
 
     SVAR output = from_dfref:output
     NVAR is_verbose = from_dfref:is_verbose
 
     tp.output = output
     tp.is_verbose = is_verbose
-
-    KillDataFolder from_dfref
 End
 
 Function TP_init(tp)

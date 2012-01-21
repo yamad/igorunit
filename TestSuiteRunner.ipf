@@ -20,28 +20,27 @@ Structure TestSuiteRunner
     Variable curr_test_idx
     STRUCT TestSuite test_suite
     STRUCT TestResult test_result
-    STRUCT TestPrinter test_printer
 EndStructure
 
-Function TSR_persist(tsr, to_dfpath)
+Function TSR_persist(tsr, to_dfref)
     STRUCT TestSuiteRunner &tsr
-    String to_dfpath
+    DFREF to_dfref
 
-    DFREF to_dfref = DataFolder_create(to_dfpath)
     Variable/G to_dfref:tests_run = tsr.tests_run
     Variable/G to_dfref:curr_group_idx = tsr.curr_group_idx
     Variable/G to_dfref:curr_grouptest_idx = tsr.curr_grouptest_idx
     Variable/G to_dfref:curr_test_idx = tsr.curr_test_idx
-    TS_persist(tsr.test_suite, to_dfpath+":test_suite")
-    TR_persist(tsr.test_result, to_dfpath+":test_result")
-    TP_persist(tsr.test_printer, to_dfpath+":test_printer")
+
+    NewDataFolder/O to_dfref:test_suite
+    NewDataFolder/O to_dfref:test_result
+    TS_persist(tsr.test_suite, to_dfref:test_suite)
+    TR_persist(tsr.test_result, to_dfref:test_result)
 End
 
-Function TSR_load(tsr, from_dfpath)
+Function TSR_load(tsr, from_dfref)
     STRUCT TestSuiteRunner &tsr
-    String from_dfpath
+    DFREF from_dfref
 
-    DFREF from_dfref = DataFolder_getDFRfromPath(from_dfpath)
     NVAR tests_run = from_dfref:tests_run
     NVAR curr_group_idx = from_dfref:curr_group_idx
     NVAR curr_grouptest_idx = from_dfref:curr_grouptest_idx
@@ -51,11 +50,8 @@ Function TSR_load(tsr, from_dfpath)
     tsr.curr_group_idx = curr_group_idx
     tsr.curr_grouptest_idx = curr_grouptest_idx
     tsr.curr_test_idx = curr_test_idx
-    TS_load(tsr.test_suite, from_dfpath+":test_suite")
-    TR_load(tsr.test_result, from_dfpath+":test_result")
-    TP_load(tsr.test_printer, from_dfpath+":test_printer")
-
-    KillDataFolder from_dfref
+    TS_load(tsr.test_suite, from_dfref:test_suite)
+    TR_load(tsr.test_result, from_dfref:test_result)
 End
 
 Function TSR_init(tsr, ts)
@@ -74,13 +70,14 @@ Function TSR_init(tsr, ts)
 
     STRUCT TestPrinter tp
     TP_init(tp)
-    tsr.test_printer = tp
     TR_setPrinter(tr, tp)
 End
 
 Function/S TSR_runAllTests(tsr)
     STRUCT TestSuiteRunner &tsr
+    TSR_persist(tsr, IgorUnit_getCurrentTSR())
     do
+        TSR_load(tsr, IgorUnit_getCurrentTSR())
         if (TSR_isDone(tsr))
             break
         endif
@@ -99,11 +96,6 @@ Function TSR_runNextTest(tsr)
     TSR_runTest(tsr, test)
 End
 
-// Stub for function references
-Function prototest(tr)
-    STRUCT TestResult &tr
-End
-
 Function protofunc()
 End
 
@@ -116,17 +108,24 @@ Function TSR_runTest(tsr, test)
 
     FUNCREF protofunc group_setup = $setupname
     FUNCREF protofunc group_teardown = $teardownname
-    FUNCREF prototest curr_test = $test.funcname
+    FUNCREF protofunc curr_test = $test.funcname
 
     TSR_createTestDataFolder(tsr, test.funcname)
     try
+        TSR_persist(tsr, IgorUnit_getCurrentTSR())
         group_setup()
-        curr_test(tsr.test_result)
+        curr_test()
         group_teardown()
+        TSR_load(tsr, IgorUnit_getCurrentTSR())
     catch
-        Variable err = GetRTError(1)
-        String msg = GetErrMessage(err)
-        TR_addError(tsr.test_result, test, msg)
+        if (V_AbortCode == ASSERTION_FAILURE)
+            // do not run other tests if assertion fails
+        else
+            // handle all other aborts as test errors
+            Variable err = GetRTError(1)
+            String msg = GetErrMessage(err)
+            TR_addError(tsr.test_result, test, msg)
+        endif
     endtry
     TSR_deleteTestDataFolder(tsr, test.funcname)
 End

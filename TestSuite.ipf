@@ -17,43 +17,47 @@ Structure TestSuite
     String groups
     Wave/T tests
     Wave/T testfuncs
-    Variable test_no
+    Variable test_count
+    Variable group_count
 EndStructure
 
-Function TS_persist(ts, to_dfpath)
+Function TS_persist(ts, to_dfref)
     STRUCT TestSuite &ts
-    String to_dfpath
-    
-    DFREF to_dfref = DataFolder_create(to_dfpath)
+    DFREF to_dfref
+
     String/G to_dfref:groups = ts.groups
-    MoveWave ts.tests, to_dfref:tests
-    MoveWave ts.testfuncs, to_dfref:testfuncs
-    Variable/G to_dfref:test_no = ts.test_no
+
+    Duplicate/O/T ts.tests, to_dfref:tests
+    Duplicate/O/T ts.testfuncs, to_dfref:testfuncs
+
+    Variable/G to_dfref:test_count = ts.test_count
+    Variable/G to_dfref:group_count = ts.group_count
 End
 
-Function TS_load(ts, from_dfpath)
+Function TS_load(ts, from_dfref)
     STRUCT TestSuite &ts
-    String from_dfpath
-    
-    DFREF from_dfref = DataFolder_getDFRfromPath(from_dfpath)
-    SVAR groups = from_dfref:groups
-    NVAR test_no = from_dfref:test_no
+    DFREF from_dfref
 
-    Wave/T ts.tests = from_dfref:tests
-    Wave/T ts.testfuncs = from_dfref:testfuncs
+    SVAR groups = from_dfref:groups
+    NVAR test_count = from_dfref:test_count
+    NVAR group_count = from_dfref:group_count
+
+    Duplicate/O/T from_dfref:tests, ts.tests
+    Duplicate/O/T from_dfref:testfuncs, ts.testfuncs
 
     ts.groups = groups
-    ts.test_no = test_no
-
-    KillDataFolder from_dfref
+    ts.test_count = test_count
+    ts.group_count = group_count
 End
 
+Static Constant GROUP_BLOCK_SIZE=10
 Function TS_init(ts)
     STRUCT TestSuite &ts
-    ts.test_no = 0
+    ts.test_count = 0
+    ts.group_count = 0
     ts.groups = ""
-    Make/FREE/T/N=0 ts.tests
-    Make/FREE/T/N=0 ts.testfuncs
+    Make/FREE/T/N=(GROUP_BLOCK_SIZE) ts.tests
+    Make/FREE/T/N=(GROUP_BLOCK_SIZE) ts.testfuncs
 End
 
 Function TS_addGroup(ts, groupname)
@@ -61,9 +65,10 @@ Function TS_addGroup(ts, groupname)
     String groupname
 
     if (!TS_hasGroup(ts, groupname))
-        ts.groups = AddListItem(groupname, ts.groups, ";", Inf)
+        ts.groups = List_addItem(ts.groups, groupname)
         TS_initNewGroupTestList(ts)
     endif
+    ts.group_count += 1
     return TS_getGroupIndex(ts, groupname)
 End
 
@@ -71,11 +76,12 @@ Static Function TS_initNewGroupTestList(ts)
     STRUCT TestSuite &ts
     Variable group_count = TS_getGroupCount(ts)
 
-    Wave_appendRow(ts.tests)
-    ts.tests[Inf] = ""
-
-    Wave_appendRow(ts.testfuncs)
-    ts.testfuncs[Inf] = ""
+    if (group_count+1 > Wave_getRowCount(ts.tests))
+        Wave_expandRows(ts.tests)
+        Wave_expandRows(ts.testfuncs)
+    endif
+    ts.tests[group_count,Inf] = ""
+    ts.testfuncs[group_count,Inf] = ""
 End
 
 Function TS_addTest(ts, test)
@@ -84,9 +90,9 @@ Function TS_addTest(ts, test)
 
     Variable group_idx = TS_addGroup(ts, test.groupname)
     if (!TS_hasTest(ts, test.groupname, test.testname))
-        ts.tests[group_idx] = AddListItem(test.testname, ts.tests[group_idx], ";", Inf)
-        ts.testfuncs[group_idx] = AddListItem(test.funcname, ts.testfuncs[group_idx], ";", Inf)
-        ts.test_no += 1
+        ts.tests[group_idx] = List_addItem(ts.tests[group_idx], test.testname)
+        ts.testfuncs[group_idx] = List_addItem(ts.testfuncs[group_idx], test.funcname)
+        ts.test_count += 1
     endif
     return TS_getTestIndex(ts, test.groupname, test.testname)
 End
@@ -118,7 +124,7 @@ Function TS_removeTest(ts, groupname, testname)
     if (TS_hasTest(ts, groupname, testname))
         Variable test_idx = TS_getTestIndex(ts, groupname, testname)
         ts.tests[group_idx] = RemoveListItem(test_idx, ts.tests[group_idx], ";")
-        ts.test_no -= 1
+        ts.test_count -= 1
     endif
 End
 
@@ -227,12 +233,12 @@ End
 
 Function TS_getTestCount(ts)
     STRUCT TestSuite &ts
-    return ts.test_no
+    return ts.test_count
 End
 
 Function TS_getGroupCount(ts)
     STRUCT TestSuite &ts
-    return List_getLength(ts.groups)
+    return ts.group_count
 End
 
 #endif
