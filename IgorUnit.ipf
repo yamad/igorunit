@@ -36,18 +36,23 @@ Function/S IgorUnit_init()
 End
 
 Function/DF IgorUnit_getCurrentTSR()
-	// Determine if  exists.  If it does, then that
-	// wave contains one point which stores the DFREF where the global
-	// frameworks are located.  If this wave does not exist then initialize it.
-    String curr_tsr_refname = IGORUNIT_DF+":CURR_TSR_REF"
-    Wave/DF/Z TSR_PTRS = $(curr_tsr_refname)
-	if (!WaveExists(TSR_PTRS) || (DataFolderRefStatus(TSR_PTRS[0]) == 0))
-		Make/O/N=1/DF $(curr_tsr_refname)
-        Wave/DF TSR_PTRS = $(curr_tsr_refname)
-		TSR_PTRS[0] = NewFreeDataFolder()
-//		SetWaveLock 1, TSR_PTRS
-	endif
-	return TSR_PTRS[0]
+    String TSR_REFWAVE_PATH = IGORUNIT_DF+":CURR_TSR_REF"
+    return DataFolder_createOrGetHidden(TSR_REFWAVE_PATH)
+End
+
+Function IgorUnit_clearCurrentTSR()
+    String TSR_REFWAVE_PATH = IGORUNIT_DF+":CURR_TSR_REF"
+    KillWaves $(TSR_REFWAVE_PATH)
+End
+
+Function/DF IgorUnit_getCurrentUnitTest()
+    String TEST_REFWAVE_PATH = IGORUNIT_DF+":CURR_TEST_REF"
+    return DataFolder_createOrGetHidden(TEST_REFWAVE_PATH)
+End
+
+Function IgorUnit_clearCurrentUnitTest()
+    String TEST_REFWAVE_PATH = IGORUNIT_DF+":CURR_TEST_REF"
+    KillWaves $(TEST_REFWAVE_PATH)
 End
 
 Function/S IgorUnit_getCallingStack()
@@ -78,11 +83,7 @@ Function/S TS_runSuite(ts)
     STRUCT TestSuiteRunner tsr
     TSR_init(tsr, ts)
   
-    DFREF curr_tsr_ref = IgorUnit_getCurrentTSR()
-    TSR_persist(tsr, curr_tsr_ref)
-
     String results = TSR_runAllTests(tsr)
-    KillDataFolder curr_tsr_ref
     return results
 End
 
@@ -91,9 +92,9 @@ Function runAllTests()
 End
 
 Function test_TestTest()
-    ASSERT(1 == 2)
+//    ASSERT(1 == 2)
     EXPECT(1 == 2)
-    ASSERT(1 == 2)
+//    ASSERT(1 == 2)
 End
 
 #endif

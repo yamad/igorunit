@@ -231,8 +231,8 @@ Function/S formatAllErrors(tr)
     Variable i
     STRUCT TestDefect td
     for (i=0; i < error_count; i+=1)
-        TR_getErrorByIndex(tr, i, td)
-        error_section += formatDefect(td)
+        //TR_getErrorByIndex(tr, i, td)
+        //error_section += formatDefect(td)
         error_section += formatDefectFooter()
     endfor
     return error_section
@@ -251,8 +251,8 @@ Function/S formatAllFailures(tr)
     Variable i
     STRUCT TestDefect td
     for (i=0; i < fail_count; i+=1)
-        TR_getFailureByIndex(tr, i, td)
-        fail_section += formatDefect(td)
+        //TR_getFailureByIndex(tr, i, td)
+        //fail_section += formatDefect(td)
         fail_section += formatDefectFooter()
     endfor
     return fail_section

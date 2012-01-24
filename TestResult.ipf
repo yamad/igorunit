@@ -14,11 +14,14 @@
 #include "TestDefect"
 
 Structure TestResult
-    Wave/T failures
-    Wave/T errors
-    Variable tests_run
+    Wave tests_run
+    Wave assertions
+    Wave/T string_store
+    Variable test_run_count
     Variable failure_count
     Variable error_count
+    Variable assertion_count
+    Variable string_count
     STRUCT TestPrinter test_printer
 EndStructure
 
@@ -26,12 +29,15 @@ Function TR_persist(tr, to_dfref)
     STRUCT TestResult &tr
     DFREF to_dfref
 
-    Variable/G to_dfref:tests_run = tr.tests_run
+    Variable/G to_dfref:test_run_count = tr.test_run_count
     Variable/G to_dfref:failure_count = tr.failure_count
     Variable/G to_dfref:error_count = tr.error_count
-    
-    Duplicate/O/T tr.failures, to_dfref:failures
-    Duplicate/O/T tr.errors, to_dfref:errors
+    Variable/G to_dfref:assertion_count = tr.assertion_count
+    Variable/G to_dfref:string_count = tr.string_count
+
+    Duplicate/O tr.tests_run, to_dfref:tr_tests
+    Duplicate/O tr.assertions, to_dfref:tr_assertions
+    Duplicate/O/T tr.string_store, to_dfref:tr_string_store
 
     NewDataFolder/O to_dfref:test_printer
     TP_persist(tr.test_printer, to_dfref:test_printer)
@@ -41,20 +47,29 @@ Function TR_load(tr, from_dfref)
     STRUCT TestResult &tr
     DFREF from_dfref
 
-    NVAR tests_run = from_dfref:tests_run
+    NVAR test_run_count = from_dfref:test_run_count
     NVAR failure_count = from_dfref:failure_count
     NVAR error_count = from_dfref:error_count
+    NVAR assertion_count = from_dfref:assertion_count
+    NVAR string_count = from_dfref:string_count
 
-    Duplicate/O/T from_dfref:failures, tr.failures
-    Duplicate/O/T from_dfref:errors, tr.errors
+    Duplicate/O from_dfref:tr_tests, tr.tests_run
+    Duplicate/O from_dfref:tr_assertions, tr.assertions
+    Duplicate/O/T from_dfref:tr_string_store, tr.string_store
 
-    tr.tests_run = tests_run
+    tr.test_run_count = test_run_count
     tr.failure_count = failure_count
     tr.error_count = error_count
+    tr.assertion_count = assertion_count
+    tr.string_count = string_count
+
     TP_load(tr.test_printer, from_dfref:test_printer)
 End
 
-Static Constant FAILWAVE_BLOCK_SIZE = 10
+
+Static Constant TESTWAVE_BLOCK_SIZE = 50
+Static Constant ASSERTWAVE_BLOCK_SIZE = 100
+Static Constant STRINGSTORE_BLOCK_SIZE = 300
 Function TR_init(tr)
     STRUCT TestResult &tr
 
@@ -62,30 +77,31 @@ Function TR_init(tr)
     TP_init(tp)
     TR_setPrinter(tr, tp)
 
-    // Waves hold information about each test that failed
-    //   column 0 is the group name
-    //   column 1 is the test name
-    //   column 2 is the test function name
-    //   column 3 is the error message
-    //   column 4 is the stack information
-    Make/FREE/T/N=(FAILWAVE_BLOCK_SIZE,5) tr.failures
-    Make/FREE/T/N=(FAILWAVE_BLOCK_SIZE,5) tr.errors
+    Make/FREE/N=(TESTWAVE_BLOCK_SIZE,7) tr.tests_run
+    SetDimLabel 1, 0, test_idx, tr.tests_run
+    SetDimLabel 1, 1, result_code, tr.tests_run
+    SetDimLabel 1, 2, test_duration, tr.tests_run    
+    SetDimLabel 1, 3, group_name_idx, tr.tests_run    
+    SetDimLabel 1, 4, test_name_idx, tr.tests_run    
+    SetDimLabel 1, 5, func_name_idx, tr.tests_run
+    SetDimLabel 1, 6, msg_idx, tr.tests_run
 
-    SetDimLabel 1, 0, group_name, tr.failures
-    SetDimLabel 1, 1, test_name, tr.failures
-    SetDimLabel 1, 2, func_name, tr.failures
-    SetDimLabel 1, 3, message, tr.failures
-    SetDimLabel 1, 4, stack_info, tr.failures
+    Make/FREE/N=(ASSERTWAVE_BLOCK_SIZE,6) tr.assertions
+    SetDimLabel 1, 0, test_idx, tr.assertions
+    SetDimLabel 1, 1, assert_type, tr.assertions
+    SetDimLabel 1, 2, result_code, tr.assertions
+    SetDimLabel 1, 3, params_string_idx, tr.assertions
+    SetDimLabel 1, 4, msg_string_idx, tr.assertions
+    SetDimLabel 1, 5, stack_string_idx, tr.assertions
 
-    SetDimLabel 1, 0, group_name, tr.errors
-    SetDimLabel 1, 1, test_name, tr.errors
-    SetDimLabel 1, 2, func_name, tr.errors
-    SetDimLabel 1, 3, message, tr.errors
-    SetDimLabel 1, 4, stack_info, tr.errors
+    Make/FREE/T/N=(STRINGSTORE_BLOCK_SIZE) tr.string_store
+    tr.string_store[0] = ""
+    tr.string_count = 1
 
-    tr.tests_run = 0
+    tr.test_run_count = 0
     tr.failure_count = 0
     tr.error_count = 0
+    tr.assertion_count = 0
 End
 
 Function TR_setPrinter(tr, tp)
@@ -112,7 +128,7 @@ End
 
 Function TR_getTestRunCount(tr)
     STRUCT TestResult &tr
-    return tr.tests_run
+    return tr.test_run_count
 End
 
 Function TR_getSuccessCount(tr)
@@ -127,87 +143,147 @@ Function TR_getDefectCount(tr)
     return TR_getFailureCount(tr) + TR_getErrorCount(tr)
 End
 
-Function TR_addFailure(tr, test, message)
+Function TR_addTestRun(tr, test, result_code, duration, message)
     STRUCT TestResult &tr
     STRUCT UnitTest &test
+    Variable result_code
+    Variable duration
     String message
-    TR_addFailed(tr.failures, tr.failure_count, test, message)
-    TR_addRunTest(tr, test, message)
+
+    if (tr.test_run_count+1 > Wave_getRowCount(tr.tests_run))
+        Wave_appendRows(tr.tests_run, TESTWAVE_BLOCK_SIZE)
+    endif
+
+    Variable i = tr.test_run_count
+    tr.tests_run[i][%test_idx] = UnitTest_getIndex(test)
+    tr.tests_run[i][%result_code] = result_code
+    tr.tests_run[i][%test_duration] = duration
+    tr.tests_run[i][%group_name_idx] = TR_storeString(tr, UnitTest_getGroupname(test))
+    tr.tests_run[i][%test_name_idx] = TR_storeString(tr, UnitTest_getTestname(test))
+    tr.tests_run[i][%func_name_idx] = TR_storeString(tr, UnitTest_getFuncname(test))
+    tr.tests_run[i][%msg_idx] = TR_storeString(tr, message)
+    tr.test_run_count += 1
+End
+
+Function TR_addTestFailure(tr, test, duration, message)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    Variable duration
+    String message
+    TR_addTestRun(tr, test, TEST_FAILURE, duration, message)
     TP_addFailure(tr.test_printer, test, message)
     tr.failure_count += 1
 End
 
-Function TR_addError(tr, test, message)
+Function TR_addTestError(tr, test, duration, message)
     STRUCT TestResult &tr
     STRUCT UnitTest &test
+    Variable duration
     String message
-    TR_addFailed(tr.errors, tr.error_count, test, message)
-    TR_addRunTest(tr, test, message)
+    TR_addTestRun(tr, test, TEST_ERROR, duration, message)
     TP_addError(tr.test_printer, test, message)
     tr.error_count += 1
 End
 
-Function TR_addSuccess(tr, test, message)
+Function TR_addTestSuccess(tr, test, duration, message)
     STRUCT TestResult &tr
     STRUCT UnitTest &test
+    Variable duration
     String message
-    TR_addRunTest(tr, test, message)
+    TR_addTestRun(tr, test, TEST_SUCCESS, duration, message)
     TP_addSuccess(tr.test_printer, test, message)
 End
 
-Function TR_addRunTest(tr, test, message)
+Function TR_addAssertSuccess(tr, test, assertion)
     STRUCT TestResult &tr
     STRUCT UnitTest &test
-    String message
-    tr.tests_run += 1
+    STRUCT Assertion &assertion
+    TR_addAssertionRun(tr, test, assertion, ASSERTION_SUCCESS)
 End
 
-Static Function TR_addFailed(fail_wave, fail_idx, test, message)
-    Wave/T fail_wave
-    Variable fail_idx
+Function TR_addAssertFailure(tr, test, assertion)
+    STRUCT TestResult &tr
     STRUCT UnitTest &test
-    String message
+    STRUCT Assertion &assertion
+    TR_addAssertionRun(tr, test, assertion, ASSERTION_FAILURE)
+End
 
-    if (fail_idx+1 > Wave_getRowCount(fail_wave))
-        Wave_appendRows(fail_wave, FAILWAVE_BLOCK_SIZE)
+Function TR_addAssertionRun(tr, test, assertion, result_code)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    STRUCT Assertion &assertion
+    Variable result_code
+
+    if (tr.assertion_count+1 > Wave_getRowCount(tr.assertions))
+        Wave_appendRows(tr.assertions, ASSERTWAVE_BLOCK_SIZE)
     endif
-    fail_wave[fail_idx][%group_name] = test.groupname
-    fail_wave[fail_idx][%test_name] = test.testname
-    fail_wave[fail_idx][%func_name] = test.funcname
-    fail_wave[fail_idx][%message] = message
-    fail_wave[fail_idx][%stack_info] = Stack_getPartialNegativeIndex(2)
+
+    Variable i = tr.assertion_count
+
+    tr.assertions[i][%test_idx] = UnitTest_getIndex(test)
+    tr.assertions[i][%assert_type] = Assertion_getType(assertion)
+    tr.assertions[i][%result_code] = result_code
+    tr.assertions[i][%params_string_idx] = TR_storeString(tr, Assertion_getParams(assertion))
+    tr.assertions[i][%stack_string_idx] = TR_storeString(tr, Assertion_getStack(assertion))
+    tr.assertions[i][%msg_string_idx] = TR_storeString(tr, Assertion_getMessage(assertion))
+
+    tr.assertion_count += 1
 End
 
-Function TR_getFailureByIndex(tr, fail_idx, output_defect)
+Static Function TR_storeString(tr, string_to_save)
     STRUCT TestResult &tr
-    Variable fail_idx
-    STRUCT TestDefect &output_defect
-    TR_getDefectByIndex(tr.failures, fail_idx, output_defect)
+    String string_to_save
+
+    Variable idx = tr.string_count
+    if (idx+1 > Wave_getRowCount(tr.string_store))
+        Wave_appendRows(tr.string_store, STRINGSTORE_BLOCK_SIZE)
+    endif
+
+    if (strlen(string_to_save) > 0)
+        tr.string_store[idx] = string_to_save
+        tr.string_count += 1
+    else
+        return 0
+    endif
+    return idx
 End
 
-Function TR_getErrorByIndex(tr, fail_idx, output_defect)
+Static Function/S TR_getStoredString(tr, string_idx)
     STRUCT TestResult &tr
-    Variable fail_idx
-    STRUCT TestDefect &output_defect
-    TR_getDefectByIndex(tr.errors, fail_idx, output_defect)
+    Variable string_idx
+    return tr.string_store[string_idx]
 End
 
-Function TR_getDefectByIndex(fail_wave, fail_idx, output_defect)
-    Wave/T fail_wave
-    Variable fail_idx
+// Function TR_getFailureByIndex(tr, fail_idx, output_defect)
+//     STRUCT TestResult &tr
+//     Variable fail_idx
+//     STRUCT TestDefect &output_defect
+//     TR_getDefectByIndex(tr.failures, fail_idx, output_defect)
+// End
 
-    STRUCT TestDefect &output_defect
+// Function TR_getErrorByIndex(tr, fail_idx, output_defect)
+//     STRUCT TestResult &tr
+//     Variable fail_idx
+//     STRUCT TestDefect &output_defect
+//     TR_getDefectByIndex(tr.errors, fail_idx, output_defect)
+// End
 
-    String groupname = fail_wave[fail_idx][%group_name]
-    String testname = fail_wave[fail_idx][%test_name]
-    String funcname = fail_wave[fail_idx][%func_name]
-    STRUCT UnitTest test
-    UnitTest_init(test, groupname, testname, funcname)
+// Function TR_getDefectByIndex(fail_wave, fail_idx, output_defect)
+//     Wave/T fail_wave
+//     Variable fail_idx
 
-    String message = fail_wave[fail_idx][%message]
-    String stack_info = fail_wave[fail_idx][%stack_info]
-    TD_init(output_defect, test, message, stack_info)
-    return 0
-End
+//     STRUCT TestDefect &output_defect
+
+//     String groupname = fail_wave[fail_idx][%group_name]
+//     String testname = fail_wave[fail_idx][%test_name]
+//     String funcname = fail_wave[fail_idx][%func_name]
+//     STRUCT UnitTest test
+//     UnitTest_init(test, groupname, testname, funcname)
+
+//     String message = fail_wave[fail_idx][%message]
+//     String stack_info = fail_wave[fail_idx][%stack_info]
+//     TD_init(output_defect, test, message, stack_info)
+//     return 0
+// End
 
 #endif

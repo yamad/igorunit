@@ -14,10 +14,11 @@
 #include "TestPrinter"
 
 Structure TestSuiteRunner
-    Variable tests_run
+    Variable test_run_count
     Variable curr_group_idx
     Variable curr_grouptest_idx
     Variable curr_test_idx
+    Variable curr_test_status
     STRUCT TestSuite test_suite
     STRUCT TestResult test_result
 EndStructure
@@ -26,10 +27,11 @@ Function TSR_persist(tsr, to_dfref)
     STRUCT TestSuiteRunner &tsr
     DFREF to_dfref
 
-    Variable/G to_dfref:tests_run = tsr.tests_run
+    Variable/G to_dfref:test_run_count = tsr.test_run_count
     Variable/G to_dfref:curr_group_idx = tsr.curr_group_idx
     Variable/G to_dfref:curr_grouptest_idx = tsr.curr_grouptest_idx
     Variable/G to_dfref:curr_test_idx = tsr.curr_test_idx
+    Variable/G to_dfref:curr_test_status = tsr.curr_test_status
 
     NewDataFolder/O to_dfref:test_suite
     NewDataFolder/O to_dfref:test_result
@@ -41,15 +43,17 @@ Function TSR_load(tsr, from_dfref)
     STRUCT TestSuiteRunner &tsr
     DFREF from_dfref
 
-    NVAR tests_run = from_dfref:tests_run
+    NVAR test_run_count = from_dfref:test_run_count
     NVAR curr_group_idx = from_dfref:curr_group_idx
     NVAR curr_grouptest_idx = from_dfref:curr_grouptest_idx
     NVAR curr_test_idx = from_dfref:curr_test_idx
+    NVAR curr_test_status = from_dfref:curr_test_status
 
-    tsr.tests_run = tests_run
+    tsr.test_run_count = test_run_count
     tsr.curr_group_idx = curr_group_idx
     tsr.curr_grouptest_idx = curr_grouptest_idx
     tsr.curr_test_idx = curr_test_idx
+    tsr.curr_test_status = curr_test_status
     TS_load(tsr.test_suite, from_dfref:test_suite)
     TR_load(tsr.test_result, from_dfref:test_result)
 End
@@ -58,10 +62,11 @@ Function TSR_init(tsr, ts)
     STRUCT TestSuiteRunner &tsr
     STRUCT TestSuite &ts
 
-    tsr.tests_run = 0
+    tsr.test_run_count = 0
     tsr.curr_group_idx = 0
     tsr.curr_grouptest_idx = 0
     tsr.curr_test_idx = 0
+    tsr.curr_test_status = TEST_UNKNOWN
     tsr.test_suite = ts
 
     STRUCT TestResult tr
@@ -83,16 +88,16 @@ Function/S TSR_runAllTests(tsr)
         endif
         TSR_runNextTest(tsr)
     while(1)
-    return TSR_printReport(tsr)
+    String report = TSR_printReport(tsr)
+    IgorUnit_clearCurrentTSR()
+    return report
 End
 
 Function TSR_runNextTest(tsr)
     STRUCT TestSuiteRunner &tsr
 
-    String testname = TSR_getNextTest(tsr)
-    String groupname = TSR_getCurrentGroup(tsr)
     STRUCT UnitTest test
-    TS_getTest(tsr.test_suite, groupname, testname, test)
+    String testname = TSR_getNextTest(tsr, test)
     TSR_runTest(tsr, test)
 End
 
@@ -110,24 +115,52 @@ Function TSR_runTest(tsr, test)
     FUNCREF protofunc group_teardown = $teardownname
     FUNCREF protofunc curr_test = $test.funcname
 
+    tsr.curr_test_status = TEST_SUCCESS
+    Variable start_time, end_time
+    String msg = ""
     TSR_createTestDataFolder(tsr, test.funcname)
+    TSR_persist(tsr, IgorUnit_getCurrentTSR())
+    UnitTest_persist(test, IgorUnit_getCurrentUnitTest())
+    start_time = stopMSTimer(-2)
     try
-        TSR_persist(tsr, IgorUnit_getCurrentTSR())
         group_setup()
         curr_test()
         group_teardown()
+        end_time = stopMSTimer(-2)
         TSR_load(tsr, IgorUnit_getCurrentTSR())
     catch
+        end_time = stopMSTimer(-2)
+        TSR_load(tsr, IgorUnit_getCurrentTSR())
         if (V_AbortCode == ASSERTION_FAILURE)
             // do not run other tests if assertion fails
+            // assertion results have already been recorded
+            tsr.curr_test_status = TEST_FAILURE
         else
             // handle all other aborts as test errors
+            tsr.curr_test_status = TEST_ERROR
             Variable err = GetRTError(1)
-            String msg = GetErrMessage(err)
-            TR_addError(tsr.test_result, test, msg)
+            msg = GetErrMessage(err)
         endif
     endtry
+
+    Variable duration = end_time - start_time
+    switch(tsr.curr_test_status)
+        case TEST_SUCCESS:
+            TR_addTestSuccess(tsr.test_result, test, duration, msg)
+            break
+        case TEST_FAILURE:
+            TR_addTestFailure(tsr.test_result, test, duration, msg)
+            break
+        case TEST_ERROR:
+            TR_addTestError(tsr.test_result, test, duration, msg)
+            break
+        default:
+            break
+    endswitch
+
+    tsr.test_run_count += 1
     TSR_deleteTestDataFolder(tsr, test.funcname)
+    IgorUnit_clearCurrentUnitTest()
 End
 
 Function/S getGroupSetupName(groupname)
@@ -177,7 +210,7 @@ End
 
 Function TSR_getRunTestCount(tsr)
     STRUCT TestSuiteRunner &tsr
-    return tsr.tests_run
+    return tsr.test_run_count
 End
 
 Function TSR_getTestCount(tsr)
@@ -185,39 +218,37 @@ Function TSR_getTestCount(tsr)
     return TS_getTestCount(tsr.test_suite)
 End
 
-Function/S TSR_getNextTest(tsr)
+Function/S TSR_getNextTest(tsr, test)
     STRUCT TestSuiteRunner &tsr
+    STRUCT UnitTest &test
 
     if (TSR_isCurrentGroupDone(tsr))
         TSR_getNextGroup(tsr)
     endif
 
-    String testname = TS_getTestByIndex(tsr.test_suite, tsr.curr_group_idx, tsr.curr_grouptest_idx)
+    TS_getGroupTestByIndex(tsr.test_suite, tsr.curr_group_idx, tsr.curr_grouptest_idx, test)
     tsr.curr_grouptest_idx += 1
     tsr.curr_test_idx += 1
 
-    return testname
+    return test.testname
 End
 
-Function/S TSR_getCurrentGroup(tsr)
+Function TSR_getCurrentGroup(tsr)
     STRUCT TestSuiteRunner &tsr
-    return TS_getGroupByIndex(tsr.test_suite, tsr.curr_group_idx)
+    return tsr.curr_group_idx
 End
 
-Function/S TSR_getNextGroup(tsr)
+Function TSR_getNextGroup(tsr)
     STRUCT TestSuiteRunner &tsr
-
-    String groupname = TSR_getCurrentGroup(tsr)
     tsr.curr_group_idx += 1
     tsr.curr_grouptest_idx = 0
-    return groupname
+    return TSR_getCurrentGroup(tsr)
 End
 
 Function TSR_isCurrentGroupDone(tsr)
     STRUCT TestSuiteRunner &tsr
 
-    String groupname = TSR_getCurrentGroup(tsr)
-    if (TS_getGroupTestCount(tsr.test_suite, groupname) == tsr.curr_grouptest_idx)
+    if (TS_getGroupTestCount(tsr.test_suite, tsr.curr_group_idx) == tsr.curr_grouptest_idx)
         return TRUE
     endif
     return FALSE

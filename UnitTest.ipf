@@ -10,7 +10,31 @@ Structure UnitTest
     String groupname
     String testname
     String funcname
+    Variable index
 EndStructure
+
+Function UnitTest_persist(test, to_dfref)
+    STRUCT UnitTest &test
+    DFREF to_dfref
+
+    Variable/G to_dfref:index = test.index
+    String/G to_dfref:groupname = test.groupname
+    String/G to_dfref:testname = test.testname
+    String/G to_dfref:funcname = test.funcname
+End
+
+Function UnitTest_load(test, from_dfref)
+    STRUCT UnitTest &test
+    DFREF from_dfref
+
+    SVAR groupname = from_dfref:groupname
+    SVAR testname = from_dfref:testname
+    SVAR funcname = from_dfref:funcname
+    NVAR index = from_dfref:index
+
+    UnitTest_set(test, groupname, testname, funcname)
+    UnitTest_setIndex(test, index)
+End
 
 Function UnitTest_init(test, groupname, testname, funcname)
     STRUCT UnitTest &test
@@ -25,6 +49,17 @@ Function UnitTest_set(test, groupname, testname, funcname)
     test.groupname = groupname
     test.testname = testname
     test.funcname = funcname
+End
+
+Function UnitTest_setIndex(test, index)
+    STRUCT UnitTest &test
+    Variable index
+    test.index = index
+End
+
+Function UnitTest_getIndex(test)
+    STRUCT UnitTest &test
+    return test.index
 End
 
 Function/S UnitTest_getTestname(test)

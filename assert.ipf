@@ -3,7 +3,17 @@
 #ifndef IGORUNIT_ASSERT
 #define IGORUNIT_ASSERT
 
-Constant ASSERTION_FAILURE = 1
+#include "stringutils"
+
+#include "Assertion"
+
+Constant ASSERTION_SUCCESS = 1
+Constant ASSERTION_FAILURE = 2
+
+Constant TEST_UNKNOWN = 0
+Constant TEST_SUCCESS = 1
+Constant TEST_FAILURE = 2
+Constant TEST_ERROR = 3
 
 Function ASSERT_TRUE(condition, [err_msg])
 	Variable condition
@@ -14,8 +24,6 @@ Function ASSERT_TRUE(condition, [err_msg])
 	endif
 End
 
-End
-
 Function/S EXPECTED_ERROR_MSG(expected, actual)
   String expected, actual
   String msg
@@ -23,42 +31,46 @@ Function/S EXPECTED_ERROR_MSG(expected, actual)
   return msg
 End
 
-Constant TEST_SUCCESS = 1
-Constant TEST_FAILURE = 2
-
-Function EXPECT(condition, [fail_msg, test_type])
+Function EXPECT(condition, [fail_msg])
     Variable condition
     String fail_msg
-    Variable test_type
 
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
 
-    if (ParamIsDefault(test_type))
-        test_type = Assert_getTypeCode("EXPECT")
-    endif
+    String params
+	sprintf params, "%.16g", condition
 
-    Variable test_status
+    STRUCT Assertion a
+    Assertion_init(a)
+    Assertion_setTypeName(a, "EXPECT")
+    Assertion_setParams(a, params)
+    Assertion_autosetStackInfo(a)
+
+    ASSERT_BASE(condition, fail_msg, a)
+End
+
+Function ASSERT_BASE(condition, fail_msg, assertion)
+    Variable condition
+    String fail_msg
+    STRUCT Assertion &assertion
 
     STRUCT TestSuiteRunner tsr
     TSR_load(tsr, IgorUnit_getCurrentTSR())
-    
+
     STRUCT UnitTest test
-    String call_stack = IgorUnit_getCallingStack()
-    String call_row = Stack_getLastRow(call_stack)
-    String funcname = StackRow_getFunctionName(call_row)
-    UnitTest_init(test, "", funcname, funcname)
+    UnitTest_load(test, IgorUnit_getCurrentUnitTest())
 
     if (condition)
-        TR_addSuccess(tsr.test_result, test, fail_msg)
-        test_status = TEST_SUCCESS
+        TR_addAssertSuccess(tsr.test_result, test, assertion)
+        tsr.curr_test_status = TEST_SUCCESS
     else
-        TR_addFailure(tsr.test_result, test, fail_msg)
-        test_status = TEST_FAILURE
+        TR_addAssertFailure(tsr.test_result, test, assertion)
+        tsr.curr_test_status = TEST_FAILURE
     endif
     TSR_persist(tsr, IgorUnit_getCurrentTSR())
-    return test_status
+    return tsr.curr_test_status
 End
 
 Function ASSERT(condition, [fail_msg])
@@ -69,27 +81,17 @@ Function ASSERT(condition, [fail_msg])
         fail_msg = ""
     endif
 
-    Variable test_status = EXPECT(condition, fail_msg=fail_msg)
+    String params
+	sprintf params, "%.16g", condition
+
+    STRUCT Assertion a
+    Assertion_initAuto(a, "ASSERT", params, fail_msg)
+
+    Variable test_status = ASSERT_BASE(condition, fail_msg, a)
     if (test_status == TEST_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
 End
 
-Constant ASSERT_UNKNOWN = 0
-Constant ASSERT_ASSERT = 1
-Constant ASSERT_EXPECT = 2
-
-Function Assert_getTypeCode(assert_name)
-    String assert_name
-
-    strswitch(assert_name)
-        case "ASSERT":
-            return ASSERT_ASSERT
-        case "EXPECT":
-            return ASSERT_EXPECT
-        default:
-            return ASSERT_UNKNOWN
-    endswitch
-End
 
 #endif

@@ -7,6 +7,7 @@
 #define IGORUNIT_TS
 
 #include "booleanutils"
+#include "stringutils"
 #include "listutils"
 #include "waveutils"
 #include "datafolderutils"
@@ -56,8 +57,22 @@ Function TS_init(ts)
     ts.test_count = 0
     ts.group_count = 0
     ts.groups = ""
-    Make/FREE/T/N=(GROUP_BLOCK_SIZE) ts.tests
+    Make/FREE/T/N=(GROUP_BLOCK_SIZE, 3) ts.tests
+    SetDimLabel 1, 0, test_name, ts.tests
+    SetDimLabel 1, 1, func_name, ts.tests
+    SetDimLabel 1, 2, group_idx, ts.tests
+
     Make/FREE/T/N=(GROUP_BLOCK_SIZE) ts.testfuncs
+End
+
+Function TS_getTestCount(ts)
+    STRUCT TestSuite &ts
+    return ts.test_count
+End
+
+Function TS_getGroupCount(ts)
+    STRUCT TestSuite &ts
+    return ts.group_count
 End
 
 Function TS_addGroup(ts, groupname)
@@ -66,22 +81,9 @@ Function TS_addGroup(ts, groupname)
 
     if (!TS_hasGroup(ts, groupname))
         ts.groups = List_addItem(ts.groups, groupname)
-        TS_initNewGroupTestList(ts)
     endif
     ts.group_count += 1
     return TS_getGroupIndex(ts, groupname)
-End
-
-Static Function TS_initNewGroupTestList(ts)
-    STRUCT TestSuite &ts
-    Variable group_count = TS_getGroupCount(ts)
-
-    if (group_count+1 > Wave_getRowCount(ts.tests))
-        Wave_expandRows(ts.tests)
-        Wave_expandRows(ts.testfuncs)
-    endif
-    ts.tests[group_count,Inf] = ""
-    ts.testfuncs[group_count,Inf] = ""
 End
 
 Function TS_addTest(ts, test)
@@ -90,11 +92,12 @@ Function TS_addTest(ts, test)
 
     Variable group_idx = TS_addGroup(ts, test.groupname)
     if (!TS_hasTest(ts, test.groupname, test.testname))
-        ts.tests[group_idx] = List_addItem(ts.tests[group_idx], test.testname)
-        ts.testfuncs[group_idx] = List_addItem(ts.testfuncs[group_idx], test.funcname)
+        ts.tests[ts.test_count][%test_name] = test.testname
+        ts.tests[ts.test_count][%func_name] = test.funcname
+        ts.tests[ts.test_count][%group_idx] = num2str(group_idx)
         ts.test_count += 1
     endif
-    return TS_getTestIndex(ts, test.groupname, test.testname)
+    return ts.test_count
 End
 
 Function TS_addTestByName(ts, groupname, testname, funcname)
@@ -107,45 +110,59 @@ Function TS_addTestByName(ts, groupname, testname, funcname)
 End
 
 // Load UnitTest into output_test
-Function TS_getTest(ts, groupname, testname, output_test)
+Function TS_getTest(ts, test_idx, output_test)
+    STRUCT TestSuite &ts
+    Variable test_idx
+    STRUCT UnitTest &output_test
+
+    String groupname = TS_getTestGroupNameByIndex(ts, test_idx)
+    String testname = TS_getTestNameByIndex(ts, test_idx)
+    String funcname = TS_getTestFuncNameByIndex(ts, test_idx)
+    UnitTest_set(output_test, groupname, testname, funcname)
+    UnitTest_setIndex(output_test, test_idx)
+End
+
+Function TS_getTestByName(ts, groupname, testname, output_test)
     STRUCT TestSuite &ts
     String groupname, testname
     STRUCT UnitTest &output_test
 
-    String funcname = TS_getTestFuncName(ts, groupname, testname)
-    UnitTest_set(output_test, groupname, testname, funcname)
-End
-
-Function TS_removeTest(ts, groupname, testname)
-    STRUCT TestSuite &ts
-    String groupname, testname
-
     Variable group_idx = TS_getGroupIndex(ts, groupname)
-    if (TS_hasTest(ts, groupname, testname))
-        Variable test_idx = TS_getTestIndex(ts, groupname, testname)
-        ts.tests[group_idx] = RemoveListItem(test_idx, ts.tests[group_idx], ";")
-        ts.test_count -= 1
+    Extract/O/FREE/INDX ts.tests, results, (isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx)) && isStringsEqual(ts.tests[p][%test_name], testname))
+    if (Wave_getRowCount(results) == 0)
+        return -1
     endif
+    Variable test_idx = results[0]
+    TS_getTest(ts, test_idx, output_test)
+    return test_idx
 End
 
-Function/S TS_getGroupByIndex(ts, group_idx)
+Function TS_getGroupTestByIndex(ts, group_idx, grouptest_idx, output_test)
+    STRUCT TestSuite &ts
+    Variable group_idx, grouptest_idx
+    STRUCT UnitTest &output_test
+
+    Variable full_idx = TS_getIndexFromGroupIndex(ts, group_idx, grouptest_idx)
+    TS_getTest(ts, full_idx, output_test)
+End
+
+Function TS_getIndexFromGroupIndex(ts, group_idx, grouptest_idx)
+    STRUCT TestSuite &ts
+    Variable group_idx, grouptest_idx
+
+    Wave group_test_idxs = TS_getGroupTestIndices(ts, group_idx)
+    return group_test_idxs[grouptest_idx]
+End
+
+Function/S TS_getGroupNameByIndex(ts, group_idx)
     STRUCT TestSuite &ts
     Variable group_idx
 
-    String groupname = StringFromList(group_idx, ts.groups)
+    String groupname = List_getItem(ts.groups, group_idx)
     return groupname
 End
 
-Function/S TS_getTestByIndex(ts, group_idx, test_idx)
-    STRUCT TestSuite &ts
-    Variable group_idx, test_idx
-
-    String test_list = TS_getGroupTestsByIndex(ts, group_idx)
-    String testname = StringFromList(test_idx, test_list)
-    return testname
-End
-
-Function/S TS_getGroupTests(ts, groupname)
+Function/WAVE TS_getGroupTests(ts, groupname)
     // Return a list of tests in a given group
     STRUCT TestSuite &ts
     String groupname
@@ -154,37 +171,29 @@ Function/S TS_getGroupTests(ts, groupname)
     return TS_getGroupTestsByIndex(ts, group_idx)
 End
 
-Function/S TS_getGroupTestsByIndex(ts, group_idx)
+Function/WAVE TS_getGroupTestsByIndex(ts, group_idx)
     // Return a list of tests in a given group
     STRUCT TestSuite &ts
     Variable group_idx
 
-    return ts.tests[group_idx]
+    Extract/O/FREE ts.tests, result, isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx))
+    return result
 End
 
-Function/S TS_getGroupTestFuncs(ts, groupname)
-    // Return a list of test functions in a given group
-    STRUCT TestSuite &ts
-    String groupname
-
-    Variable group_idx = TS_getGroupIndex(ts, groupname)
-    return TS_getGroupFuncsByIndex(ts, group_idx)
-End
-
-Function/S TS_getGroupFuncsByIndex(ts, group_idx)
-    // Return a list of test functions in a given group
+Function/WAVE TS_getGroupTestIndices(ts, group_idx)
+    // Return a list of tests in a given group
     STRUCT TestSuite &ts
     Variable group_idx
 
-    return ts.testfuncs[group_idx]
+    Extract/O/FREE/INDX ts.tests, result, isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx))
+    return result
 End
 
-Function TS_getGroupTestCount(ts, groupname)
+Function TS_getGroupTestCount(ts, group_idx)
     STRUCT TestSuite &ts
-    String groupname
-
-    String test_list = TS_getGroupTests(ts, groupname)
-    return List_getLength(test_list)
+    Variable group_idx
+    Wave group_tests = TS_getGroupTestIndices(ts, group_idx)
+    return Wave_getRowCount(group_tests)
 End
 
 Function TS_hasGroup(ts, groupname)
@@ -201,7 +210,8 @@ Function TS_hasTest(ts, groupname, testname)
     STRUCT TestSuite &ts
     String groupname, testname
 
-    if (TS_getTestIndex(ts, groupname, testname) > -1)
+    STRUCT UnitTest test
+    if (TS_getTestByName(ts, groupname, testname, test) > -1)
         return TRUE
     endif
     return FALSE
@@ -214,31 +224,22 @@ Function TS_getGroupIndex(ts, groupname)
     return WhichListItem(groupname, ts.groups, ";")
 End
 
-Function TS_getTestIndex(ts, groupname, testname)
+Function/S TS_getTestNameByIndex(ts, test_idx)
     STRUCT TestSuite &ts
-    String groupname, testname
-
-    String test_list = TS_getGroupTests(ts, groupname)
-    return WhichListItem(testname, test_list, ";")
+    Variable test_idx
+    return ts.tests[test_idx][%test_name]
 End
 
-Function/S TS_getTestFuncName(ts, groupname, testname)
+Function/S TS_getTestFuncNameByIndex(ts, test_idx)
     STRUCT TestSuite &ts
-    String groupname, testname
-
-    Variable test_idx = TS_getTestIndex(ts, groupname, testname)
-    String func_list = TS_getGroupTestFuncs(ts, groupname)
-    return StringFromList(test_idx, func_list)
+    Variable test_idx
+    return ts.tests[test_idx][%func_name]
 End
 
-Function TS_getTestCount(ts)
+Function/S TS_getTestGroupNameByIndex(ts, test_idx)
     STRUCT TestSuite &ts
-    return ts.test_count
+    Variable test_idx
+    return TS_getGroupNameByIndex(ts, str2num(ts.tests[test_idx][%group_idx]))
 End
-
-Function TS_getGroupCount(ts)
-    STRUCT TestSuite &ts
-    return ts.group_count
-End
-
+    
 #endif
