@@ -29,13 +29,17 @@ Function TR_persist(tr, to_dfref)
     STRUCT TestResult &tr
     DFREF to_dfref
 
+    if (!isDataFolderExists(to_dfref))
+        NewDataFolder to_dfref
+    endif
+
     Variable/G to_dfref:test_run_count = tr.test_run_count
     Variable/G to_dfref:failure_count = tr.failure_count
     Variable/G to_dfref:error_count = tr.error_count
     Variable/G to_dfref:assertion_count = tr.assertion_count
     Variable/G to_dfref:string_count = tr.string_count
 
-    Duplicate/O tr.tests_run, to_dfref:tr_tests
+    Duplicate/O tr.tests_run, to_dfref:tests
     Duplicate/O tr.assertions, to_dfref:tr_assertions
     Duplicate/O/T tr.string_store, to_dfref:tr_string_store
 
@@ -53,7 +57,7 @@ Function TR_load(tr, from_dfref)
     NVAR assertion_count = from_dfref:assertion_count
     NVAR string_count = from_dfref:string_count
 
-    Duplicate/O from_dfref:tr_tests, tr.tests_run
+    Duplicate/O from_dfref:tests, tr.tests_run
     Duplicate/O from_dfref:tr_assertions, tr.assertions
     Duplicate/O/T from_dfref:tr_string_store, tr.string_store
 

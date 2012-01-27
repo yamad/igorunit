@@ -26,6 +26,10 @@ Function TS_persist(ts, to_dfref)
     STRUCT TestSuite &ts
     DFREF to_dfref
 
+    if (!isDataFolderExists(to_dfref))
+        NewDataFolder to_dfref
+    endif
+
     String/G to_dfref:groups = ts.groups
 
     Duplicate/O/T ts.tests, to_dfref:tests

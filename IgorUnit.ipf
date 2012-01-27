@@ -36,23 +36,23 @@ Function/S IgorUnit_init()
 End
 
 Function/DF IgorUnit_getCurrentTSR()
-    String TSR_REFWAVE_PATH = IGORUNIT_DF+":CURR_TSR_REF"
-    return DataFolder_createOrGetHidden(TSR_REFWAVE_PATH)
+    String TSR_REFWAVE_PATH = IGORUNIT_DF+":CURR_TSR"
+    return DataFolder_createOrGet(TSR_REFWAVE_PATH)
 End
 
 Function IgorUnit_clearCurrentTSR()
-    String TSR_REFWAVE_PATH = IGORUNIT_DF+":CURR_TSR_REF"
-    KillWaves $(TSR_REFWAVE_PATH)
+    String TSR_REFWAVE_PATH = IGORUNIT_DF+":CURR_TSR"
+    KillDataFolder $(TSR_REFWAVE_PATH)
 End
 
 Function/DF IgorUnit_getCurrentUnitTest()
-    String TEST_REFWAVE_PATH = IGORUNIT_DF+":CURR_TEST_REF"
-    return DataFolder_createOrGetHidden(TEST_REFWAVE_PATH)
+    String TEST_REFWAVE_PATH = IGORUNIT_DF+":CURR_TEST"
+    return DataFolder_createOrGet(TEST_REFWAVE_PATH)
 End
 
 Function IgorUnit_clearCurrentUnitTest()
-    String TEST_REFWAVE_PATH = IGORUNIT_DF+":CURR_TEST_REF"
-    KillWaves $(TEST_REFWAVE_PATH)
+    String TEST_REFWAVE_PATH = IGORUNIT_DF+":CURR_TEST"
+    KillDataFolder $(TEST_REFWAVE_PATH)
 End
 
 Function/S IgorUnit_getCallingStack()
