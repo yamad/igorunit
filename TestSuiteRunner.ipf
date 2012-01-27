@@ -159,6 +159,7 @@ Function TSR_runTest(tsr, test)
     endswitch
 
     tsr.test_run_count += 1
+    TSR_persist(tsr, IgorUnit_getCurrentTSR())
     TSR_deleteTestDataFolder(tsr, test.funcname)
     IgorUnit_clearCurrentUnitTest()
 End
