@@ -23,6 +23,8 @@ Structure TestListener
     FUNCREF TL_addTestEnded testend_func
     FUNCREF TL_addAssertSuccess assertsuccess_func
     FUNCREF TL_addAssertFailure assertfail_func
+    FUNCREF TL_addTestSuiteStart ts_start_func
+    FUNCREF TL_addTestSuiteEnd ts_end_func
 EndStructure
 
 Function TL_persist(tl, to_dfref)
@@ -61,6 +63,12 @@ Function TL_persist(tl, to_dfref)
 
     funcinfo = FuncRefInfo(tl.assertfail_func)
     String/G to_dfref:assertfail_func = Dict_getItem(funcinfo, "NAME")
+
+    funcinfo = FuncRefInfo(tl.ts_start_func)
+    String/G to_dfref:ts_start_func = Dict_getItem(funcinfo, "NAME")
+
+    funcinfo = FuncRefInfo(tl.ts_end_func)
+    String/G to_dfref:ts_end_func = Dict_getItem(funcinfo, "NAME")
 End
 
 Function TL_load(tl, from_dfref)
@@ -83,6 +91,8 @@ Function TL_load(tl, from_dfref)
     SVAR testend_func = from_dfref:testend_func
     SVAR assertsuccess_func = from_dfref:assertsuccess_func
     SVAR assertfail_func = from_dfref:assertfail_func
+    SVAR ts_start_func = from_dfref:ts_start_func
+    SVAR ts_end_func = from_dfref:ts_end_func
 
     FUNCREF TL_output tl.output_func = $(output_func)
     FUNCREF TL_addTestFailure tl.testfail_func = $(testfail_func)
@@ -92,6 +102,8 @@ Function TL_load(tl, from_dfref)
     FUNCREF TL_addTestEnded tl.testend_func = $(testend_func)
     FUNCREF TL_addAssertSuccess tl.assertsuccess_func = $(assertsuccess_func)
     FUNCREF TL_addAssertFailure tl.assertfail_func = $(assertfail_func)
+    FUNCREF TL_addTestSuiteStart tl.ts_start_func = $(ts_start_func)
+    FUNCREF TL_addTestSuiteEnd tl.ts_end_func = $(ts_end_func)
 End
 
 Function TL_init(tl)
@@ -115,12 +127,28 @@ Function TL_setFuncPointers(tl, prefix)
     FUNCREF TL_addTestEnded tl.testend_func = $(prefix+"_addTestEnded")
     FUNCREF TL_addAssertSuccess tl.assertsuccess_func = $(prefix+"_addAssertSuccess")
     FUNCREF TL_addAssertFailure tl.assertfail_func = $(prefix+"_addAssertFailure")
+    FUNCREF TL_addTestSuiteStart tl.ts_start_func = $(prefix+"_addTestSuiteStart")
+    FUNCREF TL_addTestSuiteEnd tl.ts_end_func = $(prefix+"_addTestSuiteEnd")
 End
 
 Function/S TL_output(tl, out_string)
     STRUCT TestListener &tl
     String out_string
     return tl.output_func(tl, out_string)
+End
+
+Function TL_addTestSuiteStart(tl, tr, ts)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT TestSuite &ts
+    return tl.ts_start_func(tl, tr, ts)
+End
+
+Function TL_addTestSuiteEnd(tl, tr, ts)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT TestSuite &ts
+    return tl.ts_end_func(tl, tr, ts)
 End
 
 Function TL_addTestFailure(tl, tr, test)
@@ -141,18 +169,21 @@ Function TL_addTestError(tl, tr, test)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
     STRUCT UnitTest &test
+    return tl.testerror_func(tl, tr, test)
 End
 
 Function TL_addTestStart(tl, tr, test)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
     STRUCT UnitTest &test
+    return tl.teststart_func(tl, tr, test)
 End
 
 Function TL_addTestEnded(tl, tr, test)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
     STRUCT UnitTest &test
+    return tl.testend_func(tl, tr, test)
 End
 
 Function TL_addAssertFailure(tl, tr, test, assertion)
@@ -160,6 +191,7 @@ Function TL_addAssertFailure(tl, tr, test, assertion)
     STRUCT TestResult &tr
     STRUCT UnitTest &test
     STRUCT Assertion &assertion
+    return tl.assertfail_func(tl, tr, test, assertion)
 End
 
 Function TL_addAssertSuccess(tl, tr, test, assertion)
@@ -167,6 +199,7 @@ Function TL_addAssertSuccess(tl, tr, test, assertion)
     STRUCT TestResult &tr
     STRUCT UnitTest &test
     STRUCT Assertion &assertion
+    return tl.assertsuccess_func(tl, tr, test, assertion)
 End
 
 #endif

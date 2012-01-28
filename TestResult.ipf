@@ -239,6 +239,37 @@ Function TR_addAssertionRun(tr, test, assertion, result_code)
     tr.assertion_count += 1
 End
 
+Function TR_addTestSuiteStart(tr, ts)
+    STRUCT TestResult &tr
+    STRUCT TestSuite &ts
+End
+
+Function TR_addTestSuiteEnd(tr, ts)
+    STRUCT TestResult &tr
+    STRUCT TestSuite &ts
+    TR_notifyTestSuiteEnd(tr, ts)
+End
+
+Function TR_notifyTestSuiteStart(tr, ts)
+    STRUCT TestResult &tr
+    STRUCT TestSuite &ts
+
+    Variable i
+    for (i=0; i<tr.listener_count; i+=1)
+        TL_addTestSuiteStart(tr.test_listeners[i], tr, ts)
+    endfor
+End
+
+Function TR_notifyTestSuiteEnd(tr, ts)
+    STRUCT TestResult &tr
+    STRUCT TestSuite &ts
+
+    Variable i
+    for (i=0; i<tr.listener_count; i+=1)
+        TL_addTestSuiteEnd(tr.test_listeners[i], tr, ts)
+    endfor
+End
+
 Function TR_notifyTestSuccess(tr, test, duration, message)
     STRUCT TestResult &tr
     STRUCT UnitTest &test
