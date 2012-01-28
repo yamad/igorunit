@@ -10,8 +10,11 @@
 #include "stackinfoutils"
 
 #include "UnitTest"
-#include "TestPrinter"
 #include "TestDefect"
+#include "TestListener"
+#include "TestListener_CommandLine"
+
+Static Constant LISTENER_MAX_COUNT = 20
 
 Structure TestResult
     Wave tests_run
@@ -22,7 +25,8 @@ Structure TestResult
     Variable error_count
     Variable assertion_count
     Variable string_count
-    STRUCT TestPrinter test_printer
+    Variable listener_count
+    STRUCT TestListener test_listeners[LISTENER_MAX_COUNT]
 EndStructure
 
 Function TR_persist(tr, to_dfref)
@@ -38,13 +42,18 @@ Function TR_persist(tr, to_dfref)
     Variable/G to_dfref:error_count = tr.error_count
     Variable/G to_dfref:assertion_count = tr.assertion_count
     Variable/G to_dfref:string_count = tr.string_count
+    Variable/G to_dfref:listener_count = tr.listener_count
 
     Duplicate/O tr.tests_run, to_dfref:tests
     Duplicate/O tr.assertions, to_dfref:tr_assertions
     Duplicate/O/T tr.string_store, to_dfref:tr_string_store
 
-    NewDataFolder/O to_dfref:test_printer
-    TP_persist(tr.test_printer, to_dfref:test_printer)
+    Variable i
+    for (i=0; i<tr.listener_count; i+=1)
+        String listen_name = "test_listener"+num2str(i)
+        NewDataFolder/O to_dfref:$(listen_name)
+        TL_persist(tr.test_listeners[i], to_dfref:$(listen_name))
+    endfor
 End
 
 Function TR_load(tr, from_dfref)
@@ -56,6 +65,7 @@ Function TR_load(tr, from_dfref)
     NVAR error_count = from_dfref:error_count
     NVAR assertion_count = from_dfref:assertion_count
     NVAR string_count = from_dfref:string_count
+    NVAR listener_count = from_dfref:listener_count
 
     Duplicate/O from_dfref:tests, tr.tests_run
     Duplicate/O from_dfref:tr_assertions, tr.assertions
@@ -66,20 +76,20 @@ Function TR_load(tr, from_dfref)
     tr.error_count = error_count
     tr.assertion_count = assertion_count
     tr.string_count = string_count
+    tr.listener_count = listener_count
 
-    TP_load(tr.test_printer, from_dfref:test_printer)
+    Variable i
+    for (i=0; i<tr.listener_count; i+=1)
+        String listen_name = "test_listener"+num2str(i)
+        TL_load(tr.test_listeners[i], from_dfref:$(listen_name))
+    endfor
 End
-
 
 Static Constant TESTWAVE_BLOCK_SIZE = 50
 Static Constant ASSERTWAVE_BLOCK_SIZE = 100
 Static Constant STRINGSTORE_BLOCK_SIZE = 300
 Function TR_init(tr)
     STRUCT TestResult &tr
-
-    STRUCT TestPrinter tp
-    TP_init(tp)
-    TR_setPrinter(tr, tp)
 
     Make/FREE/N=(TESTWAVE_BLOCK_SIZE,7) tr.tests_run
     SetDimLabel 1, 0, test_idx, tr.tests_run
@@ -106,18 +116,11 @@ Function TR_init(tr)
     tr.failure_count = 0
     tr.error_count = 0
     tr.assertion_count = 0
-End
+    tr.listener_count = 0
 
-Function TR_setPrinter(tr, tp)
-    STRUCT TestResult &tr
-    STRUCT TestPrinter &tp
-    tr.test_printer = tp
-End
-
-Function TR_getPrinter(tr, tp)
-    STRUCT TestResult &tr
-    STRUCT TestPrinter &tp
-    tp = tr.test_printer
+    STRUCT TestListener tl
+    CLTL_init(tl)
+    TR_registerListener(tr, tl)
 End
 
 Function TR_getFailureCount(tr)
@@ -175,7 +178,7 @@ Function TR_addTestFailure(tr, test, duration, message)
     Variable duration
     String message
     TR_addTestRun(tr, test, TEST_FAILURE, duration, message)
-    TP_addFailure(tr.test_printer, test, message)
+    TR_notifyTestFailure(tr, test, duration, message)
     tr.failure_count += 1
 End
 
@@ -185,7 +188,7 @@ Function TR_addTestError(tr, test, duration, message)
     Variable duration
     String message
     TR_addTestRun(tr, test, TEST_ERROR, duration, message)
-    TP_addError(tr.test_printer, test, message)
+//    TP_addError(tr.test_printer, test, message)
     tr.error_count += 1
 End
 
@@ -195,7 +198,7 @@ Function TR_addTestSuccess(tr, test, duration, message)
     Variable duration
     String message
     TR_addTestRun(tr, test, TEST_SUCCESS, duration, message)
-    TP_addSuccess(tr.test_printer, test, message)
+    TR_notifyTestSuccess(tr, test, duration, message)
 End
 
 Function TR_addAssertSuccess(tr, test, assertion)
@@ -222,6 +225,8 @@ Function TR_addAssertionRun(tr, test, assertion, result_code)
         Wave_appendRows(tr.assertions, ASSERTWAVE_BLOCK_SIZE)
     endif
 
+    Assertion_setResult(assertion, result_code)
+    Assertion_setTest(assertion, test)
     Variable i = tr.assertion_count
 
     tr.assertions[i][%test_idx] = UnitTest_getIndex(test)
@@ -232,6 +237,30 @@ Function TR_addAssertionRun(tr, test, assertion, result_code)
     tr.assertions[i][%msg_string_idx] = TR_storeString(tr, Assertion_getMessage(assertion))
 
     tr.assertion_count += 1
+End
+
+Function TR_notifyTestSuccess(tr, test, duration, message)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    Variable duration
+    String message
+    
+    Variable i
+    for (i=0; i<tr.listener_count; i+=1)
+        TL_addTestSuccess(tr.test_listeners[i], tr, test)
+    endfor
+End
+
+Function TR_notifyTestFailure(tr, test, duration, message)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    Variable duration
+    String message
+    
+    Variable i
+    for (i=0; i<tr.listener_count; i+=1)
+        TL_addTestFailure(tr.test_listeners[i], tr, test)
+    endfor
 End
 
 Static Function TR_storeString(tr, string_to_save)
@@ -258,36 +287,54 @@ Static Function/S TR_getStoredString(tr, string_idx)
     return tr.string_store[string_idx]
 End
 
-// Function TR_getFailureByIndex(tr, fail_idx, output_defect)
-//     STRUCT TestResult &tr
-//     Variable fail_idx
-//     STRUCT TestDefect &output_defect
-//     TR_getDefectByIndex(tr.failures, fail_idx, output_defect)
-// End
+Function TR_registerListener(tr, tl)
+    STRUCT TestResult &tr
+    STRUCT TestListener &tl
 
-// Function TR_getErrorByIndex(tr, fail_idx, output_defect)
-//     STRUCT TestResult &tr
-//     Variable fail_idx
-//     STRUCT TestDefect &output_defect
-//     TR_getDefectByIndex(tr.errors, fail_idx, output_defect)
-// End
+    if (tr.listener_count > LISTENER_MAX_COUNT)
+        Abort "Too many registered listeners"
+    endif
 
-// Function TR_getDefectByIndex(fail_wave, fail_idx, output_defect)
-//     Wave/T fail_wave
-//     Variable fail_idx
+    tr.test_listeners[tr.listener_count] = tl
+    tr.listener_count += 1
+End
 
-//     STRUCT TestDefect &output_defect
+Function TR_getTestRunByIndex(tr, testrun_idx, output_defect)
+    STRUCT TestResult &tr
+    Variable testrun_idx
+    STRUCT TestDefect &output_defect
 
-//     String groupname = fail_wave[fail_idx][%group_name]
-//     String testname = fail_wave[fail_idx][%test_name]
-//     String funcname = fail_wave[fail_idx][%func_name]
-//     STRUCT UnitTest test
-//     UnitTest_init(test, groupname, testname, funcname)
+    Variable test_idx = tr.tests_run[testrun_idx][%test_idx]
+    Variable result_code = tr.tests_run[testrun_idx][%result_code]
+    Variable duration = tr.tests_run[testrun_idx][%test_duration]
+    String group_name = TR_getStoredString(tr, tr.tests_run[testrun_idx][%group_name_idx])
+    String test_name = TR_getStoredString(tr, tr.tests_run[testrun_idx][%test_name_idx])
+    String func_name = TR_getStoredString(tr, tr.tests_run[testrun_idx][%func_name_idx])
+    String message = TR_getStoredString(tr, tr.tests_run[testrun_idx][%msg_idx])
 
-//     String message = fail_wave[fail_idx][%message]
-//     String stack_info = fail_wave[fail_idx][%stack_info]
-//     TD_init(output_defect, test, message, stack_info)
-//     return 0
-// End
+    STRUCT UnitTest test
+    UnitTest_init(test, group_name, test_name, func_name)
+    UnitTest_setIndex(test, test_idx)
+    TD_init(output_defect, test, duration, result_code, message)
+    return 0
+End
+
+Function TR_getAssertByIndex(tr, assert_idx, output_assert)
+    STRUCT TestResult &tr
+    Variable assert_idx
+    STRUCT Assertion &output_assert
+
+    Variable test_idx = tr.assertions[assert_idx][%test_idx]
+    Variable assert_type = tr.assertions[assert_idx][%assert_type]
+    Variable result_code = tr.assertions[assert_idx][%result_code]
+    String param_list = TR_getStoredString(tr, tr.assertions[assert_idx][%params_string_idx])
+    String stack_info = TR_getStoredString(tr, tr.assertions[assert_idx][%stack_string_idx])
+    String message = TR_getStoredString(tr, tr.assertions[assert_idx][%msg_string_idx])
+
+    Assertion_set(output_assert, assert_type, param_list, stack_info, message)
+    Assertion_setResult(output_assert, result_code)
+    Assertion_setTestIndex(output_assert, test_idx)
+    return 0
+End
 
 #endif

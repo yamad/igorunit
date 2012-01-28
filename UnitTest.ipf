@@ -77,5 +77,17 @@ Function/S UnitTest_getFuncname(test)
     return test.funcname
 End
 
+Function/S UnitTest_getFilename(test)
+    STRUCT UnitTest &test
+    String funcinfo = FunctionInfo(UnitTest_getFuncname(test))
+    return Dict_getItem(funcinfo, "PROCWIN")
+End
+
+Function UnitTest_getLineNumber(test)
+    STRUCT UnitTest &test
+    String funcinfo = FunctionInfo(UnitTest_getFuncname(test))
+    return str2num(Dict_getItem(funcinfo, "PROCLINE"))
+End
+
 #endif
 

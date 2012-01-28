@@ -10,26 +10,32 @@
 
 Structure TestDefect
     STRUCT UnitTest test
+    Variable duration
+    Variable result_code
     String message
-    String stack_info
 EndStructure
 
-Function TD_init(td, test, message, stack_info)
+Function TD_init(td, test, duration, result_code, message)
     STRUCT TestDefect &td
     STRUCT UnitTest &test
-    String message, stack_info
+    Variable duration
+    Variable result_code
+    String message
 
-    TD_set(td, test, message, stack_info)
+    TD_set(td, test, duration, result_code, message)
 End
 
-Function TD_set(td, test, message, stack_info)
+Function TD_set(td, test, duration, result_code, message)
     STRUCT TestDefect &td
     STRUCT UnitTest &test
-    String message, stack_info
+    Variable duration
+    Variable result_code
+    String message
 
     td.test = test
+    td.duration = duration
+    td.result_code = result_code
     td.message = message
-    td.stack_info = stack_info
 End
 
 Function/S TD_getGroupname(td)
@@ -52,21 +58,24 @@ Function/S TD_getMessage(td)
     return td.message
 End
 
-Function/S TD_getStackInfo(td)
+Function TD_getResult(td)
     STRUCT TestDefect &td
-    return td.stack_info
+    return td.result_code
+End
+
+Function TD_getDuration(td)
+    STRUCT TestDefect &td
+    return td.duration
 End
 
 Function/S TD_getFilename(td)
     STRUCT TestDefect &td
-    String stack_row = Stack_getLastRow(td.stack_info)
-    return StackRow_getFileName(stack_row)
+    return UnitTest_getFilename(td.test)
 End
 
 Function TD_getLineNumber(td)
     STRUCT TestDefect &td
-    String stack_row = Stack_getLastRow(td.stack_info)
-    return StackRow_getLineNumber(stack_row)
+    return UnitTest_getLineNumber(td.test)
 End
 
 #endif

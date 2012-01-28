@@ -7,9 +7,6 @@
 
 #include "Assertion"
 
-Constant ASSERTION_SUCCESS = 1
-Constant ASSERTION_FAILURE = 2
-
 Constant TEST_UNKNOWN = 0
 Constant TEST_SUCCESS = 1
 Constant TEST_FAILURE = 2

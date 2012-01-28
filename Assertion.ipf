@@ -8,20 +8,28 @@
 
 #include "stackinfoutils"
 
+Constant ASSERTION_UNKNOWN = 0
+Constant ASSERTION_SUCCESS = 1
+Constant ASSERTION_FAILURE = 2
+
 Constant ASSERT_UNKNOWN = 0
 Constant ASSERT_ASSERT = 1
 Constant ASSERT_EXPECT = 2
 
 Structure Assertion
     Variable assert_type
+    Variable result_code
     String param_list
     String stack_info
     String message
+    Variable test_idx
 EndStructure
 
 Function Assertion_init(a)
     STRUCT Assertion &a
     Assertion_set(a, ASSERT_UNKNOWN, "", "", "")
+    a.result_code = ASSERTION_UNKNOWN
+    a.test_idx = -1
 End
 
 Function Assertion_set(a, assert_type, param_list, stack_info, message)
@@ -42,6 +50,24 @@ Function Assertion_initAuto(a, assert_name, param_list, message)
     Assertion_setStackInfo(a, Stack_getPartialNegativeIndex(2))
     Assertion_setParams(a, param_list)
     Assertion_setMessage(a, message)
+End
+
+Function Assertion_setResult(a, result_code)
+    STRUCT Assertion &a
+    Variable result_code
+    a.result_code = result_code
+End
+
+Function Assertion_setTestIndex(a, test_idx)
+    STRUCT Assertion &a
+    Variable test_idx
+    a.test_idx = test_idx
+End
+
+Function Assertion_setTest(a, test)
+    STRUCT Assertion &a
+    STRUCT UnitTest &test
+    a.test_idx = UnitTest_getIndex(test)
 End
 
 Function Assertion_setType(a, assert_type)
