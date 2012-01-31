@@ -242,6 +242,7 @@ End
 Function TR_addTestSuiteStart(tr, ts)
     STRUCT TestResult &tr
     STRUCT TestSuite &ts
+    TR_notifyTestSuiteStart(tr, ts)
 End
 
 Function TR_addTestSuiteEnd(tr, ts)

@@ -112,7 +112,7 @@ Function TL_init(tl)
     tl.listener_type = LISTENERTYPE_COMMANDLINE
     tl.verbosity = VERBOSITY_LOW
     tl.output = ""
-    TL_setFuncPointers(tl, "TL")
+    TL_setFuncPointers(tl, "TLnull")
 End
 
 Function TL_setFuncPointers(tl, prefix)
@@ -200,6 +200,67 @@ Function TL_addAssertSuccess(tl, tr, test, assertion)
     STRUCT UnitTest &test
     STRUCT Assertion &assertion
     return tl.assertsuccess_func(tl, tr, test, assertion)
+End
+
+Function/S TLnull_output(tl, out_string)
+    STRUCT TestListener &tl
+    String out_string
+End
+
+Function TLnull_addTestSuiteStart(tl, tr, ts)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT TestSuite &ts
+End
+
+Function TLnull_addTestSuiteEnd(tl, tr, ts)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT TestSuite &ts
+End
+
+Function TLnull_addTestFailure(tl, tr, test)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+End
+
+Function TLnull_addTestSuccess(tl, tr, test)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+End
+
+Function TLnull_addTestError(tl, tr, test)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+End
+
+Function TLnull_addTestStart(tl, tr, test)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+End
+
+Function TLnull_addTestEnded(tl, tr, test)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+End
+
+Function TLnull_addAssertFailure(tl, tr, test, assertion)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    STRUCT Assertion &assertion
+End
+
+Function TLnull_addAssertSuccess(tl, tr, test, assertion)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    STRUCT Assertion &assertion
 End
 
 #endif

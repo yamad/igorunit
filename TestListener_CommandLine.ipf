@@ -80,6 +80,7 @@ Function CLTL_addTestEnded(tl, tr, test)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
     STRUCT UnitTest &test
+    TL_output(tl, formatSummary(tr))
 End
 
 Function CLTL_addAssertFailure(tl, tr, test, assertion)
@@ -150,6 +151,19 @@ Function/S formatVerboseDashes(test_description)
         res_dashes += "."
     endfor
     return res_dashes
+End
+
+Function/S formatSummary(test_result)
+    STRUCT TestResult &test_result
+
+    Variable test_count = TR_getTestRunCount(test_result)
+    Variable success_count = TR_getSuccessCount(test_result)
+    Variable failure_count = TR_getFailureCount(test_result)
+    Variable error_count = TR_getErrorCount(test_result)
+
+    String summary_msg
+    sprintf summary_msg, "%d tests run: %d successes, %d failures, %d errors\r", test_count, success_count, failure_count, error_count
+    return summary_msg
 End
 
 #endif
