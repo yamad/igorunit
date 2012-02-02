@@ -122,7 +122,8 @@ Function TR_init(tr)
     tr.listener_count = 0
 
     STRUCT TestListener tl
-    CLTL_init(tl)
+    TLTP_init(tl)
+    TL_setVerbosity(tl, VERBOSITY_HIGH)
     TR_registerListener(tr, tl)
 End
 
@@ -175,6 +176,12 @@ Static Function TR_addTestOutcome(tr, test, result_code, duration, message)
     tr.test_outcomes[i][%msg_idx] = TR_storeString(tr, message)
     tr.test_run_count += 1
     return i
+End
+
+Function TR_addTestStart(tr, test)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    TR_notifyTestStart(tr, test)
 End
 
 Function TR_addTestFailure(tr, test, duration, message)
@@ -273,6 +280,16 @@ Function TR_addTestSuiteEnd(tr, ts)
     STRUCT TestResult &tr
     STRUCT TestSuite &ts
     TR_notifyTestSuiteEnd(tr, ts)
+End
+
+Function TR_notifyTestStart(tr, test)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+
+    Variable i
+    for (i=0; i<tr.listener_count; i+=1)
+        TL_addTestStart(tr.test_listeners[i], tr, test)
+    endfor
 End
 
 Function TR_notifyTestSuiteStart(tr, ts)
