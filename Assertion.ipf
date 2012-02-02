@@ -110,6 +110,11 @@ Function Assertion_getType(a)
     return a.assert_type
 End
 
+Function Assertion_getResult(a)
+    STRUCT Assertion &a
+    return a.result_code
+End
+
 Function/S Assertion_getParams(a)
     STRUCT Assertion &a
     return a.param_list
@@ -118,6 +123,14 @@ End
 Function/S Assertion_getStack(a)
     STRUCT Assertion &a
     return a.stack_info
+End
+
+Function Assertion_getLineNumber(a)
+    STRUCT Assertion &a
+    String stack_info = Assertion_getStack(a)
+    Variable stack_len = Stack_getLength(stack_info)
+    String stack_row = Stack_getRow(stack_info, stack_len - 2)
+    return StackRow_getLineNumber(stack_row)
 End
 
 Function/S Assertion_getMessage(a)

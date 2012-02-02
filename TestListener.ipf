@@ -20,7 +20,7 @@ Structure TestListener
     FUNCREF TL_addTestSuccess testsuccess_func
     FUNCREF TL_addTestError testerror_func
     FUNCREF TL_addTestStart teststart_func
-    FUNCREF TL_addTestEnded testend_func
+    FUNCREF TL_addTestEnd testend_func
     FUNCREF TL_addAssertSuccess assertsuccess_func
     FUNCREF TL_addAssertFailure assertfail_func
     FUNCREF TL_addTestSuiteStart ts_start_func
@@ -99,7 +99,7 @@ Function TL_load(tl, from_dfref)
     FUNCREF TL_addTestSuccess tl.testsuccess_func = $(testsuccess_func)
     FUNCREF TL_addTestError tl.testerror_func = $(testerror_func)
     FUNCREF TL_addTestStart tl.teststart_func = $(teststart_func)
-    FUNCREF TL_addTestEnded tl.testend_func = $(testend_func)
+    FUNCREF TL_addTestEnd tl.testend_func = $(testend_func)
     FUNCREF TL_addAssertSuccess tl.assertsuccess_func = $(assertsuccess_func)
     FUNCREF TL_addAssertFailure tl.assertfail_func = $(assertfail_func)
     FUNCREF TL_addTestSuiteStart tl.ts_start_func = $(ts_start_func)
@@ -124,7 +124,7 @@ Function TL_setFuncPointers(tl, prefix)
     FUNCREF TL_addTestSuccess tl.testsuccess_func = $(prefix+"_addTestSuccess")
     FUNCREF TL_addTestError tl.testerror_func = $(prefix+"_addTestError")
     FUNCREF TL_addTestStart tl.teststart_func = $(prefix+"_addTestStart")
-    FUNCREF TL_addTestEnded tl.testend_func = $(prefix+"_addTestEnded")
+    FUNCREF TL_addTestEnd tl.testend_func = $(prefix+"_addTestEnd")
     FUNCREF TL_addAssertSuccess tl.assertsuccess_func = $(prefix+"_addAssertSuccess")
     FUNCREF TL_addAssertFailure tl.assertfail_func = $(prefix+"_addAssertFailure")
     FUNCREF TL_addTestSuiteStart tl.ts_start_func = $(prefix+"_addTestSuiteStart")
@@ -151,25 +151,25 @@ Function TL_addTestSuiteEnd(tl, tr, ts)
     return tl.ts_end_func(tl, tr, ts)
 End
 
-Function TL_addTestFailure(tl, tr, test)
+Function TL_addTestFailure(tl, tr, to)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
-    STRUCT UnitTest &test
-    return tl.testfail_func(tl, tr, test)
+    STRUCT TestOutcome &to
+    return tl.testfail_func(tl, tr, to)
 End
 
-Function TL_addTestSuccess(tl, tr, test)
+Function TL_addTestSuccess(tl, tr, to)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
-    STRUCT UnitTest &test
-    return tl.testsuccess_func(tl, tr, test)
+    STRUCT TestOutcome &to
+    return tl.testsuccess_func(tl, tr, to)
 End
 
-Function TL_addTestError(tl, tr, test)
+Function TL_addTestError(tl, tr, to)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
-    STRUCT UnitTest &test
-    return tl.testerror_func(tl, tr, test)
+    STRUCT TestOutcome &to
+    return tl.testerror_func(tl, tr, to)
 End
 
 Function TL_addTestStart(tl, tr, test)
@@ -179,11 +179,11 @@ Function TL_addTestStart(tl, tr, test)
     return tl.teststart_func(tl, tr, test)
 End
 
-Function TL_addTestEnded(tl, tr, test)
+Function TL_addTestEnd(tl, tr, to)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
-    STRUCT UnitTest &test
-    return tl.testend_func(tl, tr, test)
+    STRUCT TestOutcome &to
+    return tl.testend_func(tl, tr, to)
 End
 
 Function TL_addAssertFailure(tl, tr, test, assertion)
@@ -219,22 +219,22 @@ Function TLnull_addTestSuiteEnd(tl, tr, ts)
     STRUCT TestSuite &ts
 End
 
-Function TLnull_addTestFailure(tl, tr, test)
+Function TLnull_addTestFailure(tl, tr, to)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
-    STRUCT UnitTest &test
+    STRUCT TestOutcome &to
 End
 
-Function TLnull_addTestSuccess(tl, tr, test)
+Function TLnull_addTestSuccess(tl, tr, to)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
-    STRUCT UnitTest &test
+    STRUCT TestOutcome &to
 End
 
-Function TLnull_addTestError(tl, tr, test)
+Function TLnull_addTestError(tl, tr, to)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
-    STRUCT UnitTest &test
+    STRUCT TestOutcome &to
 End
 
 Function TLnull_addTestStart(tl, tr, test)
@@ -243,10 +243,10 @@ Function TLnull_addTestStart(tl, tr, test)
     STRUCT UnitTest &test
 End
 
-Function TLnull_addTestEnded(tl, tr, test)
+Function TLnull_addTestEnd(tl, tr, to)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
-    STRUCT UnitTest &test
+    STRUCT TestOutcome &to
 End
 
 Function TLnull_addAssertFailure(tl, tr, test, assertion)

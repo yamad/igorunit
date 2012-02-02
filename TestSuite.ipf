@@ -132,7 +132,10 @@ Function TS_getTestByName(ts, groupname, testname, output_test)
     STRUCT UnitTest &output_test
 
     Variable group_idx = TS_getGroupIndex(ts, groupname)
-    Extract/O/FREE/INDX ts.tests, results, (isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx)) && isStringsEqual(ts.tests[p][%test_name], testname))
+    Variable dimgroup_idx = FindDimLabel(ts.tests, 1, "group_idx")
+    Variable dimtest_idx = FindDimLabel(ts.tests, 1, "test_name")
+    Extract/O/FREE/INDX ts.tests, results, ((q == dimgroup_idx && isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx))) && (q == dimtest_idx && isStringsEqual(ts.tests[p][%test_name], testname)))
+    results = Wave2D_getColumnIndex(results, p)
     if (Wave_getRowCount(results) == 0)
         return -1
     endif
@@ -180,7 +183,9 @@ Function/WAVE TS_getGroupTestsByIndex(ts, group_idx)
     STRUCT TestSuite &ts
     Variable group_idx
 
-    Extract/O/FREE ts.tests, result, isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx))
+    Variable dim_idx = FindDimLabel(ts.tests, 1, "group_idx")
+    Extract/O/FREE ts.tests, result, (q == dim_idx && isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx)))
+    result = Wave2D_getColumnIndex(result, p)
     return result
 End
 
@@ -189,7 +194,9 @@ Function/WAVE TS_getGroupTestIndices(ts, group_idx)
     STRUCT TestSuite &ts
     Variable group_idx
 
-    Extract/O/FREE/INDX ts.tests, result, isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx))
+    Variable dim_idx = FindDimLabel(ts.tests, 1, "group_idx")
+    Extract/O/FREE/INDX ts.tests, result, (q == dim_idx && isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx)))
+    result = Wave2D_getColumnIndex(result, p)
     return result
 End
 

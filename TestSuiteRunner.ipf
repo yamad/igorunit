@@ -86,7 +86,7 @@ Function/S TSR_runAllTests(tsr)
     while(1)
     TR_addTestSuiteEnd(tsr.test_result, tsr.test_suite)
     String report = TSR_printReport(tsr)
-    IgorUnit_clearCurrentTSR()
+//    IgorUnit_clearCurrentTSR()
     return report
 End
 
