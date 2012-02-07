@@ -118,6 +118,7 @@ Function TSR_runTest(tsr, test)
     TSR_createTestDataFolder(tsr, test.funcname)
     TSR_persist(tsr, IgorUnit_getCurrentTSR())
     UnitTest_persist(test, IgorUnit_getCurrentUnitTest())
+    TR_addTestStart(tsr.test_result, test)
     start_time = stopMSTimer(-2)
     try
         group_setup()

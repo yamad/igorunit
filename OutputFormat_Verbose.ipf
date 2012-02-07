@@ -1,68 +1,62 @@
-#ifndef IGORUNIT_OUTPUTFORMAT_BASIC
-#define IGORUNIT_OUTPUTFORMAT_BASIC
+#ifndef IGORUNIT_OUTPUTFORMAT_VERBOSE
+#define IGORUNIT_OUTPUTFORMAT_VERBOSE
 
-#include "stringutils"
-
-Function OFBasic_init(of)
+Function OFVerbose_init(of)
     STRUCT OutputFormat &of
-    of.name = "Basic"
-    OF_setFuncPointers(of, "OFBasic")
+    of.name = "Verbose"
+    OF_setFuncPointers(of, "OFVerbose")
 End
 
-Function/S OFBasic_TestStart(of, test)
+Function/S OFVerbose_TestStart(of, test)
     STRUCT OutputFormat &of
     STRUCT UnitTest &test
-    return ""
+
+    String result_line
+    String funcname = UnitTest_getFuncname(test)
+    sprintf result_line, "%s %s ", funcname, formatVerboseDashes(funcname)
+    return result_line
 End
 
-Function/S OFBasic_TestSuccess(of, to)
+Function/S OFVerbose_TestSuccess(of, to)
     STRUCT OutputFormat &of
     STRUCT TestOutcome &to
-    return "."
+    return "OK\r"
 End
 
-Function/S OFBasic_TestFailure(of, to)
+Function/S OFVerbose_TestFailure(of, to)
     STRUCT OutputFormat &of
     STRUCT TestOutcome &to
-    return "F"
+    return "FAIL\r"
 End
 
-Function/S OFBasic_TestError(of, to)
+Function/S OFVerbose_TestError(of, to)
     STRUCT OutputFormat &of
     STRUCT TestOutcome &to
-    return "E"
+    return "ERROR\r"
 End
 
-Function/S OFBasic_AssertSuccess(of, test, assertion)
-    STRUCT OutputFormat &of
-    STRUCT UnitTest &test
-    STRUCT Assertion &assertion
-    return ""
-End
-
-Function/S OFBasic_AssertFailure(of, test, assertion)
+Function/S OFVerbose_AssertSuccess(of, test, assertion)
     STRUCT OutputFormat &of
     STRUCT UnitTest &test
     STRUCT Assertion &assertion
     return ""
 End
 
-Function/S OFBasic_TestSuiteSummary(of, tr, ts)
+Function/S OFVerbose_AssertFailure(of, test, assertion)
+    STRUCT OutputFormat &of
+    STRUCT UnitTest &test
+    STRUCT Assertion &assertion
+    return ""
+End
+
+Function/S OFVerbose_TestSuiteSummary(of, tr, ts)
     STRUCT OutputFormat &of
     STRUCT TestResult &tr
     STRUCT TestSuite &ts
-
-    Variable test_count = TR_getTestRunCount(tr)
-    Variable success_count = TR_getSuccessCount(tr)
-    Variable failure_count = TR_getFailureCount(tr)
-    Variable error_count = TR_getErrorCount(tr)
-
-    String summary_msg
-    sprintf summary_msg, "%d tests run: %d successes, %d failures, %d errors\r", test_count, success_count, failure_count, error_count
-    return summary_msg
+    return OFBasic_TestSuiteSummary(of, tr, ts)
 End
 
-Function/S OFBasic_TestOutcomeSummary(of, to)
+Function/S OFVerbose_TestOutcomeSummary(of, to)
     STRUCT OutputFormat &of
     STRUCT TestOutcome &to
 
@@ -74,7 +68,7 @@ Function/S OFBasic_TestOutcomeSummary(of, to)
     String message = TO_getMessage(to)
 
     String defect_summary
-    sprintf defect_summary, "%s in %s at line %d\r", funcname, filename, linenum
+    sprintf defect_summary, "%s, %s (%s) in %s at line %d\r", groupname, testname, funcname, filename, linenum
 
     if (isStringExists(message))
         String msg_line
@@ -84,7 +78,7 @@ Function/S OFBasic_TestOutcomeSummary(of, to)
     return defect_summary
 End
 
-Function/S OFBasic_AssertionSummary(of, to, assertion)
+Function/S OFVerbose_AssertionSummary(of, to, assertion)
     STRUCT OutputFormat &of
     STRUCT TestOutcome &to
     STRUCT Assertion &assertion
@@ -99,6 +93,19 @@ Function/S OFBasic_AssertionSummary(of, to, assertion)
     String summary
     sprintf summary, "\t%s(%s), %s, at line %d\r", type, param_list, message, linenum
     return summary
+End
+
+Constant DASH_COLUMN = 50
+Function/S formatVerboseDashes(test_description)
+    String test_description
+
+    String res_dashes = ""
+    Variable dash_length = DASH_COLUMN - strlen(test_description)
+    Variable i
+    for (i=0; i< dash_length; i+=1)
+        res_dashes += "."
+    endfor
+    return res_dashes
 End
 
 #endif

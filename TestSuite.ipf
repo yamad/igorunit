@@ -135,7 +135,7 @@ Function TS_getTestByName(ts, groupname, testname, output_test)
     Variable dimgroup_idx = FindDimLabel(ts.tests, 1, "group_idx")
     Variable dimtest_idx = FindDimLabel(ts.tests, 1, "test_name")
     Extract/O/FREE/INDX ts.tests, results, ((q == dimgroup_idx && isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx))) && (q == dimtest_idx && isStringsEqual(ts.tests[p][%test_name], testname)))
-    results = Wave2D_getColumnIndex(results, p)
+    results = Wave2D_getRowIndex(results, p, Wave2D_getColumnIndex(results, p))
     if (Wave_getRowCount(results) == 0)
         return -1
     endif
@@ -185,7 +185,7 @@ Function/WAVE TS_getGroupTestsByIndex(ts, group_idx)
 
     Variable dim_idx = FindDimLabel(ts.tests, 1, "group_idx")
     Extract/O/FREE ts.tests, result, (q == dim_idx && isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx)))
-    result = Wave2D_getColumnIndex(result, p)
+    result = Wave2D_getRowIndex(result, p, Wave2D_getColumnIndex(result, p))
     return result
 End
 
@@ -196,7 +196,7 @@ Function/WAVE TS_getGroupTestIndices(ts, group_idx)
 
     Variable dim_idx = FindDimLabel(ts.tests, 1, "group_idx")
     Extract/O/FREE/INDX ts.tests, result, (q == dim_idx && isStringsEqual(ts.tests[p][%group_idx], num2str(group_idx)))
-    result = Wave2D_getColumnIndex(result, p)
+    result = Wave2D_getRowIndex(result, p, Wave2D_getColumnIndex(result, p))
     return result
 End
 

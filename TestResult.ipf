@@ -122,7 +122,8 @@ Function TR_init(tr)
     tr.listener_count = 0
 
     STRUCT TestListener tl
-    CLTL_init(tl)
+    TLTP_init(tl)
+    TL_setVerbosity(tl, VERBOSITY_HIGH)
     TR_registerListener(tr, tl)
 End
 
@@ -175,6 +176,12 @@ Static Function TR_addTestOutcome(tr, test, result_code, duration, message)
     tr.test_outcomes[i][%msg_idx] = TR_storeString(tr, message)
     tr.test_run_count += 1
     return i
+End
+
+Function TR_addTestStart(tr, test)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    TR_notifyTestStart(tr, test)
 End
 
 Function TR_addTestFailure(tr, test, duration, message)
@@ -273,6 +280,16 @@ Function TR_addTestSuiteEnd(tr, ts)
     STRUCT TestResult &tr
     STRUCT TestSuite &ts
     TR_notifyTestSuiteEnd(tr, ts)
+End
+
+Function TR_notifyTestStart(tr, test)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+
+    Variable i
+    for (i=0; i<tr.listener_count; i+=1)
+        TL_addTestStart(tr.test_listeners[i], tr, test)
+    endfor
 End
 
 Function TR_notifyTestSuiteStart(tr, ts)
@@ -428,7 +445,7 @@ Function/S TR_getTestFailureIndices(tr)
 
     Variable dim_idx = FindDimLabel(tr.test_outcomes, 1, "result_code")
     Extract/O/FREE/INDX tr.test_outcomes, results, (q == dim_idx && tr.test_outcomes[p][%result_code] == TEST_FAILURE)
-    results = Wave2D_getColumnIndex(results, p)
+    results = Wave2D_getRowIndex(results, p, Wave2D_getColumnIndex(results, p))
     return Wave_NumsToList(results)
 End
 
@@ -437,7 +454,7 @@ Function/S TR_getTestErrorIndices(tr)
 
     Variable dim_idx = FindDimLabel(tr.test_outcomes, 1, "result_code")    
     Extract/O/FREE/INDX tr.test_outcomes, results, (q == dim_idx && tr.test_outcomes[p][%result_code] == TEST_ERROR)
-    results = Wave2D_getColumnIndex(results, p)
+    results = Wave2D_getRowIndex(results, p, Wave2D_getColumnIndex(results, p))
     return Wave_NumsToList(results)
 End
 
@@ -446,7 +463,7 @@ Function/S TR_getAssertFailureIndices(tr)
 
     Variable dim_idx = FindDimLabel(tr.assertions, 1, "result_code")    
     Extract/O/FREE/INDX tr.assertions, results, (q == dim_idx && tr.assertions[p][%result_code] == ASSERTION_FAILURE)
-    results = Wave2D_getColumnIndex(results, p)
+    results = Wave2D_getRowIndex(results, p, Wave2D_getColumnIndex(results, p))
     return Wave_NumsToList(results)
 End
  
@@ -458,7 +475,7 @@ Function/S TR_getAssertIndicesByTest(tr, to_idx)
     TR_getTestOutcomeByIndex(tr, to_idx, to)
     Variable dim_idx = FindDimLabel(tr.assertions, 1, "test_idx")    
     Extract/O/FREE/INDX tr.assertions, results, (q == dim_idx && tr.assertions[p][%test_idx] == TO_getIndex(to))
-    results = Wave2D_getColumnIndex(results, p)
+    results = Wave2D_getRowIndex(results, p, Wave2D_getColumnIndex(results, p))
     return Wave_NumsToList(results)
 End
 
@@ -469,10 +486,9 @@ Function/S TR_getAssertFailIndicesByTest(tr, to_idx)
     STRUCT TestOutcome to
     TR_getTestOutcomeByIndex(tr, to_idx, to)
 
-    Variable dimtest_idx = FindDimLabel(tr.assertions, 1, "test_idx")
-    Variable dimres_idx = FindDimLabel(tr.assertions, 1, "result_code")
-    Extract/O/FREE/INDX tr.assertions, results, ((q == dimtest_idx && tr.assertions[p][%test_idx] == TO_getIndex(to)) && (q == dimres_idx && tr.assertions[p][%result_code] == ASSERTION_FAILURE))
-    results = Wave2D_getColumnIndex(results, p)
+    Variable dim_idx = FindDimLabel(tr.assertions, 1, "test_idx")
+    Extract/O/FREE/INDX tr.assertions, results, (q == dim_idx && tr.assertions[p][%test_idx] == TO_getIndex(to) && tr.assertions[p][%result_code] == ASSERTION_FAILURE)
+    results = Wave2D_getRowIndex(results, p, Wave2D_getColumnIndex(results, p))
     return Wave_NumsToList(results)
 End
 

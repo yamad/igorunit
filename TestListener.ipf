@@ -7,9 +7,10 @@
 #define IGORUNIT_TESTLISTENER
 
 Constant LISTENERTYPE_DEFAULT = 0
-Constant LISTENERTYPE_COMMANDLINE = 1
+Constant LISTENERTYPE_PRINTER = 1
 
 Constant VERBOSITY_LOW = 1
+Constant VERBOSITY_HIGH = 2
 
 Structure TestListener
     Variable listener_type
@@ -109,7 +110,7 @@ End
 Function TL_init(tl)
     STRUCT TestListener &tl
 
-    tl.listener_type = LISTENERTYPE_COMMANDLINE
+    tl.listener_type = LISTENERTYPE_DEFAULT
     tl.verbosity = VERBOSITY_LOW
     tl.output = ""
     TL_setFuncPointers(tl, "TLnull")
@@ -129,6 +130,12 @@ Function TL_setFuncPointers(tl, prefix)
     FUNCREF TL_addAssertFailure tl.assertfail_func = $(prefix+"_addAssertFailure")
     FUNCREF TL_addTestSuiteStart tl.ts_start_func = $(prefix+"_addTestSuiteStart")
     FUNCREF TL_addTestSuiteEnd tl.ts_end_func = $(prefix+"_addTestSuiteEnd")
+End
+
+Function TL_setVerbosity(tl, verbosity)
+    STRUCT TestListener &tl
+    Variable verbosity
+    tl.verbosity = verbosity
 End
 
 Function/S TL_output(tl, out_string)
