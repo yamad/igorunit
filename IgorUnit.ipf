@@ -93,7 +93,10 @@ End
 
 Function test_TestTest()
 //    ASSERT(1 == 2)
-    EXPECT(1 == 2)
+    EXPECT_FALSE(1 == 2)
+    EXPECT_TRUE(1 == 1)
+    EXPECT_TRUE(2 != 1)
+    EXPECT_EQ(1, 1, tolerance=0)
 //    ASSERT(1 == 2)
 End
 

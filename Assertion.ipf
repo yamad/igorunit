@@ -43,13 +43,15 @@ Function Assertion_set(a, assert_type, param_list, stack_info, message)
     a.message = message
 End
 
-Function Assertion_initAuto(a, assert_name, param_list, message)
+Function Assertion_initAuto(a)
     STRUCT Assertion &a
-    String assert_name, param_list, message
+
+    String stack_info = Stack_getPartialNegativeIndex(2)
+    String assert_name = StackRow_getFunctionName(Stack_getLastRow(stack_info))
+
+    Assertion_init(a)
     Assertion_setTypeName(a, assert_name)
-    Assertion_setStackInfo(a, Stack_getPartialNegativeIndex(2))
-    Assertion_setParams(a, param_list)
-    Assertion_setMessage(a, message)
+    Assertion_setStackInfo(a, stack_info)
 End
 
 Function Assertion_setResult(a, result_code)
@@ -97,6 +99,13 @@ End
 Function Assertion_autosetStackInfo(a)
     STRUCT Assertion &a
     Assertion_setStackInfo(a, Stack_getPartialNegativeIndex(1))
+End
+
+Function Assertion_autosetType(a)
+    STRUCT Assertion &a
+    String stack_info = Stack_getPartialNegativeIndex(1)
+    String stack_row = Stack_getLastRow(stack_info)
+    Assertion_setTypeName(a, StackRow_getFunctionName(stack_row))
 End
 
 Function Assertion_setParams(a, param_list)
