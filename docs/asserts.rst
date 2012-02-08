@@ -42,7 +42,7 @@ determine whether a test is successful or not.
 .. #+ORGTBL: SEND basic_assert orgtbl-to-rst
 .. | Fatal assertion         | Non-fatal assertion     | Verifies              |
 .. |-------------------------+-------------------------+-----------------------|
-.. |                         | SUCCEED()[1]            | unconditional success |
+.. |                         | SUCCEED()[1]_           | unconditional success |
 .. | FAIL()                  | EXPECT_FAIL()[2]_       | unconditional failure |
 .. | ASSERT(condition)       | EXPECT(condition)       | *condition* is true   |
 .. | ASSERT_TRUE(condition)  | EXPECT_TRUE(condition)  | same as above         |
@@ -51,7 +51,7 @@ determine whether a test is successful or not.
 +-------------------------+-------------------------+-----------------------+
 | Fatal assertion         | Non-fatal assertion     | Verifies              |
 +=========================+=========================+=======================+
-|                         | SUCCEED()[1]            | unconditional success |
+|                         | SUCCEED()[1]_           | unconditional success |
 +-------------------------+-------------------------+-----------------------+
 | FAIL()                  | EXPECT_FAIL()[2]_       | unconditional failure |
 +-------------------------+-------------------------+-----------------------+
@@ -63,8 +63,11 @@ determine whether a test is successful or not.
 +-------------------------+-------------------------+-----------------------+
 .. END RECEIVE ORGTBL basic_assert
 
-.. [1] All functions have an optional *fail_msg* parameter that is not listed. Therefore, for instance, the real signature for SUCCEED() is SUCCEED([fail_msg]).
-.. [2] This is a departure from the `googletest`_ name, which is ADD_FAILURE(). I believe that EXPECT_FAIL() is more consistent with the other non-fatal assertions.
+.. [1] All functions have an optional *fail_msg* parameter that is not listed. 
+   Therefore, for instance, the real signature for SUCCEED() is SUCCEED([fail_msg]).
+
+.. [2] This is a departure from the `googletest`_ name, which is ADD_FAILURE(). 
+   I believe that EXPECT_FAIL() is more consistent with the other non-fatal assertions.
 
 
 Variable comparison
