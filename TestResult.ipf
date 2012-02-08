@@ -11,8 +11,7 @@
 
 #include "UnitTest"
 #include "TestOutcome"
-#include "TestListener"
-#include "TestListener_CommandLine"
+#include "TestListener_TestPrinter"
 
 Static Constant LISTENER_MAX_COUNT = 20
 
