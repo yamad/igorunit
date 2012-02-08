@@ -4,75 +4,32 @@ Syntax
 Defining a test
 ---------------
 
-An IgorUnit test has a name and must belong to a group. To define a
-test, use the TEST macro::
+An IgorUnit test is an Igor function that returns nothing and has no
+parameters::
 
-  ${TEST("<GROUP_NAME>", "<TEST_NAME>")}
-  // test body
-  ${END_TEST()}
+  Function test_<TEST_NAME>()
+      // test body
+  End
 
-where <GROUP_NAME> and <TEST_NAME> are both strings. Each test is
-uniquely defined by its group and name. That is, no two tests should
-have the same group as well as the same name. If this occurs, only one
-of the tests will be run.
+where <TEST_NAME> is an arbitrary string (following the rules for Igor
+function names).
 
-
-Defining a test group
----------------------
-
-Test groups allow the sharing of setup/teardown methods across several
-unit tests. They can also be used for simple semantic organization of
-tests. For example, it may often make sense to organize all tests
-dealing with one module or idea into a single test group.
-
-To define a setup and teardown routine for a group, use the TEST_SETUP
-and TEST_TEARDOWN macros::
-
-  ${TEST_SETUP("<GROUP_NAME>")}
-  // setup body
-  ${END_SETUP()}
-
-  ${TEST_TEARDOWN("<GROUP_NAME>")}
-  // teardown body
-  ${END_TEARDOWN()}
+If you want your tests to be autodiscovered, your test function names
+must start with "test_". If a function name does not start with
+"test_", the function can still be included in test suites manually.
 
 Writing the test body
 ---------------------
 
-The TEST macro makes several variables available within the test body:
+Test success/failure is determined by calling one or more assertion
+functions that describe expectations for the code under test. A test
+without any assertions succeeds by default.
 
- - `tr` -- reference to a TestResult instance
- - `groupname` -- the name of the test group
- - `testname` -- the name of the test
- - `funcname` -- the name of the test function
- - `msg` -- string variable for holding an error message
- - `test` -- a UnitTest structure holding information about the test
+This example test ensures that the *strlen* function works as documented::
 
-To test a condition in a unit test, the test must call one of a set of
-assertion macros. Any number of assertion macros can be defined in a
-test, but at least one is required for the test to be
-meaningful. Using the assertion macros within the TEST environment
-allows IgorUnit to automatically keep track of useful information
-about the results of each test.
+  Function test_strlenOnNullIsNaN()
+      String str_foo
+      EXPECT_EQ(NaN, strlen(str_foo))       // strlen should return NaN for a NULL string
+  End
 
-
-List of assertion macros
-------------------------
-
-The following assertion macros are available:
-
-+-------------------------------+------------------------------------------+
-|Macro                          |Description                               |
-+===============================+==========================================+
-|SUCCEED()                      |Unconditional test success                |
-+-------------------------------+------------------------------------------+
-|FAIL(message)                  |Unconditional test failure, stored with   |
-|                               |`message`                                 |
-+-------------------------------+------------------------------------------+
-|ASSERT(condition)              |Checks that the `condition` is true       |
-+-------------------------------+------------------------------------------+
-|VARS_EQUAL(expected, actual)   |Checks that two numbers (variables) are   |
-|                               |equal                                     |
-+-------------------------------+------------------------------------------+
-|STRINGS_EQUAL(expected, actual)|Checks that two strings are equal         |
-+-------------------------------+------------------------------------------+
+Tests are best kept small and focused on a single aspect of functionality.

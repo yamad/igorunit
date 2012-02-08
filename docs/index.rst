@@ -9,13 +9,9 @@ IgorUnit
 IgorUnit_ is an implementation of the xUnit_ test framework for the
 `Igor Pro`_ data analysis language. 
 
-IgorUnit_ generates valid Igor code using a Python_\ -based toolkit. Tests are
-defined using a set of simple macros to make writing tests easy.
-
 .. _`IgorUnit`: http://github.com/yamad/igorunit
 .. _`Igor Pro`: http://www.wavemetrics.com
 .. _xUnit: http://www.junit.org
-.. _Python: http://www.python.org
 
 Contents:
 
@@ -24,7 +20,9 @@ Contents:
 
    usage
    syntax
-   windows
+   asserts
+   make_doc
+   design
 
 Indices and tables
 ==================
@@ -32,4 +30,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
