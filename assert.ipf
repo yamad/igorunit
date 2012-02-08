@@ -588,6 +588,192 @@ Function TEST_STREQ(expected, actual, case_sensitive, assertion)
     endif
 End
 
+
+// String equality, case sensitive (*_STREQ)
+Function EXPECT_STREQ(expected, actual, [fail_msg])
+	String expected
+	String actual
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    Variable passed = TEST_STREQ(expected, actual, TRUE, a)
+    ASSERT_BASE(passed, fail_msg, a)
+End
+
+Function ASSERT_STREQ(expected, actual, [fail_msg])
+	String expected
+	String actual
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    Variable passed = TEST_STREQ(expected, actual, TRUE, a)
+    Variable test_status = ASSERT_BASE(passed, fail_msg, a)
+    if (test_status == TEST_FAILURE)
+        AbortOnValue 1, ASSERTION_FAILURE
+    endif
+End
+
+// String inequality, case sensitive (*_STRNE)
+Function EXPECT_STRNE(expected, actual, [fail_msg])
+	String expected
+	String actual
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    Variable passed = !TEST_STREQ(expected, actual, TRUE, a)
+    ASSERT_BASE(passed, fail_msg, a)
+End
+
+Function ASSERT_STRNE(expected, actual, [fail_msg])
+	String expected
+	String actual
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    Variable passed = !TEST_STREQ(expected, actual, TRUE, a)
+    Variable test_status = ASSERT_BASE(passed, fail_msg, a)
+    if (test_status == TEST_FAILURE)
+        AbortOnValue 1, ASSERTION_FAILURE
+    endif
+End
+
+// String equality, case insensitive (*_STRCASEEQ)
+Function EXPECT_STRCASEEQ(expected, actual, [fail_msg])
+	String expected
+	String actual
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    Variable passed = TEST_STREQ(expected, actual, FALSE, a)
+    ASSERT_BASE(passed, fail_msg, a)
+End
+
+Function ASSERT_STRCASEEQ(expected, actual, [fail_msg])
+	String expected
+	String actual
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    Variable passed = TEST_STREQ(expected, actual, FALSE, a)
+    Variable test_status = ASSERT_BASE(passed, fail_msg, a)
+    if (test_status == TEST_FAILURE)
+        AbortOnValue 1, ASSERTION_FAILURE
+    endif
+End
+
+// String inequality, case insensitive (*_STRCASENE)
+Function EXPECT_STRCASENE(expected, actual, [fail_msg])
+	String expected
+	String actual
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    Variable passed = !TEST_STREQ(expected, actual, FALSE, a)
+    ASSERT_BASE(passed, fail_msg, a)
+End
+
+Function ASSERT_STRCASENE(expected, actual, [fail_msg])
+	String expected
+	String actual
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    Variable passed = !TEST_STREQ(expected, actual, FALSE, a)
+    Variable test_status = ASSERT_BASE(passed, fail_msg, a)
+    if (test_status == TEST_FAILURE)
+        AbortOnValue 1, ASSERTION_FAILURE
+    endif
+End
+
+Function SUCCEED([fail_msg])
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+    ASSERT_BASE(TRUE, fail_msg, a)
+End
+
+Function EXPECT_FAIL([fail_msg])
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+    ASSERT_BASE(FALSE, fail_msg, a)
+End
+
+Function FAIL([fail_msg])
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    Variable test_status = ASSERT_BASE(FALSE, fail_msg, a)
+    if (test_status == TEST_FAILURE)
+        AbortOnValue 1, ASSERTION_FAILURE
+    endif
+End
+
+
 Function/S EXPECTED_ERROR_MSG(expected, actual)
   String expected, actual
   String msg
