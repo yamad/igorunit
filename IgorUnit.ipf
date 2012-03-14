@@ -59,22 +59,22 @@ Function/S IgorUnit_getCallingStack()
     return Stack_getPartialNegativeIndex(2)
 End
 
-Function/S runAllTests_getResults()
-  STRUCT TestSuite ts
-  TS_init(ts)
+Function/S IgorUnit_autoDiscoverTests()
+    return FunctionList("utest*", ";", "KIND:2")
+End
 
+Function/S IgorUnit_runAllTests()
+    STRUCT TestSuite ts
+    TS_init(ts)
 
-  // Add Tests
-  // STRUCT UnitTest test
-  // % for group in suite.groups:
-  // TS_addGroup(ts, "${group.get_name()}")
-  // % for test in group.tests:
-  // TS_addTestByName(ts, "${group.get_name()}", "${test.get_name()}", "${test.get_funcname()}")
-  // % endfor
-  // % endfor
-
-  TS_addTestByName(ts, "t", "test_TestTest", "test_TestTest")
-  return TS_runSuite(ts)
+    String test_list = IgorUnit_autoDiscoverTests()
+    Variable list_len = List_getLength(test_list)
+    Variable i
+    for (i=0; i<list_len; i+=1)
+        String curr_test = List_getItem(test_list, i)
+        TS_addTestByName(ts, curr_test, curr_test, curr_test)
+    endfor
+    print TS_runSuite(ts)
 End
 
 Function/S TS_runSuite(ts)
@@ -87,11 +87,7 @@ Function/S TS_runSuite(ts)
     return results
 End
 
-Function runAllTests()
-  print runAllTests_getResults()
-End
-
-Function test_TestTest()
+Function utest_TestTest()
 //    ASSERT(1 == 2)
     EXPECT_FALSE(1 == 2)
     EXPECT_TRUE(1 == 1)
