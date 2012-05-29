@@ -12,9 +12,12 @@ Constant ASSERTION_UNKNOWN = 0
 Constant ASSERTION_SUCCESS = 1
 Constant ASSERTION_FAILURE = 2
 
-Constant ASSERT_UNKNOWN = 0
-Constant ASSERT_ASSERT = 1
-Constant ASSERT_EXPECT = 2
+// Assertion Type Codes (at_*)
+Constant at_ASSERT_UNKNOWN = 0
+Constant at_ASSERT = 1
+Constant at_EXPECT = 2
+Constant at_ASSERT_STREQ = 3
+Constant at_EXPECT_STREQ = 4
 
 Structure Assertion
     Variable assert_type
@@ -27,7 +30,7 @@ EndStructure
 
 Function Assertion_init(a)
     STRUCT Assertion &a
-    Assertion_set(a, ASSERT_UNKNOWN, "", "", "")
+    Assertion_set(a, at_ASSERT_UNKNOWN, "", "", "")
     a.result_code = ASSERTION_UNKNOWN
     a.test_idx = -1
 End
@@ -46,7 +49,7 @@ End
 Function Assertion_initAuto(a)
     STRUCT Assertion &a
 
-    String stack_info = Stack_getPartialNegativeIndex(2)
+    String stack_info = Stack_getPartialNegativeIndex(1)
     String assert_name = StackRow_getFunctionName(Stack_getLastRow(stack_info))
 
     Assertion_init(a)
@@ -156,10 +159,14 @@ Function/S Assert_getTypeName(assert_type)
     Variable assert_type
 
     switch(assert_type)
-        case ASSERT_ASSERT:
+        case at_ASSERT:
             return "ASSERT"
-        case ASSERT_EXPECT:
+        case at_EXPECT:
             return "EXPECT"
+        case at_ASSERT_STREQ:
+            return "ASSERT_STREQ"
+        case at_EXPECT_STREQ:
+            return "EXPECT_STREQ"
         default:
             return "UNKNOWN ASSERT TYPE"
     endswitch
@@ -170,11 +177,15 @@ Function Assert_getTypeCode(assert_name)
 
     strswitch(assert_name)
         case "ASSERT":
-            return ASSERT_ASSERT
+            return at_ASSERT
         case "EXPECT":
-            return ASSERT_EXPECT
+            return at_EXPECT
+        case "ASSERT_STREQ":
+            return at_ASSERT_STREQ
+        case "EXPECT_STREQ":
+            return at_EXPECT_STREQ
         default:
-            return ASSERT_UNKNOWN
+            return at_ASSERT_UNKNOWN
     endswitch
 End
 
