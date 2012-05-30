@@ -35,6 +35,12 @@ Function/S OFVerbose_TestError(of, to)
     return "ERROR\r"
 End
 
+Function/S OFVerbose_TestIgnore(of, to)
+    STRUCT OutputFormat &of
+    STRUCT TestOutcome &to
+    return "IGNORE\r"
+End
+
 Function/S OFVerbose_AssertSuccess(of, test, assertion)
     STRUCT OutputFormat &of
     STRUCT UnitTest &test

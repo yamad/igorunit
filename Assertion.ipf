@@ -12,6 +12,7 @@
 Constant ASSERTION_UNKNOWN = 0
 Constant ASSERTION_SUCCESS = 1
 Constant ASSERTION_FAILURE = 2
+Constant ASSERTION_IGNORETEST = 3
 
 // Assertion Type Codes (ATC_*)
 Constant ATC_ASSERT_UNKNOWN = 0
@@ -49,6 +50,7 @@ Constant ATC_SUCCEED = 31
 Constant ATC_EXPECT_SUCCEED = 32
 Constant ATC_FAIL = 33
 Constant ATC_EXPECT_FAIL = 34
+Constant ATC_IGNORE_TEST = 35
 
 Structure Assertion
     Variable assert_type
@@ -258,6 +260,8 @@ Function/S Assert_getTypeName(assert_type)
             return "FAIL"
         case ATC_EXPECT_FAIL:
             return "EXPECT_FAIL"
+        case ATC_IGNORE_TEST:
+            return "IGNORE_TEST"
         case ATC_ASSERT_UNKNOWN:
         default:
             return "UNKNOWN_ASSERT"
@@ -336,6 +340,8 @@ Function Assert_getTypeCode(assert_name)
             return ATC_FAIL
         case "EXPECT_FAIL":
             return ATC_EXPECT_FAIL
+        case "IGNORE_TEST":
+            return ATC_IGNORE_TEST
         case "ASSERT_UNKNOWN":
         default:
             return ATC_ASSERT_UNKNOWN

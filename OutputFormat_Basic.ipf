@@ -33,6 +33,12 @@ Function/S OFBasic_TestError(of, to)
     return "E"
 End
 
+Function/S OFBasic_TestIgnore(of, to)
+    STRUCT OutputFormat &of
+    STRUCT TestOutcome &to
+    return "I"
+End
+
 Function/S OFBasic_AssertSuccess(of, test, assertion)
     STRUCT OutputFormat &of
     STRUCT UnitTest &test
@@ -56,9 +62,10 @@ Function/S OFBasic_TestSuiteSummary(of, tr, ts)
     Variable success_count = TR_getSuccessCount(tr)
     Variable failure_count = TR_getFailureCount(tr)
     Variable error_count = TR_getErrorCount(tr)
+    Variable ignore_count = TR_getIgnoreCount(tr)
 
     String summary_msg
-    sprintf summary_msg, "%d tests run: %d successes, %d failures, %d errors\r", test_count, success_count, failure_count, error_count
+    sprintf summary_msg, "%d tests run: %d successes, %d failures, %d errors, %d ignored \r", test_count, success_count, failure_count, error_count, ignore_count
     return summary_msg
 End
 

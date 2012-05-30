@@ -163,5 +163,19 @@ The following assertions compare two string values.
 A NULL string and an empty string are considered different. Two NULL
 strings are equal.
 
-Note that *CASE* indicates that the assertion is **not** case
-sensitive.
+Note that *CASE* indicates that the assertion is case **insensitive**.
+
+Ignoring tests
+--------------
+
+A test can be ignored by adding the IGNORE_TEST assertion:
+
+    IGNORE_TEST()
+
+This assertion signals the current test to stop and the test is
+flagged as ignored. Ignored tests do not count towards test failure or
+error counts. This can be useful to temporarily "comment out" a
+troublesome test.
+
+Note that IGNORE_TEST must be called before any fatal assertions. It
+is best to make IGNORE_TEST the first line of a test.

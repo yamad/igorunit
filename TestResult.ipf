@@ -19,9 +19,10 @@ Structure TestResult
     Wave test_outcomes
     Wave assertions
     Wave/T string_store
-    Variable test_run_count
+    Variable test_count
     Variable failure_count
     Variable error_count
+    Variable ignore_count
     Variable assertion_count
     Variable string_count
     Variable listener_count
@@ -36,9 +37,10 @@ Function TR_persist(tr, to_dfref)
         NewDataFolder to_dfref
     endif
 
-    Variable/G to_dfref:test_run_count = tr.test_run_count
+    Variable/G to_dfref:test_count = tr.test_count
     Variable/G to_dfref:failure_count = tr.failure_count
     Variable/G to_dfref:error_count = tr.error_count
+    Variable/G to_dfref:ignore_count = tr.ignore_count
     Variable/G to_dfref:assertion_count = tr.assertion_count
     Variable/G to_dfref:string_count = tr.string_count
     Variable/G to_dfref:listener_count = tr.listener_count
@@ -59,9 +61,10 @@ Function TR_load(tr, from_dfref)
     STRUCT TestResult &tr
     DFREF from_dfref
 
-    NVAR test_run_count = from_dfref:test_run_count
+    NVAR test_count = from_dfref:test_count
     NVAR failure_count = from_dfref:failure_count
     NVAR error_count = from_dfref:error_count
+    NVAR ignore_count = from_dfref:ignore_count
     NVAR assertion_count = from_dfref:assertion_count
     NVAR string_count = from_dfref:string_count
     NVAR listener_count = from_dfref:listener_count
@@ -70,9 +73,10 @@ Function TR_load(tr, from_dfref)
     Duplicate/O from_dfref:tr_assertions, tr.assertions
     Duplicate/O/T from_dfref:tr_string_store, tr.string_store
 
-    tr.test_run_count = test_run_count
+    tr.test_count = test_count
     tr.failure_count = failure_count
     tr.error_count = error_count
+    tr.ignore_count = ignore_count
     tr.assertion_count = assertion_count
     tr.string_count = string_count
     tr.listener_count = listener_count
@@ -114,9 +118,10 @@ Function TR_init(tr)
     tr.string_store[0] = ""
     tr.string_count = 1
 
-    tr.test_run_count = 0
+    tr.test_count = 0
     tr.failure_count = 0
     tr.error_count = 0
+    tr.ignore_count = 0
     tr.assertion_count = 0
     tr.listener_count = 0
 
@@ -136,9 +141,14 @@ Function TR_getErrorCount(tr)
     return tr.error_count
 End
 
+Function TR_getIgnoreCount(tr)
+    STRUCT TestResult &tr
+    return tr.ignore_count
+End
+
 Function TR_getTestRunCount(tr)
     STRUCT TestResult &tr
-    return tr.test_run_count
+    return tr.test_count - TR_getIgnoreCount(tr)
 End
 
 Function TR_getSuccessCount(tr)
@@ -160,12 +170,12 @@ Static Function TR_addTestOutcome(tr, test, result_code, duration, message)
     Variable duration
     String message
 
-    if (tr.test_run_count == Wave_getRowCount(tr.test_outcomes))
+    if (tr.test_count == Wave_getRowCount(tr.test_outcomes))
         Wave_appendRows(tr.test_outcomes, TESTWAVE_BLOCK_SIZE)
-        tr.test_outcomes[tr.test_run_count,][%test_idx] = -1
+        tr.test_outcomes[tr.test_count,][%test_idx] = -1
     endif
 
-    Variable i = tr.test_run_count
+    Variable i = tr.test_count
     tr.test_outcomes[i][%test_idx] = UnitTest_getIndex(test)
     tr.test_outcomes[i][%result_code] = result_code
     tr.test_outcomes[i][%test_duration] = duration
@@ -173,7 +183,7 @@ Static Function TR_addTestOutcome(tr, test, result_code, duration, message)
     tr.test_outcomes[i][%test_name_idx] = TR_storeString(tr, UnitTest_getTestname(test))
     tr.test_outcomes[i][%func_name_idx] = TR_storeString(tr, UnitTest_getFuncname(test))
     tr.test_outcomes[i][%msg_idx] = TR_storeString(tr, message)
-    tr.test_run_count += 1
+    tr.test_count += 1
     return i
 End
 
@@ -222,9 +232,24 @@ Function TR_addTestSuccess(tr, test, duration, message)
     Variable to_idx
     STRUCT TestOutcome to
 
-    to_idx = TR_addTestOutcome(tr, test, TEST_ERROR, duration, message)
+    to_idx = TR_addTestOutcome(tr, test, TEST_SUCCESS, duration, message)
     TR_getTestOutcomeByIndex(tr, to_idx, to)
     TR_notifyTestSuccess(tr, to)
+End
+
+Function TR_addTestIgnore(tr, test, duration, message)
+    STRUCT TestResult &tr
+    STRUCT UnitTest &test
+    Variable duration
+    String message
+
+    Variable to_idx
+    STRUCT TestOutcome to
+
+    to_idx = TR_addTestOutcome(tr, test, TEST_IGNORE, duration, message)
+    TR_getTestOutcomeByIndex(tr, to_idx, to)
+    TR_notifyTestIgnore(tr, to)
+    tr.ignore_count += 1
 End
 
 Function TR_addAssertSuccess(tr, test, assertion)
@@ -327,6 +352,12 @@ Function TR_notifyTestError(tr, to)
     STRUCT TestResult &tr
     STRUCT TestOutcome &to
     TR_notifyTestOutcome(tr, to, TL_addTestError)
+End
+
+Function TR_notifyTestIgnore(tr, to)
+    STRUCT TestResult &tr
+    STRUCT TestOutcome &to
+    TR_notifyTestOutcome(tr, to, TL_addTestIgnore)
 End
 
 Function TR_notifyTestOutcome(tr, to, tl_func)
@@ -452,6 +483,14 @@ Function/S TR_getTestErrorIndices(tr)
 
     Variable dim_idx = FindDimLabel(tr.test_outcomes, 1, "result_code")
     Extract/O/FREE/INDX tr.test_outcomes, results, (q == dim_idx && tr.test_outcomes[p][%result_code] == TEST_ERROR)
+    return Wave_NumsToList(Wave_convert2DToRowIndices(results, tr.test_outcomes))
+End
+
+Function/S TR_getTestIgnoreIndices(tr)
+    STRUCT TestResult &tr
+
+    Variable dim_idx = FindDimLabel(tr.test_outcomes, 1, "result_code")
+    Extract/O/FREE/INDX tr.test_outcomes, results, (q == dim_idx && tr.test_outcomes[p][%result_code] == TEST_IGNORE)
     return Wave_NumsToList(Wave_convert2DToRowIndices(results, tr.test_outcomes))
 End
 

@@ -34,7 +34,7 @@ Function TLTP_addTestFailure(tl, tr, to)
 
     STRUCT OutputFormat of
     OutputFormat_factory(tl.verbosity, of)
-    
+
     TL_output(tl, OF_TestFailure(of, to))
 End
 
@@ -56,8 +56,19 @@ Function TLTP_addTestError(tl, tr, to)
 
     STRUCT OutputFormat of
     OutputFormat_factory(tl.verbosity, of)
-    
+
     TL_output(tl, OF_TestError(of, to))
+End
+
+Function TLTP_addTestIgnore(tl, tr, to)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    STRUCT TestOutcome &to
+
+    STRUCT OutputFormat of
+    OutputFormat_factory(tl.verbosity, of)
+
+    TL_output(tl, OF_TestIgnore(of, to))
 End
 
 Function TLTP_addTestStart(tl, tr, test)
@@ -138,7 +149,7 @@ Function TLTP_listFailures(tl, tr)
     TL_output(tl, formatSectionHeader("Test Failures"))
 
     String fail_idxs = TR_getTestFailureIndices(tr)
-    
+
     STRUCT TestOutcome to
     STRUCT Assertion assertion
     Variable i, to_idx
@@ -155,8 +166,8 @@ Function TLTP_listFailures(tl, tr)
                 a_idx = str2num(List_getItem(assert_idxs, j))
                 TR_getAssertByIndex(tr, a_idx, assertion)
                 TL_output(tl, OF_AssertionSummary(of, to, assertion))
-            endfor            
-        endif        
+            endfor
+        endif
         TL_output(tl, formatDefectFooter())
     endfor
 End

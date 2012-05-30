@@ -12,6 +12,7 @@ Constant TEST_UNKNOWN = 0
 Constant TEST_SUCCESS = 1
 Constant TEST_FAILURE = 2
 Constant TEST_ERROR = 3
+Constant TEST_IGNORE = 4
 
 Function ASSERT_BASE(condition, fail_msg, assertion)
     Variable condition
@@ -787,6 +788,19 @@ Function FAIL([fail_msg])
 
     ASSERT_BASE(FALSE, fail_msg, a)
     AbortOnValue 1, ASSERTION_FAILURE
+End
+
+Function IGNORE_TEST([fail_msg])
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    AbortOnValue 1, ASSERTION_IGNORETEST
 End
 
 

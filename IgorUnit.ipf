@@ -89,6 +89,7 @@ End
 
 Function utest_TestTest()
 //    ASSERT(1 == 2)
+    IGNORE_TEST()
     EXPECT_FALSE(1 == 2)
     EXPECT_TRUE(1 == -1)
     EXPECT_TRUE(2 != 1)

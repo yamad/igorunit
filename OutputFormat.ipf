@@ -12,6 +12,7 @@ Structure OutputFormat
     FUNCREF OFnull_TestSuccess testsuccess_func
     FUNCREF OFnull_TestFailure testfail_func
     FUNCREF OFnull_TestError testerror_func
+    FUNCREF OFnull_TestIgnore testignore_func
     FUNCREF OFnull_AssertSuccess assertsuccess_func
     FUNCREF OFnull_AssertFailure assertfail_func
     FUNCREF OFnull_TestSuiteSummary ts_summ_func
@@ -68,6 +69,11 @@ Function OF_setFuncPointers(of, prefix)
         FUNCREF OFnull_TestError of.testerror_func = $(funcname)
     endif
 
+    funcname = prefix+"_TestIgnore"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_TestIgnore of.testignore_func = $(funcname)
+    endif
+
     funcname = prefix+"_AssertSuccess"
     if (isFunctionExists(funcname))
         FUNCREF OFnull_AssertSuccess of.assertsuccess_func = $(funcname)
@@ -117,6 +123,9 @@ Function OF_persist(of, to_dfref)
     funcinfo = FuncRefInfo(of.testerror_func)
     String/G to_dfref:testerror_func = Dict_getItem(funcinfo, "NAME")
 
+    funcinfo = FuncRefInfo(of.testignore_func)
+    String/G to_dfref:testignore_func = Dict_getItem(funcinfo, "NAME")
+
     funcinfo = FuncRefInfo(of.assertsuccess_func)
     String/G to_dfref:assertsuccess_func = Dict_getItem(funcinfo, "NAME")
 
@@ -144,6 +153,7 @@ Function OF_load(of, from_dfref)
     SVAR testsuccess_func = from_dfref:testsuccess_func
     SVAR testfail_func = from_dfref:testfail_func
     SVAR testerror_func = from_dfref:testerror_func
+    SVAR testignore_func = from_dfref:testignore_func
     SVAR assertsuccess_func = from_dfref:assertsuccess_func
     SVAR assertfail_func = from_dfref:assertfail_func
     SVAR ts_summ_func = from_dfref:ts_summ_func
@@ -154,6 +164,7 @@ Function OF_load(of, from_dfref)
     FUNCREF OFnull_TestSuccess of.testsuccess_func = $(testsuccess_func)
     FUNCREF OFnull_TestFailure of.testfail_func = $(testfail_func)
     FUNCREF OFnull_TestError of.testerror_func = $(testerror_func)
+    FUNCREF OFnull_TestIgnore of.testignore_func = $(testignore_func)
     FUNCREF OFnull_AssertSuccess of.assertsuccess_func = $(assertsuccess_func)
     FUNCREF OFnull_AssertFailure of.assertfail_func = $(assertfail_func)
     FUNCREF OFnull_TestSuiteSummary of.ts_summ_func = $(ts_summ_func)
@@ -190,7 +201,7 @@ Function/S OF_TestSuccess(of, to)
     return of.testsuccess_func(of, to)
 End
 
-Function/S OF_TestFailure(of, to) 
+Function/S OF_TestFailure(of, to)
     STRUCT OutputFormat &of
     STRUCT TestOutcome &to
     return of.testfail_func(of, to)
@@ -200,6 +211,12 @@ Function/S OF_TestError(of, to)
     STRUCT OutputFormat &of
     STRUCT TestOutcome &to
     return of.testerror_func(of, to)
+End
+
+Function/S OF_TestIgnore(of, to)
+    STRUCT OutputFormat &of
+    STRUCT TestOutcome &to
+    return of.testignore_func(of, to)
 End
 
 Function/S OF_AssertSuccess(of, test, assertion)
@@ -261,6 +278,12 @@ Function/S OFnull_TestFailure(of, to)
 End
 
 Function/S OFnull_TestError(of, to)
+    STRUCT OutputFormat &of
+    STRUCT TestOutcome &to
+    return ""
+End
+
+Function/S OFnull_TestIgnore(of, to)
     STRUCT OutputFormat &of
     STRUCT TestOutcome &to
     return ""
