@@ -63,6 +63,8 @@ Function EXPECT_TRUE(condition, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_TRUE(condition, a)
+    fail_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true", fail_msg)
+
     return ASSERT_BASE(passed, fail_msg, a)
 End
 
@@ -78,6 +80,8 @@ Function ASSERT_TRUE(condition, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_TRUE(condition, a)
+    fail_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true", fail_msg)
+
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
@@ -119,7 +123,9 @@ Function EXPECT_FALSE(condition, [fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = TEST_TRUE(!(condition), a)
+    Variable passed = !TEST_TRUE(condition, a)
+    fail_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false", fail_msg)
+
     ASSERT_BASE(passed, fail_msg, a)
 End
 
@@ -135,6 +141,8 @@ Function ASSERT_FALSE(condition, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = !TEST_TRUE(condition, a)
+    fail_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false", fail_msg)
+
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
@@ -152,9 +160,6 @@ Function TEST_EQ(expected, actual, tolerance, assertion)
 	String params
 	sprintf params, "%.16g, %.16g, %.16g", expected, actual, tolerance
     Assertion_setParams(assertion, params)
-
-    String err_msg = EXPECTED_ERROR_MSG(expected, actual)
-    Assertion_setMessage(assertion, err_msg)
 
 	Variable ntExpected = numtype(expected)
 	Variable ntActual = numtype(actual)
@@ -177,11 +182,14 @@ Function EXPECT_EQ(expected, actual, [tol, fail_msg])
 	Variable tol
     String fail_msg
 
-    if (ParamIsDefault(tol))
-        tol = 0
-    endif
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
+    endif
+    if (ParamIsDefault(tol))
+        tol = 0
+        fail_msg = MSG_OPERATOR_ERROR(expected, actual, "not ==", fail_msg)
+    else
+        fail_msg = MSG_OPERATOR_TOL_ERROR(expected, actual, "not ==", fail_msg, tol)
     endif
 
     STRUCT Assertion a
@@ -203,6 +211,7 @@ Function ASSERT_EQ(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(expected, actual, "not ==", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -226,9 +235,9 @@ Function EXPECT_NE(expected, actual, [tol, fail_msg])
         tol = 0
     endif
     if (ParamIsDefault(fail_msg))
-        String msg_format = "Expected <%s> should not equal actual <%s>"
-        sprintf fail_msg, msg_format, num2str(expected), num2str(actual)
+        fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(expected, actual, "not !=", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -248,9 +257,9 @@ Function ASSERT_NE(expected, actual, [tol, fail_msg])
         tol = 0
     endif
     if (ParamIsDefault(fail_msg))
-        String msg_format = "Expected <%s> should not equal actual <%s>"
-        sprintf fail_msg, msg_format, num2str(expected), num2str(actual)
+        fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(expected, actual, "not !=", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -285,6 +294,7 @@ Function EXPECT_LT(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not <", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -300,6 +310,7 @@ Function ASSERT_LT(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not <", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -335,6 +346,7 @@ Function EXPECT_LE(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not <=", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -350,6 +362,7 @@ Function ASSERT_LE(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not <=", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -382,6 +395,7 @@ Function EXPECT_GT(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not >", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -397,6 +411,7 @@ Function ASSERT_GT(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not >", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -432,6 +447,7 @@ Function EXPECT_GE(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not >=", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -447,6 +463,7 @@ Function ASSERT_GE(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not >=", fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -498,6 +515,7 @@ Function EXPECT_EQ_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_ERROR(Num_complexToString(expected), Num_complexToString(actual), fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -518,6 +536,7 @@ Function ASSERT_EQ_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_ERROR(Num_complexToString(expected), Num_complexToString(actual), fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -541,9 +560,9 @@ Function EXPECT_NE_C(expected, actual, [tol, fail_msg])
         tol = 0
     endif
     if (ParamIsDefault(fail_msg))
-        String msg_format = "Expected <%s> should not equal actual <%s>"
-        sprintf fail_msg, msg_format, num2str(expected), num2str(actual)
+        fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(Num_complexToString(expected), Num_complexToString(actual), fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -563,9 +582,9 @@ Function ASSERT_NE_C(expected, actual, [tol, fail_msg])
         tol = 0
     endif
     if (ParamIsDefault(fail_msg))
-        String msg_format = "Expected <%s> should not equal actual <%s>"
-        sprintf fail_msg, msg_format, num2str(expected), num2str(actual)
+        fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(Num_complexToString(expected), Num_complexToString(actual), fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -611,8 +630,9 @@ Function EXPECT_STREQ(expected, actual, [fail_msg])
     String fail_msg
 
     if (ParamIsDefault(fail_msg))
-        fail_msg = EXPECTED_ERROR_MSG_STR(expected, actual)
+        fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_ERROR(expected, actual, fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -629,6 +649,7 @@ Function ASSERT_STREQ(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_ERROR(expected, actual, fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -650,6 +671,7 @@ Function EXPECT_STRNE(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -666,6 +688,7 @@ Function ASSERT_STRNE(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -687,6 +710,7 @@ Function EXPECT_STRCASEEQ(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_ERROR(expected, actual, fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -703,6 +727,7 @@ Function ASSERT_STRCASEEQ(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_ERROR(expected, actual, fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -724,6 +749,7 @@ Function EXPECT_STRCASENE(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -740,6 +766,7 @@ Function ASSERT_STRCASENE(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
+    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, fail_msg)
 
     STRUCT Assertion a
     Assertion_initAuto(a)
@@ -817,21 +844,77 @@ Function IGNORE_TEST([fail_msg])
     Assertion_initAuto(a)
 
     AbortOnValue 1, ASSERTION_IGNORETEST
+    return ASSERTION_IGNORETEST
 End
 
+Function/S MSG_EXPECTED_ERROR(expected, actual, msg)
+    Variable expected, actual
+    String msg
 
-Function/S EXPECTED_ERROR_MSG(expected, actual)
-  Variable expected, actual
-  String msg
-  sprintf msg, "Expected <%d>, but was <%d>", expected, actual
-  return msg
+    String msg_out
+    sprintf msg_out, "expected <%g>, but was <%g>", expected, actual
+    if (isStringExists(msg))
+        msg_out = msg + ", " + msg_out
+    endif
+    return msg_out
 End
 
-Function/S EXPECTED_ERROR_MSG_STR(expected, actual)
-  String expected, actual
-  String msg
-  sprintf msg, "Expected <\"%s\">, but was <\"%s\">", expected, actual
-  return msg
+Function/S MSG_STR_EXPECTED_ERROR(expected, actual, msg)
+    String expected, actual
+    String msg
+
+    String msg_out
+    sprintf msg_out, "expected <\"%s\">, but was <\"%s\">", expected, actual
+    return MSG_FORMAT(msg_out, msg)
+End
+
+Function/S MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, msg)
+    String expected, actual
+    String msg
+
+    String msg_out
+    sprintf msg_out, "expected different:<\"%s\">, but was same", expected, actual
+    return MSG_FORMAT(msg_out, msg)
+End
+
+Function/S MSG_OPERATOR_ERROR(expected, actual, op_str, msg)
+    Variable expected, actual
+    String op_str, msg
+
+    String msg_out
+    sprintf msg_out, "[%g] %s [%g]", expected, op_str, actual
+    return MSG_FORMAT(msg_out, msg)
+End
+
+Function/S MSG_OPERATOR_TOL_ERROR(expected, actual, op_str, msg, tolerance)
+    Variable expected, actual
+    String op_str
+    String msg
+    Variable tolerance
+
+    String msg_out
+    sprintf msg_out, "[%g] %s [%g] within [%g] delta", expected, op_str, actual, tolerance
+    return MSG_FORMAT(msg_out, msg)
+End
+
+Function/S MSG_PREDICATE_ERROR(condition_str, suffix, msg)
+    String condition_str, suffix, msg
+
+    String msg_out
+    sprintf msg_out, "%s %s", condition_str, suffix
+    return MSG_FORMAT(msg_out, msg)
+End
+
+Function/S MSG_FORMAT(std_msg, msg)
+    String std_msg, msg
+
+    if (!isStringExists(msg))
+        return std_msg
+    else
+        String msg_out
+        sprintf msg_out, "%s : %s", std_msg, msg
+        return msg_out
+    endif
 End
 
 #endif
