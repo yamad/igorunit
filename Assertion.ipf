@@ -8,16 +8,46 @@
 
 #include "stackinfoutils"
 
+// Assertion Status/Result Codes
 Constant ASSERTION_UNKNOWN = 0
 Constant ASSERTION_SUCCESS = 1
 Constant ASSERTION_FAILURE = 2
 
-// Assertion Type Codes (at_*)
-Constant at_ASSERT_UNKNOWN = 0
-Constant at_ASSERT = 1
-Constant at_EXPECT = 2
-Constant at_ASSERT_STREQ = 3
-Constant at_EXPECT_STREQ = 4
+// Assertion Type Codes (ATC_*)
+Constant ATC_ASSERT_UNKNOWN = 0
+Constant ATC_ASSERT = 1
+Constant ATC_EXPECT = 2
+Constant ATC_ASSERT_TRUE = 3
+Constant ATC_EXPECT_TRUE = 4
+Constant ATC_ASSERT_FALSE = 5
+Constant ATC_EXPECT_FALSE = 6
+Constant ATC_ASSERT_EQ = 7
+Constant ATC_EXPECT_EQ = 8
+Constant ATC_ASSERT_NE = 9
+Constant ATC_EXPECT_NE = 10
+Constant ATC_ASSERT_LT = 11
+Constant ATC_EXPECT_LT = 12
+Constant ATC_ASSERT_LE = 13
+Constant ATC_EXPECT_LE = 14
+Constant ATC_ASSERT_GT = 15
+Constant ATC_EXPECT_GT = 16
+Constant ATC_ASSERT_GE = 17
+Constant ATC_EXPECT_GE = 18
+Constant ATC_ASSERT_EQ_C = 19
+Constant ATC_EXPECT_EQ_C = 20
+Constant ATC_ASSERT_NE_C = 21
+Constant ATC_EXPECT_NE_C = 22
+Constant ATC_ASSERT_STREQ = 23
+Constant ATC_EXPECT_STREQ = 24
+Constant ATC_ASSERT_STRNE = 25
+Constant ATC_EXPECT_STRNE = 26
+Constant ATC_ASSERT_STRCASEEQ = 27
+Constant ATC_EXPECT_STRCASEEQ = 28
+Constant ATC_ASSERT_STRCASENE = 29
+Constant ATC_EXPECT_STRCASENE = 30
+Constant ATC_SUCCEED = 31
+Constant ATC_FAIL = 32
+Constant ATC_EXPECT_FAIL = 33
 
 Structure Assertion
     Variable assert_type
@@ -30,7 +60,7 @@ EndStructure
 
 Function Assertion_init(a)
     STRUCT Assertion &a
-    Assertion_set(a, at_ASSERT_UNKNOWN, "", "", "")
+    Assertion_set(a, ATC_ASSERT_UNKNOWN, "", "", "")
     a.result_code = ASSERTION_UNKNOWN
     a.test_idx = -1
 End
@@ -159,16 +189,75 @@ Function/S Assert_getTypeName(assert_type)
     Variable assert_type
 
     switch(assert_type)
-        case at_ASSERT:
+        case ATC_ASSERT:
             return "ASSERT"
-        case at_EXPECT:
+        case ATC_EXPECT:
             return "EXPECT"
-        case at_ASSERT_STREQ:
+        case ATC_ASSERT_TRUE:
+            return "ASSERT_TRUE"
+        case ATC_EXPECT_TRUE:
+            return "EXPECT_TRUE"
+        case ATC_ASSERT_FALSE:
+            return "ASSERT_FALSE"
+        case ATC_EXPECT_FALSE:
+            return "EXPECT_FALSE"
+        case ATC_ASSERT_EQ:
+            return "ASSERT_EQ"
+        case ATC_EXPECT_EQ:
+            return "EXPECT_EQ"
+        case ATC_ASSERT_NE:
+            return "ASSERT_NE"
+        case ATC_EXPECT_NE:
+            return "EXPECT_NE"
+        case ATC_ASSERT_LT:
+            return "ASSERT_LT"
+        case ATC_EXPECT_LT:
+            return "EXPECT_LT"
+        case ATC_ASSERT_LE:
+            return "ASSERT_LE"
+        case ATC_EXPECT_LE:
+            return "EXPECT_LE"
+        case ATC_ASSERT_GT:
+            return "ASSERT_GT"
+        case ATC_EXPECT_GT:
+            return "EXPECT_GT"
+        case ATC_ASSERT_GE:
+            return "ASSERT_GE"
+        case ATC_EXPECT_GE:
+            return "EXPECT_GE"
+        case ATC_ASSERT_EQ_C:
+            return "ASSERT_EQ_C"
+        case ATC_EXPECT_EQ_C:
+            return "EXPECT_EQ_C"
+        case ATC_ASSERT_NE_C:
+            return "ASSERT_NE_C"
+        case ATC_EXPECT_NE_C:
+            return "EXPECT_NE_C"
+        case ATC_ASSERT_STREQ:
             return "ASSERT_STREQ"
-        case at_EXPECT_STREQ:
+        case ATC_EXPECT_STREQ:
             return "EXPECT_STREQ"
+        case ATC_ASSERT_STRNE:
+            return "ASSERT_STRNE"
+        case ATC_EXPECT_STRNE:
+            return "EXPECT_STRNE"
+        case ATC_ASSERT_STRCASEEQ:
+            return "ASSERT_STRCASEEQ"
+        case ATC_EXPECT_STRCASEEQ:
+            return "EXPECT_STRCASEEQ"
+        case ATC_ASSERT_STRCASENE:
+            return "ASSERT_STRCASENE"
+        case ATC_EXPECT_STRCASENE:
+            return "EXPECT_STRCASENE"
+        case ATC_SUCCEED:
+            return "SUCCEED"
+        case ATC_FAIL:
+            return "FAIL"
+        case ATC_EXPECT_FAIL:
+            return "EXPECT_FAIL"
+        case ATC_ASSERT_UNKNOWN:
         default:
-            return "UNKNOWN ASSERT TYPE"
+            return "UNKNOWN_ASSERT"
     endswitch
 End
 
@@ -177,15 +266,74 @@ Function Assert_getTypeCode(assert_name)
 
     strswitch(assert_name)
         case "ASSERT":
-            return at_ASSERT
+            return ATC_ASSERT
         case "EXPECT":
-            return at_EXPECT
+            return ATC_EXPECT
+        case "ASSERT_TRUE":
+            return ATC_ASSERT_TRUE
+        case "EXPECT_TRUE":
+            return ATC_EXPECT_TRUE
+        case "ASSERT_FALSE":
+            return ATC_ASSERT_FALSE
+        case "EXPECT_FALSE":
+            return ATC_EXPECT_FALSE
+        case "ASSERT_EQ":
+            return ATC_ASSERT_EQ
+        case "EXPECT_EQ":
+            return ATC_EXPECT_EQ
+        case "ASSERT_NE":
+            return ATC_ASSERT_NE
+        case "EXPECT_NE":
+            return ATC_EXPECT_NE
+        case "ASSERT_LT":
+            return ATC_ASSERT_LT
+        case "EXPECT_LT":
+            return ATC_EXPECT_LT
+        case "ASSERT_LE":
+            return ATC_ASSERT_LE
+        case "EXPECT_LE":
+            return ATC_EXPECT_LE
+        case "ASSERT_GT":
+            return ATC_ASSERT_GT
+        case "EXPECT_GT":
+            return ATC_EXPECT_GT
+        case "ASSERT_GE":
+            return ATC_ASSERT_GE
+        case "EXPECT_GE":
+            return ATC_EXPECT_GE
+        case "ASSERT_EQ_C":
+            return ATC_ASSERT_EQ_C
+        case "EXPECT_EQ_C":
+            return ATC_EXPECT_EQ_C
+        case "ASSERT_NE_C":
+            return ATC_ASSERT_NE_C
+        case "EXPECT_NE_C":
+            return ATC_EXPECT_NE_C
         case "ASSERT_STREQ":
-            return at_ASSERT_STREQ
+            return ATC_ASSERT_STREQ
         case "EXPECT_STREQ":
-            return at_EXPECT_STREQ
+            return ATC_EXPECT_STREQ
+        case "ASSERT_STRNE":
+            return ATC_ASSERT_STRNE
+        case "EXPECT_STRNE":
+            return ATC_EXPECT_STRNE
+        case "ASSERT_STRCASEEQ":
+            return ATC_ASSERT_STRCASEEQ
+        case "EXPECT_STRCASEEQ":
+            return ATC_EXPECT_STRCASEEQ
+        case "ASSERT_STRCASENE":
+            return ATC_ASSERT_STRCASENE
+        case "EXPECT_STRCASENE":
+            return ATC_EXPECT_STRCASENE
+        case "SUCCEED":
+            return ATC_SUCCEED
+        case "FAIL":
+            return ATC_FAIL
+        case "EXPECT_FAIL":
+            return ATC_EXPECT_FAIL
+        case "ASSERT_UNKNOWN":
         default:
-            return at_ASSERT_UNKNOWN
+            return ATC_ASSERT_UNKNOWN
     endswitch
 End
 
