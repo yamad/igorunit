@@ -112,7 +112,7 @@ Function TSR_runTest(tsr, test)
     FUNCREF protofunc group_teardown = $teardownname
     FUNCREF protofunc curr_test = $test.funcname
 
-    tsr.curr_test_status = TEST_SUCCESS
+    tsr.curr_test_status = TEST_UNKNOWN
     Variable start_time, end_time
     String msg = ""
     TSR_createTestDataFolder(tsr, test.funcname)
