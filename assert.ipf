@@ -145,14 +145,14 @@ Function TEST_EQ(expected, actual, tolerance, assertion)
 	Variable actual
 	Variable tolerance
     STRUCT Assertion &assertion
-	
+
 	String params
 	sprintf params, "%.16g, %.16g, %.16g", expected, actual, tolerance
     Assertion_setParams(assertion, params)
 
-    String err_msg = EXPECTED_ERROR_MSG(num2str(expected), num2str(actual))
+    String err_msg = EXPECTED_ERROR_MSG(expected, actual)
     Assertion_setMessage(assertion, err_msg)
-	
+
 	Variable ntExpected = numtype(expected)
 	Variable ntActual = numtype(actual)
 	if (ntExpected != ntActual) // values have different types
@@ -600,7 +600,7 @@ Function EXPECT_STREQ(expected, actual, [fail_msg])
     String fail_msg
 
     if (ParamIsDefault(fail_msg))
-        fail_msg = ""
+        fail_msg = EXPECTED_ERROR_MSG_STR(expected, actual)
     endif
 
     STRUCT Assertion a
@@ -779,9 +779,16 @@ End
 
 
 Function/S EXPECTED_ERROR_MSG(expected, actual)
+  Variable expected, actual
+  String msg
+  sprintf msg, "Expected <%d>, but was <%d>", expected, actual
+  return msg
+End
+
+Function/S EXPECTED_ERROR_MSG_STR(expected, actual)
   String expected, actual
   String msg
-  sprintf msg, "Expected <%s>, but was <%s>", expected, actual
+  sprintf msg, "Expected <\"%s\">, but was <\"%s\">", expected, actual
   return msg
 End
 
