@@ -55,18 +55,18 @@ Function TS_load(ts, from_dfref)
     ts.group_count = group_count
 End
 
-Static Constant GROUP_BLOCK_SIZE=10
+Static Constant TEST_BLOCK_SIZE=25
 Function TS_init(ts)
     STRUCT TestSuite &ts
     ts.test_count = 0
     ts.group_count = 0
     ts.groups = ""
-    Make/FREE/T/N=(GROUP_BLOCK_SIZE, 3) ts.tests
+    Make/FREE/T/N=(TEST_BLOCK_SIZE, 3) ts.tests
     SetDimLabel 1, 0, test_name, ts.tests
     SetDimLabel 1, 1, func_name, ts.tests
     SetDimLabel 1, 2, group_idx, ts.tests
 
-    Make/FREE/T/N=(GROUP_BLOCK_SIZE) ts.testfuncs
+    Make/FREE/T/N=(TEST_BLOCK_SIZE) ts.testfuncs
 End
 
 Function TS_getTestCount(ts)
@@ -95,6 +95,11 @@ Function TS_addTest(ts, test)
     STRUCT UnitTest &test
 
     Variable group_idx = TS_addGroup(ts, test.groupname)
+
+    if (ts.test_count == Wave_getRowCount(ts.tests))
+        Wave_appendRows(ts.tests, TEST_BLOCK_SIZE)
+    endif
+
     if (!TS_hasTest(ts, test.groupname, test.testname))
         ts.tests[ts.test_count][%test_name] = test.testname
         ts.tests[ts.test_count][%func_name] = test.funcname

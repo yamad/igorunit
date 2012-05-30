@@ -86,7 +86,7 @@ End
 
 Static Constant TESTWAVE_BLOCK_SIZE = 50
 Static Constant ASSERTWAVE_BLOCK_SIZE = 100
-Static Constant STRINGSTORE_BLOCK_SIZE = 300
+Static Constant STRINGSTORE_BLOCK_SIZE = 200
 Function TR_init(tr)
     STRUCT TestResult &tr
 
@@ -160,7 +160,7 @@ Static Function TR_addTestOutcome(tr, test, result_code, duration, message)
     Variable duration
     String message
 
-    if (tr.test_run_count+1 > Wave_getRowCount(tr.test_outcomes))
+    if (tr.test_run_count == Wave_getRowCount(tr.test_outcomes))
         Wave_appendRows(tr.test_outcomes, TESTWAVE_BLOCK_SIZE)
         tr.test_outcomes[tr.test_run_count,][%test_idx] = -1
     endif
@@ -249,7 +249,7 @@ Function TR_addAssertionOutcome(tr, test, assertion, result_code)
     STRUCT Assertion &assertion
     Variable result_code
 
-    if (tr.assertion_count+1 > Wave_getRowCount(tr.assertions))
+    if (tr.assertion_count == Wave_getRowCount(tr.assertions))
         Wave_appendRows(tr.assertions, ASSERTWAVE_BLOCK_SIZE)
         tr.assertions[tr.assertion_count,][%test_idx] = -1
     endif
@@ -370,7 +370,7 @@ Static Function TR_storeString(tr, string_to_save)
     String string_to_save
 
     Variable idx = tr.string_count
-    if (idx+1 > Wave_getRowCount(tr.string_store))
+    if (idx == Wave_getRowCount(tr.string_store))
         Wave_appendRows(tr.string_store, STRINGSTORE_BLOCK_SIZE)
     endif
 
