@@ -63,7 +63,7 @@ Function/S IgorUnit_autoDiscoverTests()
     return FunctionList("utest*", ";", "KIND:2")
 End
 
-Function/S IgorUnit_runAllTests()
+Function IgorUnit_runAllTests()
     STRUCT TestSuite ts
     TS_init(ts)
 
