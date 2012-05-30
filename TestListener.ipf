@@ -6,26 +6,30 @@
 #ifndef IGORUNIT_TESTLISTENER
 #define IGORUNIT_TESTLISTENER
 
+#include "funcutils"
+
 Constant LISTENERTYPE_DEFAULT = 0
 Constant LISTENERTYPE_PRINTER = 1
 
 Constant VERBOSITY_LOW = 1
 Constant VERBOSITY_HIGH = 2
 
+Static Strconstant TL_DEFAULT_PREFIX = "TLnull"
+
 Structure TestListener
     Variable listener_type
     Variable verbosity
     String output
-    FUNCREF TL_output output_func
-    FUNCREF TL_addTestFailure testfail_func
-    FUNCREF TL_addTestSuccess testsuccess_func
-    FUNCREF TL_addTestError testerror_func
-    FUNCREF TL_addTestStart teststart_func
-    FUNCREF TL_addTestEnd testend_func
-    FUNCREF TL_addAssertSuccess assertsuccess_func
-    FUNCREF TL_addAssertFailure assertfail_func
-    FUNCREF TL_addTestSuiteStart ts_start_func
-    FUNCREF TL_addTestSuiteEnd ts_end_func
+    FUNCREF TLnull_output output_func
+    FUNCREF TLnull_addTestFailure testfail_func
+    FUNCREF TLnull_addTestSuccess testsuccess_func
+    FUNCREF TLnull_addTestError testerror_func
+    FUNCREF TLnull_addTestStart teststart_func
+    FUNCREF TLnull_addTestEnd testend_func
+    FUNCREF TLnull_addAssertSuccess assertsuccess_func
+    FUNCREF TLnull_addAssertFailure assertfail_func
+    FUNCREF TLnull_addTestSuiteStart ts_start_func
+    FUNCREF TLnull_addTestSuiteEnd ts_end_func
 EndStructure
 
 Function TL_persist(tl, to_dfref)
@@ -95,16 +99,16 @@ Function TL_load(tl, from_dfref)
     SVAR ts_start_func = from_dfref:ts_start_func
     SVAR ts_end_func = from_dfref:ts_end_func
 
-    FUNCREF TL_output tl.output_func = $(output_func)
-    FUNCREF TL_addTestFailure tl.testfail_func = $(testfail_func)
-    FUNCREF TL_addTestSuccess tl.testsuccess_func = $(testsuccess_func)
-    FUNCREF TL_addTestError tl.testerror_func = $(testerror_func)
-    FUNCREF TL_addTestStart tl.teststart_func = $(teststart_func)
-    FUNCREF TL_addTestEnd tl.testend_func = $(testend_func)
-    FUNCREF TL_addAssertSuccess tl.assertsuccess_func = $(assertsuccess_func)
-    FUNCREF TL_addAssertFailure tl.assertfail_func = $(assertfail_func)
-    FUNCREF TL_addTestSuiteStart tl.ts_start_func = $(ts_start_func)
-    FUNCREF TL_addTestSuiteEnd tl.ts_end_func = $(ts_end_func)
+    FUNCREF TLnull_output tl.output_func = $(output_func)
+    FUNCREF TLnull_addTestFailure tl.testfail_func = $(testfail_func)
+    FUNCREF TLnull_addTestSuccess tl.testsuccess_func = $(testsuccess_func)
+    FUNCREF TLnull_addTestError tl.testerror_func = $(testerror_func)
+    FUNCREF TLnull_addTestStart tl.teststart_func = $(teststart_func)
+    FUNCREF TLnull_addTestEnd tl.testend_func = $(testend_func)
+    FUNCREF TLnull_addAssertSuccess tl.assertsuccess_func = $(assertsuccess_func)
+    FUNCREF TLnull_addAssertFailure tl.assertfail_func = $(assertfail_func)
+    FUNCREF TLnull_addTestSuiteStart tl.ts_start_func = $(ts_start_func)
+    FUNCREF TLnull_addTestSuiteEnd tl.ts_end_func = $(ts_end_func)
 End
 
 Function TL_init(tl)
@@ -113,23 +117,55 @@ Function TL_init(tl)
     tl.listener_type = LISTENERTYPE_DEFAULT
     tl.verbosity = VERBOSITY_LOW
     tl.output = ""
-    TL_setFuncPointers(tl, "TLnull")
+    TL_setFuncPointers(tl, TL_DEFAULT_PREFIX)
 End
 
 Function TL_setFuncPointers(tl, prefix)
     STRUCT TestListener &tl
     String prefix
 
-    FUNCREF TL_output tl.output_func = $(prefix+"_output")
-    FUNCREF TL_addTestFailure tl.testfail_func = $(prefix+"_addTestFailure")
-    FUNCREF TL_addTestSuccess tl.testsuccess_func = $(prefix+"_addTestSuccess")
-    FUNCREF TL_addTestError tl.testerror_func = $(prefix+"_addTestError")
-    FUNCREF TL_addTestStart tl.teststart_func = $(prefix+"_addTestStart")
-    FUNCREF TL_addTestEnd tl.testend_func = $(prefix+"_addTestEnd")
-    FUNCREF TL_addAssertSuccess tl.assertsuccess_func = $(prefix+"_addAssertSuccess")
-    FUNCREF TL_addAssertFailure tl.assertfail_func = $(prefix+"_addAssertFailure")
-    FUNCREF TL_addTestSuiteStart tl.ts_start_func = $(prefix+"_addTestSuiteStart")
-    FUNCREF TL_addTestSuiteEnd tl.ts_end_func = $(prefix+"_addTestSuiteEnd")
+    String funcname
+
+    funcname = prefix+"_output"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_output tl.output_func = $(funcname)
+    endif
+    funcname = prefix+"_addTestFailure"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addTestFailure tl.testfail_func = $(funcname)
+    endif
+    funcname = prefix+"_addTestSuccess"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addTestSuccess tl.testsuccess_func = $(funcname)
+    endif
+    funcname = prefix+"_addTestError"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addTestError tl.testerror_func = $(funcname)
+    endif
+    funcname = prefix+"_addTestStart"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addTestStart tl.teststart_func = $(funcname)
+    endif
+    funcname = prefix+"_addTestEnd"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addTestEnd tl.testend_func = $(funcname)
+    endif
+    funcname = prefix+"_addAssertSuccess"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addAssertSuccess tl.assertsuccess_func = $(funcname)
+    endif
+    funcname = prefix+"_addAssertFailure"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addAssertFailure tl.assertfail_func = $(funcname)
+    endif
+    funcname = prefix+"_addTestSuiteStart"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addTestSuiteStart tl.ts_start_func = $(funcname)
+    endif
+    funcname = prefix+"_addTestSuiteEnd"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addTestSuiteEnd tl.ts_end_func = $(funcname)
+    endif
 End
 
 Function TL_setVerbosity(tl, verbosity)

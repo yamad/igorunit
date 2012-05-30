@@ -4,6 +4,8 @@
 // OutputFormat -- a component of IgorUnit
 //    This data type handles formats for displaying test results
 
+Static Strconstant OF_DEFAULT_PREFIX = "OFnull"
+
 Structure OutputFormat
     String name
     FUNCREF OFnull_TestStart teststart_func
@@ -38,22 +40,58 @@ End
 Function OF_init(of)
     STRUCT OutputFormat &of
     of.name = ""
-    OF_setFuncPointers(of, "OFnull")
+    OF_setFuncPointers(of, OF_DEFAULT_PREFIX)
 End
 
 Function OF_setFuncPointers(of, prefix)
     STRUCT OutputFormat &of
     String prefix
 
-    FUNCREF OFnull_TestStart of.teststart_func = $(prefix+"_TestStart")
-    FUNCREF OFnull_TestSuccess of.testsuccess_func = $(prefix+"_TestSuccess")
-    FUNCREF OFnull_TestFailure of.testfail_func = $(prefix+"_TestFailure")
-    FUNCREF OFnull_TestError of.testerror_func = $(prefix+"_TestError")
-    FUNCREF OFnull_AssertSuccess of.assertsuccess_func = $(prefix+"_AssertSuccess")
-    FUNCREF OFnull_AssertFailure of.assertfail_func = $(prefix+"_AssertFailure")
-    FUNCREF OFnull_TestSuiteSummary of.ts_summ_func = $(prefix+"_TestSuiteSummary")
-    FUNCREF OFnull_TestOutcomeSummary of.to_summ_func = $(prefix+"_TestOutcomeSummary")
-    FUNCREF OFnull_AssertionSummary of.assert_summ_func = $(prefix+"_AssertionSummary")
+    String funcname
+    funcname = prefix+"_TestStart"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_TestStart of.teststart_func = $(funcname)
+    endif
+
+    funcname = prefix+"_TestSuccess"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_TestSuccess of.testsuccess_func = $(funcname)
+    endif
+
+    funcname = prefix+"_TestFailure"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_TestFailure of.testfail_func = $(funcname)
+    endif
+
+    funcname = prefix+"_TestError"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_TestError of.testerror_func = $(funcname)
+    endif
+
+    funcname = prefix+"_AssertSuccess"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_AssertSuccess of.assertsuccess_func = $(funcname)
+    endif
+
+    funcname = prefix+"_AssertFailure"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_AssertFailure of.assertfail_func = $(funcname)
+    endif
+
+    funcname = prefix+"_TestSuiteSummary"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_TestSuiteSummary of.ts_summ_func = $(funcname)
+    endif
+
+    funcname = prefix+"_TestOutcomeSummary"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_TestOutcomeSummary of.to_summ_func = $(funcname)
+    endif
+
+    funcname = prefix+"_AssertionSummary"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_AssertionSummary of.assert_summ_func = $(funcname)
+    endif
 End
 
 Function OF_persist(of, to_dfref)
