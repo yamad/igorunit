@@ -46,8 +46,9 @@ Constant ATC_EXPECT_STRCASEEQ = 28
 Constant ATC_ASSERT_STRCASENE = 29
 Constant ATC_EXPECT_STRCASENE = 30
 Constant ATC_SUCCEED = 31
-Constant ATC_FAIL = 32
-Constant ATC_EXPECT_FAIL = 33
+Constant ATC_EXPECT_SUCCEED = 32
+Constant ATC_FAIL = 33
+Constant ATC_EXPECT_FAIL = 34
 
 Structure Assertion
     Variable assert_type
@@ -251,6 +252,8 @@ Function/S Assert_getTypeName(assert_type)
             return "EXPECT_STRCASENE"
         case ATC_SUCCEED:
             return "SUCCEED"
+        case ATC_EXPECT_SUCCEED:
+            return "EXPECT_SUCCEED"
         case ATC_FAIL:
             return "FAIL"
         case ATC_EXPECT_FAIL:
@@ -327,6 +330,8 @@ Function Assert_getTypeCode(assert_name)
             return ATC_EXPECT_STRCASENE
         case "SUCCEED":
             return ATC_SUCCEED
+        case "EXPECT_SUCCEED":
+            return ATC_EXPECT_SUCCEED
         case "FAIL":
             return ATC_FAIL
         case "EXPECT_FAIL":

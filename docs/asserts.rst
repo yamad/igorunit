@@ -33,7 +33,7 @@ signatures even though it is available. Thus, for example,
 Basic assertions
 ----------------
 
-These assertions provide basic true/false condition testing. 
+These assertions provide basic true/false condition testing.
 
 Also, unconditional success (SUCCEED) and failure (FAIL) assertions
 are available. These are useful when control flow is needed to
@@ -42,8 +42,8 @@ determine whether a test is successful or not.
 .. #+ORGTBL: SEND basic_assert orgtbl-to-rst
 .. | Fatal assertion         | Non-fatal assertion     | Verifies              |
 .. |-------------------------+-------------------------+-----------------------|
-.. |                         | SUCCEED()[1]_           | unconditional success |
-.. | FAIL()                  | EXPECT_FAIL()[2]_       | unconditional failure |
+.. | SUCCEED()[1]_[2]_       | EXPECT_SUCCEED()        | unconditional success |
+.. | FAIL()                  | EXPECT_FAIL()[3]_       | unconditional failure |
 .. | ASSERT(condition)       | EXPECT(condition)       | *condition* is true   |
 .. | ASSERT_TRUE(condition)  | EXPECT_TRUE(condition)  | same as above         |
 .. | ASSERT_FALSE(condition) | EXPECT_FALSE(condition) | *condition* is false  |
@@ -51,9 +51,9 @@ determine whether a test is successful or not.
 +-------------------------+-------------------------+-----------------------+
 | Fatal assertion         | Non-fatal assertion     | Verifies              |
 +=========================+=========================+=======================+
-|                         | SUCCEED()[1]_           | unconditional success |
+| SUCCEED()[1]_[2]_       | EXPECT_SUCCEED()        | unconditional success |
 +-------------------------+-------------------------+-----------------------+
-| FAIL()                  | EXPECT_FAIL()[2]_       | unconditional failure |
+| FAIL()                  | EXPECT_FAIL()[3]_       | unconditional failure |
 +-------------------------+-------------------------+-----------------------+
 | ASSERT(condition)       | EXPECT(condition)       | *condition* is true   |
 +-------------------------+-------------------------+-----------------------+
@@ -63,17 +63,22 @@ determine whether a test is successful or not.
 +-------------------------+-------------------------+-----------------------+
 .. END RECEIVE ORGTBL basic_assert
 
-.. [1] All functions have an optional *fail_msg* parameter that is not listed. 
+.. [1] All functions have an optional *fail_msg* parameter that is not listed.
    Therefore, for instance, the real signature for SUCCEED() is SUCCEED([fail_msg]).
 
-.. [2] This is a departure from the `googletest`_ name, which is ADD_FAILURE(). 
+.. [2] SUCCEED is a special case. It is the only assertion that
+   signals success and then immediately stops test execution. It is listed
+   under "fatal assertions" because the test is stopped once it is called.
+   All other fatal assertions stop execution only if the assertion fails.
+
+.. [2] This is a departure from the `googletest`_ name, which is ADD_FAILURE().
    I believe that EXPECT_FAIL() is more consistent with the other non-fatal assertions.
 
 
 Variable comparison
 -------------------
 
-The following assertions compare two numerical values. 
+The following assertions compare two numerical values.
 
 .. #+ORGTBL: SEND var_assert orgtbl-to-rst
 .. | Fatal assertion                          | Non-fatal assertion                      | Verifies           |

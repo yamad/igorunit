@@ -133,6 +133,8 @@ Function TSR_runTest(tsr, test)
             // do not run other tests if assertion fails
             // assertion results have already been recorded
             tsr.curr_test_status = TEST_FAILURE
+        elseif (V_AbortCode == ASSERTION_SUCCESS)
+            tsr.curr_test_status = TEST_SUCCESS
         else
             // handle all other aborts as test errors
             tsr.curr_test_status = TEST_ERROR

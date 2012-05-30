@@ -737,7 +737,7 @@ Function ASSERT_STRCASENE(expected, actual, [fail_msg])
     endif
 End
 
-Function SUCCEED([fail_msg])
+Function EXPECT_SUCCEED([fail_msg])
     String fail_msg
 
     if (ParamIsDefault(fail_msg))
@@ -747,6 +747,20 @@ Function SUCCEED([fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
     ASSERT_BASE(TRUE, fail_msg, a)
+End
+
+Function SUCCEED([fail_msg])
+    String fail_msg
+
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    ASSERT_BASE(TRUE, fail_msg, a)
+    AbortOnValue 1, ASSERTION_SUCCESS
 End
 
 Function EXPECT_FAIL([fail_msg])
@@ -771,10 +785,8 @@ Function FAIL([fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable test_status = ASSERT_BASE(FALSE, fail_msg, a)
-    if (test_status == TEST_FAILURE)
-        AbortOnValue 1, ASSERTION_FAILURE
-    endif
+    ASSERT_BASE(FALSE, fail_msg, a)
+    AbortOnValue 1, ASSERTION_FAILURE
 End
 
 
