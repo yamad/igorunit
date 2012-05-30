@@ -26,8 +26,12 @@ Function ASSERT_BASE(condition, fail_msg, assertion)
 
     if (condition)
         TR_addAssertSuccess(tsr.test_result, test, assertion)
-        tsr.curr_test_status = TEST_SUCCESS
+        // signal success if test has not failed in a previous assert
+        if (tsr.curr_test_status != TEST_FAILURE && tsr.curr_test_status != TEST_ERROR)
+            tsr.curr_test_status = TEST_SUCCESS
+        endif
     else
+        assertion.message = fail_msg
         TR_addAssertFailure(tsr.test_result, test, assertion)
         tsr.curr_test_status = TEST_FAILURE
     endif
