@@ -90,7 +90,7 @@ End
 
 Static Constant TESTWAVE_BLOCK_SIZE = 50
 Static Constant ASSERTWAVE_BLOCK_SIZE = 100
-Static Constant STRINGSTORE_BLOCK_SIZE = 200
+Static Constant STRINGSTORE_BLOCK_SIZE = 300
 Function TR_init(tr)
     STRUCT TestResult &tr
 
