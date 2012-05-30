@@ -385,8 +385,7 @@ Function utest_NE_C()
 	ASSERT_NE_C(cmplx(-5, 1/3), cmplx(-5, 1/3), fail_msg="***Should not be executed at all in the first place***")
 End
 
-
-static Function test_STREQ()
+Function utest_STREQ()
 	String message
 
 	SVAR/Z nullSVAR1
@@ -421,7 +420,7 @@ static Function test_STREQ()
 	EXPECT_STREQ("AbCdEfG", "bCdE", fail_msg= "***Should not be executed at all in the first place***")
 End
 
-static Function test_STRNE()
+Function utest_STRNE()
 	String message
 
 	SVAR/Z nullSVAR1
