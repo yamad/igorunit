@@ -17,7 +17,6 @@
 Structure TestSuite
     String groups
     Wave/T tests
-    Wave/T testfuncs
     Variable test_count
     Variable group_count
 EndStructure
@@ -33,7 +32,6 @@ Function TS_persist(ts, to_dfref)
     String/G to_dfref:groups = ts.groups
 
     Duplicate/O/T ts.tests, to_dfref:tests
-    Duplicate/O/T ts.testfuncs, to_dfref:testfuncs
 
     Variable/G to_dfref:test_count = ts.test_count
     Variable/G to_dfref:group_count = ts.group_count
@@ -48,7 +46,6 @@ Function TS_load(ts, from_dfref)
     NVAR group_count = from_dfref:group_count
 
     Duplicate/O/T from_dfref:tests, ts.tests
-    Duplicate/O/T from_dfref:testfuncs, ts.testfuncs
 
     ts.groups = groups
     ts.test_count = test_count
@@ -65,8 +62,6 @@ Function TS_init(ts)
     SetDimLabel 1, 0, test_name, ts.tests
     SetDimLabel 1, 1, func_name, ts.tests
     SetDimLabel 1, 2, group_idx, ts.tests
-
-    Make/FREE/T/N=(TEST_BLOCK_SIZE) ts.testfuncs
 End
 
 Function TS_getTestCount(ts)
