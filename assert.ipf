@@ -61,8 +61,8 @@ Function EXPECT_TRUE(condition, [fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = TEST_TRUE(condition, a)    
-    ASSERT_BASE(passed, fail_msg, a)    
+    Variable passed = TEST_TRUE(condition, a)
+    ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_TRUE(condition, [fail_msg])
@@ -117,7 +117,7 @@ Function EXPECT_FALSE(condition, [fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = TEST_TRUE(!(condition), a)    
+    Variable passed = TEST_TRUE(!(condition), a)
     ASSERT_BASE(passed, fail_msg, a)
 End
 
@@ -269,7 +269,7 @@ Function TEST_LT(val1, val2, assertion)
 	String params
 	sprintf params, "%.16g, %.16g", val1, val2
     Assertion_setParams(assertion, params)
-	
+
 	return (val1 < val2)
 End
 
@@ -364,7 +364,7 @@ Function TEST_GT(val1, val2, assertion)
 	String params
 	sprintf params, "%.16g, %.16g", val1, val2
     Assertion_setParams(assertion, params)
-	
+
 	return (val1 > val2)
 End
 
@@ -456,17 +456,17 @@ Function TEST_EQ_C(expected, actual, tol, assertion)
 	Variable/C actual
 	Variable tol
     STRUCT Assertion &assertion
-	
+
 	Variable realsEqual = FALSE
     Variable imagsEqual = FALSE
     Variable numsEqual = FALSE
-    
+
     realsEqual = TEST_EQ(real(expected), real(actual), tol, assertion)
     if (realsEqual)
         imagsEqual = TEST_EQ(imag(expected), imag(actual), tol, assertion)
         if (imagsEqual)
             numsEqual = TRUE
-        endif	
+        endif
     endif
 
 	String params
@@ -576,7 +576,7 @@ Function TEST_STREQ(expected, actual, case_sensitive, assertion)
 	Variable case_sensitive
     STRUCT Assertion &assertion
 
-    // check for null strings before 
+    // check for null strings before
     Variable isExpectedNull = isStringNull(expected)
     Variable isActualNull = isStringNull(actual)
     if (isExpectedNull && isActualNull)
@@ -584,7 +584,7 @@ Function TEST_STREQ(expected, actual, case_sensitive, assertion)
     elseif (isExpectedNull || isActualNull)
         return FALSE            // one is null, so not equal
     endif
-	
+
     if (case_sensitive)
         return isStringsEqual(expected, actual)
     else

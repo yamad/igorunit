@@ -250,5 +250,5 @@ Function/S TS_getTestGroupNameByIndex(ts, test_idx)
     Variable test_idx
     return TS_getGroupNameByIndex(ts, str2num(ts.tests[test_idx][%group_idx]))
 End
-    
+
 #endif

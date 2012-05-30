@@ -93,9 +93,9 @@ Function TR_init(tr)
     Make/FREE/N=(TESTWAVE_BLOCK_SIZE,7) tr.test_outcomes
     SetDimLabel 1, 0, test_idx, tr.test_outcomes
     SetDimLabel 1, 1, result_code, tr.test_outcomes
-    SetDimLabel 1, 2, test_duration, tr.test_outcomes    
-    SetDimLabel 1, 3, group_name_idx, tr.test_outcomes    
-    SetDimLabel 1, 4, test_name_idx, tr.test_outcomes    
+    SetDimLabel 1, 2, test_duration, tr.test_outcomes
+    SetDimLabel 1, 3, group_name_idx, tr.test_outcomes
+    SetDimLabel 1, 4, test_name_idx, tr.test_outcomes
     SetDimLabel 1, 5, func_name_idx, tr.test_outcomes
     SetDimLabel 1, 6, msg_idx, tr.test_outcomes
 
@@ -332,7 +332,7 @@ End
 Function TR_notifyTestOutcome(tr, to, tl_func)
     STRUCT TestResult &tr
     STRUCT TestOutcome &to
-    FUNCREF TL_addTestSuccess &tl_func 
+    FUNCREF TL_addTestSuccess &tl_func
     Variable i
     for (i=0; i<tr.listener_count; i+=1)
         tl_func(tr.test_listeners[i], tr, to)
@@ -343,7 +343,7 @@ Function TR_notifyAssertSuccess(tr, test, assertion)
     STRUCT TestResult &tr
     STRUCT UnitTest &test
     STRUCT Assertion &assertion
-    TR_notifyAssert(tr, test, assertion, TL_addAssertSuccess)    
+    TR_notifyAssert(tr, test, assertion, TL_addAssertSuccess)
 End
 
 Function TR_notifyAssertFailure(tr, test, assertion)
@@ -358,7 +358,7 @@ Function TR_notifyAssert(tr, test, assertion, tl_func)
     STRUCT UnitTest &test
     STRUCT Assertion &assertion
     FUNCREF TL_addAssertSuccess &tl_func
-    
+
     Variable i
     for (i=0; i<tr.listener_count; i+=1)
         tl_func(tr.test_listeners[i], tr, test, assertion)
@@ -450,26 +450,26 @@ End
 Function/S TR_getTestErrorIndices(tr)
     STRUCT TestResult &tr
 
-    Variable dim_idx = FindDimLabel(tr.test_outcomes, 1, "result_code")    
+    Variable dim_idx = FindDimLabel(tr.test_outcomes, 1, "result_code")
     Extract/O/FREE/INDX tr.test_outcomes, results, (q == dim_idx && tr.test_outcomes[p][%result_code] == TEST_ERROR)
     return Wave_NumsToList(Wave_convert2DToRowIndices(results, tr.test_outcomes))
 End
 
 Function/S TR_getAssertFailureIndices(tr)
-    STRUCT TestResult &tr    
+    STRUCT TestResult &tr
 
-    Variable dim_idx = FindDimLabel(tr.assertions, 1, "result_code")    
+    Variable dim_idx = FindDimLabel(tr.assertions, 1, "result_code")
     Extract/O/FREE/INDX tr.assertions, results, (q == dim_idx && tr.assertions[p][%result_code] == ASSERTION_FAILURE)
     return Wave_NumsToList(Wave_convert2DToRowIndices(results, tr.assertions))
 End
- 
+
 Function/S TR_getAssertIndicesByTest(tr, to_idx)
     STRUCT TestResult &tr
     Variable to_idx
 
     STRUCT TestOutcome to
     TR_getTestOutcomeByIndex(tr, to_idx, to)
-    Variable dim_idx = FindDimLabel(tr.assertions, 1, "test_idx")    
+    Variable dim_idx = FindDimLabel(tr.assertions, 1, "test_idx")
     Extract/O/FREE/INDX tr.assertions, results, (q == dim_idx && tr.assertions[p][%test_idx] == TO_getIndex(to))
     return Wave_NumsToList(Wave_convert2DToRowIndices(results, tr.assertions))
 End

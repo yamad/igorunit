@@ -31,7 +31,7 @@ Function/S IgorUnit_init()
 	DFREF savedDFR = GetDataFolderDFR()
 	SetDataFolder $IGORUNIT_DF
 	Variable/G IgorUnit_INCLUDE = 1
-	
+
 	SetDataFolder savedDFR
 End
 
@@ -79,10 +79,10 @@ End
 
 Function/S TS_runSuite(ts)
     STRUCT TestSuite &ts
-    
+
     STRUCT TestSuiteRunner tsr
     TSR_init(tsr, ts)
-  
+
     String results = TSR_runAllTests(tsr)
     return results
 End
@@ -90,7 +90,7 @@ End
 Function utest_TestTest()
 //    ASSERT(1 == 2)
     EXPECT_FALSE(1 == 2)
-    EXPECT_TRUE(1 == 1)
+    EXPECT_TRUE(1 == -1)
     EXPECT_TRUE(2 != 1)
     EXPECT_EQ(1, 1, tolerance=0)
 //    ASSERT(1 == 2)
