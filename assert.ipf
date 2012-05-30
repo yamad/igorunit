@@ -63,7 +63,7 @@ Function EXPECT_TRUE(condition, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_TRUE(condition, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_TRUE(condition, [fail_msg])
@@ -82,6 +82,7 @@ Function ASSERT_TRUE(condition, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // Alias for EXPECT_TRUE
@@ -92,7 +93,7 @@ Function EXPECT(condition, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    EXPECT_TRUE(condition, fail_msg=fail_msg)
+    return EXPECT_TRUE(condition, fail_msg=fail_msg)
 End
 
 // Alias for ASSERT_TRUE
@@ -103,7 +104,7 @@ Function ASSERT(condition, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    ASSERT_TRUE(condition, fail_msg=fail_msg)
+    return ASSERT_TRUE(condition, fail_msg=fail_msg)
 End
 
 // False truth test (*_FALSE)
@@ -138,6 +139,7 @@ Function ASSERT_FALSE(condition, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // Equal (EQ)
@@ -186,7 +188,7 @@ Function EXPECT_EQ(expected, actual, [tol, fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_EQ(expected, actual, tol, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_EQ(expected, actual, [tol, fail_msg])
@@ -210,6 +212,7 @@ Function ASSERT_EQ(expected, actual, [tol, fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // Not Equal (NE)
@@ -232,7 +235,7 @@ Function EXPECT_NE(expected, actual, [tol, fail_msg])
 
     Variable passed = !TEST_EQ(expected, actual, tol, a)
     Assertion_setMessage(a, fail_msg)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_NE(expected, actual, [tol, fail_msg])
@@ -259,6 +262,7 @@ Function ASSERT_NE(expected, actual, [tol, fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // Less than (LT)
@@ -286,7 +290,7 @@ Function EXPECT_LT(val1, val2, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_LT(val1, val2, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_LT(val1, val2, [fail_msg])
@@ -305,6 +309,7 @@ Function ASSERT_LT(val1, val2, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // Less than or equal to (LE)
@@ -335,7 +340,7 @@ Function EXPECT_LE(val1, val2, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_LE(val1, val2, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_LE(val1, val2, [fail_msg])
@@ -354,6 +359,7 @@ Function ASSERT_LE(val1, val2, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // Greater than (GT)
@@ -381,7 +387,7 @@ Function EXPECT_GT(val1, val2, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_GT(val1, val2, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_GT(val1, val2, [fail_msg])
@@ -400,6 +406,7 @@ Function ASSERT_GT(val1, val2, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // Greater than or equal to (GE)
@@ -430,7 +437,7 @@ Function EXPECT_GE(val1, val2, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_GE(val1, val2, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_GE(val1, val2, [fail_msg])
@@ -449,6 +456,7 @@ Function ASSERT_GE(val1, val2, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // Complex numbers tests
@@ -495,7 +503,7 @@ Function EXPECT_EQ_C(expected, actual, [tol, fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_EQ_C(expected, actual, tol, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_EQ_C(expected, actual, [tol, fail_msg])
@@ -519,6 +527,7 @@ Function ASSERT_EQ_C(expected, actual, [tol, fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // Complex Not Equal (NE_C)
@@ -541,7 +550,7 @@ Function EXPECT_NE_C(expected, actual, [tol, fail_msg])
 
     Variable passed = !TEST_EQ_C(expected, actual, tol, a)
     Assertion_setMessage(a, fail_msg)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_NE_C(expected, actual, [tol, fail_msg])
@@ -568,6 +577,7 @@ Function ASSERT_NE_C(expected, actual, [tol, fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // String Equality (STREQ)
@@ -608,7 +618,7 @@ Function EXPECT_STREQ(expected, actual, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_STREQ(expected, actual, TRUE, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_STREQ(expected, actual, [fail_msg])
@@ -628,6 +638,7 @@ Function ASSERT_STREQ(expected, actual, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // String inequality, case sensitive (*_STRNE)
@@ -644,7 +655,7 @@ Function EXPECT_STRNE(expected, actual, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = !TEST_STREQ(expected, actual, TRUE, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_STRNE(expected, actual, [fail_msg])
@@ -664,6 +675,7 @@ Function ASSERT_STRNE(expected, actual, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // String equality, case insensitive (*_STRCASEEQ)
@@ -680,7 +692,7 @@ Function EXPECT_STRCASEEQ(expected, actual, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = TEST_STREQ(expected, actual, FALSE, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_STRCASEEQ(expected, actual, [fail_msg])
@@ -700,6 +712,7 @@ Function ASSERT_STRCASEEQ(expected, actual, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 // String inequality, case insensitive (*_STRCASENE)
@@ -716,7 +729,7 @@ Function EXPECT_STRCASENE(expected, actual, [fail_msg])
     Assertion_initAuto(a)
 
     Variable passed = !TEST_STREQ(expected, actual, FALSE, a)
-    ASSERT_BASE(passed, fail_msg, a)
+    return ASSERT_BASE(passed, fail_msg, a)
 End
 
 Function ASSERT_STRCASENE(expected, actual, [fail_msg])
@@ -736,6 +749,7 @@ Function ASSERT_STRCASENE(expected, actual, [fail_msg])
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
+    return assert_status
 End
 
 Function EXPECT_SUCCEED([fail_msg])
@@ -747,7 +761,7 @@ Function EXPECT_SUCCEED([fail_msg])
 
     STRUCT Assertion a
     Assertion_initAuto(a)
-    ASSERT_BASE(TRUE, fail_msg, a)
+    return ASSERT_BASE(TRUE, fail_msg, a)
 End
 
 Function SUCCEED([fail_msg])
@@ -762,6 +776,7 @@ Function SUCCEED([fail_msg])
 
     ASSERT_BASE(TRUE, fail_msg, a)
     AbortOnValue 1, ASSERTION_SUCCESS
+    return ASSERTION_SUCCESS
 End
 
 Function EXPECT_FAIL([fail_msg])
@@ -773,7 +788,7 @@ Function EXPECT_FAIL([fail_msg])
 
     STRUCT Assertion a
     Assertion_initAuto(a)
-    ASSERT_BASE(FALSE, fail_msg, a)
+    return ASSERT_BASE(FALSE, fail_msg, a)
 End
 
 Function FAIL([fail_msg])
@@ -788,6 +803,7 @@ Function FAIL([fail_msg])
 
     ASSERT_BASE(FALSE, fail_msg, a)
     AbortOnValue 1, ASSERTION_FAILURE
+    return ASSERTION_FAILURE
 End
 
 Function IGNORE_TEST([fail_msg])
