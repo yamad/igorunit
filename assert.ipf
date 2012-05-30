@@ -168,14 +168,14 @@ Function TEST_EQ(expected, actual, tolerance, assertion)
 	endif
 End
 
-Function EXPECT_EQ(expected, actual, [tolerance, fail_msg])
+Function EXPECT_EQ(expected, actual, [tol, fail_msg])
 	Variable expected
 	Variable actual
-	Variable tolerance
+	Variable tol
     String fail_msg
 
-    if (ParamIsDefault(tolerance))
-        tolerance = 0
+    if (ParamIsDefault(tol))
+        tol = 0
     endif
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
@@ -184,18 +184,18 @@ Function EXPECT_EQ(expected, actual, [tolerance, fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = TEST_EQ(expected, actual, tolerance, a)
+    Variable passed = TEST_EQ(expected, actual, tol, a)
     ASSERT_BASE(passed, fail_msg, a)
 End
 
-Function ASSERT_EQ(expected, actual, [tolerance, fail_msg])
+Function ASSERT_EQ(expected, actual, [tol, fail_msg])
 	Variable expected
 	Variable actual
-	Variable tolerance
+	Variable tol
     String fail_msg
 
-    if (ParamIsDefault(tolerance))
-        tolerance = 0
+    if (ParamIsDefault(tol))
+        tol = 0
     endif
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
@@ -204,22 +204,22 @@ Function ASSERT_EQ(expected, actual, [tolerance, fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = TEST_EQ(expected, actual, tolerance, a)
-    Variable test_status = ASSERT_BASE(passed, fail_msg, a)
-    if (test_status == TEST_FAILURE)
+    Variable passed = TEST_EQ(expected, actual, tol, a)
+    Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
+    if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
     endif
 End
 
 // Not Equal (NE)
-Function EXPECT_NE(expected, actual, [tolerance, fail_msg])
+Function EXPECT_NE(expected, actual, [tol, fail_msg])
 	Variable expected
 	Variable actual
-	Variable tolerance
+	Variable tol
     String fail_msg
 
-    if (ParamIsDefault(tolerance))
-        tolerance = 0
+    if (ParamIsDefault(tol))
+        tol = 0
     endif
     if (ParamIsDefault(fail_msg))
         String msg_format = "Expected <%s> should not equal actual <%s>"
@@ -229,19 +229,19 @@ Function EXPECT_NE(expected, actual, [tolerance, fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = !TEST_EQ(expected, actual, tolerance, a)
+    Variable passed = !TEST_EQ(expected, actual, tol, a)
     Assertion_setMessage(a, fail_msg)
     ASSERT_BASE(passed, fail_msg, a)
 End
 
-Function ASSERT_NE(expected, actual, [tolerance, fail_msg])
+Function ASSERT_NE(expected, actual, [tol, fail_msg])
 	Variable expected
 	Variable actual
-	Variable tolerance
+	Variable tol
     String fail_msg
 
-    if (ParamIsDefault(tolerance))
-        tolerance = 0
+    if (ParamIsDefault(tol))
+        tol = 0
     endif
     if (ParamIsDefault(fail_msg))
         String msg_format = "Expected <%s> should not equal actual <%s>"
@@ -251,7 +251,7 @@ Function ASSERT_NE(expected, actual, [tolerance, fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = !TEST_EQ(expected, actual, tolerance, a)
+    Variable passed = !TEST_EQ(expected, actual, tol, a)
     Assertion_setMessage(a, fail_msg)
 
     Variable test_status = ASSERT_BASE(passed, fail_msg, a)
@@ -477,14 +477,14 @@ Function TEST_EQ_C(expected, actual, tol, assertion)
 	return numsEqual
 End
 
-Function EXPECT_EQ_C(expected, actual, [tolerance, fail_msg])
+Function EXPECT_EQ_C(expected, actual, [tol, fail_msg])
 	Variable/C expected
 	Variable/C actual
-	Variable tolerance
+	Variable tol
     String fail_msg
 
-    if (ParamIsDefault(tolerance))
-        tolerance = 0
+    if (ParamIsDefault(tol))
+        tol = 0
     endif
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
@@ -493,18 +493,18 @@ Function EXPECT_EQ_C(expected, actual, [tolerance, fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = TEST_EQ_C(expected, actual, tolerance, a)
+    Variable passed = TEST_EQ_C(expected, actual, tol, a)
     ASSERT_BASE(passed, fail_msg, a)
 End
 
-Function ASSERT_EQ_C(expected, actual, [tolerance, fail_msg])
+Function ASSERT_EQ_C(expected, actual, [tol, fail_msg])
 	Variable/C expected
 	Variable/C actual
-	Variable tolerance
+	Variable tol
     String fail_msg
 
-    if (ParamIsDefault(tolerance))
-        tolerance = 0
+    if (ParamIsDefault(tol))
+        tol = 0
     endif
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
@@ -513,7 +513,7 @@ Function ASSERT_EQ_C(expected, actual, [tolerance, fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = TEST_EQ_C(expected, actual, tolerance, a)
+    Variable passed = TEST_EQ_C(expected, actual, tol, a)
     Variable test_status = ASSERT_BASE(passed, fail_msg, a)
     if (test_status == TEST_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
@@ -521,14 +521,14 @@ Function ASSERT_EQ_C(expected, actual, [tolerance, fail_msg])
 End
 
 // Complex Not Equal (NE_C)
-Function EXPECT_NE_C(expected, actual, [tolerance, fail_msg])
+Function EXPECT_NE_C(expected, actual, [tol, fail_msg])
 	Variable/C expected
 	Variable/C actual
-	Variable tolerance
+	Variable tol
     String fail_msg
 
-    if (ParamIsDefault(tolerance))
-        tolerance = 0
+    if (ParamIsDefault(tol))
+        tol = 0
     endif
     if (ParamIsDefault(fail_msg))
         String msg_format = "Expected <%s> should not equal actual <%s>"
@@ -538,19 +538,19 @@ Function EXPECT_NE_C(expected, actual, [tolerance, fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = !TEST_EQ_C(expected, actual, tolerance, a)
+    Variable passed = !TEST_EQ_C(expected, actual, tol, a)
     Assertion_setMessage(a, fail_msg)
     ASSERT_BASE(passed, fail_msg, a)
 End
 
-Function ASSERT_NE_C(expected, actual, [tolerance, fail_msg])
+Function ASSERT_NE_C(expected, actual, [tol, fail_msg])
 	Variable/C expected
 	Variable/C actual
-	Variable tolerance
+	Variable tol
     String fail_msg
 
-    if (ParamIsDefault(tolerance))
-        tolerance = 0
+    if (ParamIsDefault(tol))
+        tol = 0
     endif
     if (ParamIsDefault(fail_msg))
         String msg_format = "Expected <%s> should not equal actual <%s>"
@@ -560,7 +560,7 @@ Function ASSERT_NE_C(expected, actual, [tolerance, fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
-    Variable passed = !TEST_EQ_C(expected, actual, tolerance, a)
+    Variable passed = !TEST_EQ_C(expected, actual, tol, a)
     Assertion_setMessage(a, fail_msg)
 
     Variable test_status = ASSERT_BASE(passed, fail_msg, a)
