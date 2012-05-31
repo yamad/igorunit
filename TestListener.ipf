@@ -6,8 +6,6 @@
 #ifndef IGORUNIT_TESTLISTENER
 #define IGORUNIT_TESTLISTENER
 
-#include "funcutils"
-
 Constant LISTENERTYPE_DEFAULT = 0
 Constant LISTENERTYPE_PRINTER = 1
 

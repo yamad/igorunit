@@ -5,13 +5,17 @@
 #ifndef IGORUNIT_INCLUDE
 #define IGORUNIT_INCLUDE
 
+#include "booleanutils"
+#include "numutils"
+#include "waveutils"
+#include "listutils"
+#include "funcutils"
+#include "stringutils"
+#include "datafolderutils"
 #include "stackinfoutils"
 
 #include "assert"
-#include "UnitTest"
 #include "TestSuiteRunner"
-#include "TestSuite"
-#include "TestResult"
 
 Strconstant IGORUNIT_DF = "root:Packages:IgorUnit" // Path to package data folder
 

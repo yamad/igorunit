@@ -6,8 +6,6 @@
 #ifndef IGORUNIT_ASSERTION
 #define IGORUNIT_ASSERTION
 
-#include "stackinfoutils"
-
 // Assertion Status/Result Codes
 Constant ASSERTION_UNKNOWN = 0
 Constant ASSERTION_SUCCESS = 1

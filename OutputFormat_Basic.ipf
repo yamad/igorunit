@@ -1,8 +1,6 @@
 #ifndef IGORUNIT_OUTPUTFORMAT_BASIC
 #define IGORUNIT_OUTPUTFORMAT_BASIC
 
-#include "stringutils"
-
 Function OFBasic_init(of)
     STRUCT OutputFormat &of
     of.name = "Basic"

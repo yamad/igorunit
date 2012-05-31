@@ -3,9 +3,6 @@
 #ifndef IGORUNIT_ASSERT
 #define IGORUNIT_ASSERT
 
-#include "stringutils"
-#include "numutils"
-
 #include "Assertion"
 
 Constant TEST_UNKNOWN = 0

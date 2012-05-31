@@ -6,8 +6,6 @@
 #ifndef IGORUNIT_TESTOUTCOME
 #define IGORUNIT_TESTOUTCOME
 
-#include "UnitTest"
-
 Structure TestOutcome
     STRUCT UnitTest test
     Variable duration

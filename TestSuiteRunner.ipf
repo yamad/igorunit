@@ -6,9 +6,6 @@
 #ifndef IGORUNIT_TSR
 #define IGORUNIT_TSR
 
-#include "booleanutils"
-#include "datafolderutils"
-
 #include "TestSuite"
 #include "TestResult"
 

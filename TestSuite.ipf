@@ -6,12 +6,6 @@
 #ifndef IGORUNIT_TS
 #define IGORUNIT_TS
 
-#include "booleanutils"
-#include "stringutils"
-#include "listutils"
-#include "waveutils"
-#include "datafolderutils"
-
 #include "UnitTest"
 
 Structure TestSuite
