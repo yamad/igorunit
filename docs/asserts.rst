@@ -5,12 +5,10 @@ The following assertions are available. The naming and structure of
 assertions are based on the `googletest`_ framework.
 
 Each type of assertion has two variants--a fatal (ASSERT_*) and a
-non-fatal (EXPECT_*) variant. Both variants will cause the containing
-test to fail, but exit from the containing test differently. ASSERT_*
-assertions abort from the containing function, stopping function
-execution immediately. EXPECT_* assertions, when they fail, do not
-abort the current function and thus allow the rest of the function to
-run.
+non-fatal (EXPECT_*) variant. Both variants signal test failure if the
+assertion fails. However, a failed ASSERT_* assertion aborts execution
+of the containing test immediately. By contrast, a failed EXPECT_*
+assertion allows the containing test to continue executing.
 
 The EXPECT_* variant is usually *preferred*. However, the ASSERT_*
 variant should be used when it doesn't make sense to continue the
@@ -42,8 +40,8 @@ determine whether a test is successful or not.
 .. #+ORGTBL: SEND basic_assert orgtbl-to-rst
 .. | Fatal assertion         | Non-fatal assertion     | Verifies              |
 .. |-------------------------+-------------------------+-----------------------|
-.. | SUCCEED()[1]_[2]_       | EXPECT_SUCCEED()        | unconditional success |
-.. | FAIL()                  | EXPECT_FAIL()[3]_       | unconditional failure |
+.. | SUCCEED() [1]_ [2]_     | EXPECT_SUCCEED()        | unconditional success |
+.. | FAIL()                  | EXPECT_FAIL() [3]_      | unconditional failure |
 .. | ASSERT(condition)       | EXPECT(condition)       | *condition* is true   |
 .. | ASSERT_TRUE(condition)  | EXPECT_TRUE(condition)  | same as above         |
 .. | ASSERT_FALSE(condition) | EXPECT_FALSE(condition) | *condition* is false  |
@@ -51,9 +49,9 @@ determine whether a test is successful or not.
 +-------------------------+-------------------------+-----------------------+
 | Fatal assertion         | Non-fatal assertion     | Verifies              |
 +=========================+=========================+=======================+
-| SUCCEED()[1]_[2]_       | EXPECT_SUCCEED()        | unconditional success |
+| SUCCEED() [1]_ [2]_     | EXPECT_SUCCEED()        | unconditional success |
 +-------------------------+-------------------------+-----------------------+
-| FAIL()                  | EXPECT_FAIL()[3]_       | unconditional failure |
+| FAIL()                  | EXPECT_FAIL() [3]_      | unconditional failure |
 +-------------------------+-------------------------+-----------------------+
 | ASSERT(condition)       | EXPECT(condition)       | *condition* is true   |
 +-------------------------+-------------------------+-----------------------+
@@ -71,7 +69,7 @@ determine whether a test is successful or not.
    under "fatal assertions" because the test is stopped once it is called.
    All other fatal assertions stop execution only if the assertion fails.
 
-.. [2] This is a departure from the `googletest`_ name, which is ADD_FAILURE().
+.. [3] This is a departure from the `googletest`_ name, which is ADD_FAILURE().
    I believe that EXPECT_FAIL() is more consistent with the other non-fatal assertions.
 
 
@@ -168,9 +166,9 @@ Note that *CASE* indicates that the assertion is case **insensitive**.
 Ignoring tests
 --------------
 
-A test can be ignored by adding the IGNORE_TEST assertion:
+A test can be ignored by adding the IGNORE_TEST assertion::
 
-    IGNORE_TEST()
+  IGNORE_TEST()
 
 This assertion signals the current test to stop and the test is
 flagged as ignored. Ignored tests do not count towards test failure or
