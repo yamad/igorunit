@@ -70,7 +70,7 @@ Function TSR_init(tsr, ts)
     tsr.test_result = tr
 End
 
-Function/S TSR_runAllTests(tsr)
+Function TSR_runAllTests(tsr)
     STRUCT TestSuiteRunner &tsr
     TR_addTestSuiteStart(tsr.test_result, tsr.test_suite)
     TSR_persist(tsr, IgorUnit_getCurrentTSR())
@@ -82,9 +82,7 @@ Function/S TSR_runAllTests(tsr)
         TSR_runNextTest(tsr)
     while(1)
     TR_addTestSuiteEnd(tsr.test_result, tsr.test_suite)
-    String report = TSR_printReport(tsr)
-//    IgorUnit_clearCurrentTSR()
-    return report
+    return TR_isAllPassed(tsr.test_result)
 End
 
 Function TSR_runNextTest(tsr)

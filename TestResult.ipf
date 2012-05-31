@@ -159,6 +159,14 @@ Function TR_getDefectCount(tr)
     return TR_getFailureCount(tr) + TR_getErrorCount(tr)
 End
 
+Function TR_isAllPassed(tr)
+    STRUCT TestResult &tr
+    if (TR_getDefectCount(tr) == 0)
+        return TRUE
+    endif
+    return FALSE
+End
+
 Static Function TR_addTestOutcome(tr, test, result_code, duration, message)
     STRUCT TestResult &tr
     STRUCT UnitTest &test

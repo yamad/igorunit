@@ -78,17 +78,15 @@ Function IgorUnit_runAllTests()
         String curr_test = List_getItem(test_list, i)
         TS_addTestByName(ts, curr_test, curr_test, curr_test)
     endfor
-    print TS_runSuite(ts)
+    return TS_runSuite(ts)
 End
 
-Function/S TS_runSuite(ts)
+Function TS_runSuite(ts)
     STRUCT TestSuite &ts
 
     STRUCT TestSuiteRunner tsr
     TSR_init(tsr, ts)
-
-    String results = TSR_runAllTests(tsr)
-    return results
+    return TSR_runAllTests(tsr)
 End
 
 Function utest_TestTest()
