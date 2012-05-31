@@ -8,4 +8,4 @@ path and include the main IgorUnit procedure file ::
 
 Then, from the Igor command window, call the `runAllTests` function::
 
- runAllTests()
+ IgorUnit_runAllTests()
