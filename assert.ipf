@@ -870,7 +870,7 @@ Function/S MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, msg)
     String msg
 
     String msg_out
-    sprintf msg_out, "expected different:<\"%s\">, but was same", expected, actual
+    sprintf msg_out, "expected different:<\"%s\">, but was same", expected
     return MSG_FORMAT(msg_out, msg)
 End
 
