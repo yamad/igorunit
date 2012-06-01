@@ -190,26 +190,6 @@ Function TSR_deleteTestDataFolder(tsr, name)
     KillDataFolder root:$foldername
 End
 
-Function/S TSR_printReport(tsr)
-    STRUCT TestSuiteRunner &tsr
-
-//    STRUCT TestPrinter tp
-//    TR_getPrinter(tsr.test_result, tp)
-//    TP_generateReport(tp, tsr.test_result)
-//    return TP_getOutput(tp)
-    return ""
-End
-
-Function TSR_printReportToFile(tsr, fileref)
-    STRUCT TestSuiteRunner &tsr
-    Variable fileref
-
-//    STRUCT TestPrinter tp
-//    TR_getPrinter(tsr.test_result, tp)
-//    TP_generateReport(tp, tsr.test_result)
-//    fprintf fileref, "%s", TP_getOutput(tp)
-End
-
 Function TSR_getRunTestCount(tsr)
     STRUCT TestSuiteRunner &tsr
     return tsr.test_run_count

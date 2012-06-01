@@ -97,12 +97,14 @@ Function/S OFBasic_AssertionSummary(of, to, assertion)
     Variable result_code = Assertion_getResult(assertion)
     String type = Assertion_getTypeName(assertion)
     String param_list = Assertion_getParams(assertion)
-    String message = Assertion_getMessage(assertion)
+    String message = Assertion_getFullMessage(assertion)
     String stack_info = Assertion_getStack(assertion)
     Variable linenum = Assertion_getLineNumber(assertion)
 
+    message = SelectString(isStringExists(message), message + ", ", message)
+
     String summary
-    sprintf summary, "\t%s(%s), %s, at line %d\r", type, param_list, message, linenum
+    sprintf summary, "\t%s(%s), %sat line %d\r", type, param_list, message, linenum
     return summary
 End
 

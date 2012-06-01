@@ -56,12 +56,14 @@ Structure Assertion
     String param_list
     String stack_info
     String message
+    String std_message
     Variable test_idx
 EndStructure
 
 Function Assertion_init(a)
     STRUCT Assertion &a
     Assertion_set(a, ATC_ASSERT_UNKNOWN, "", "", "")
+    a.std_message = ""
     a.result_code = ASSERTION_UNKNOWN
     a.test_idx = -1
 End
@@ -130,6 +132,12 @@ Function Assertion_setMessage(a, message)
     a.message = message
 End
 
+Function Assertion_setStdMessage(a, message)
+    STRUCT Assertion &a
+    String message
+    a.std_message = message
+End
+
 Function Assertion_autosetStackInfo(a)
     STRUCT Assertion &a
     Assertion_setStackInfo(a, Stack_getPartialNegativeIndex(1))
@@ -179,6 +187,28 @@ End
 Function/S Assertion_getMessage(a)
     STRUCT Assertion &a
     return a.message
+End
+
+Function/S Assertion_getStdMessage(a)
+    STRUCT Assertion &a
+    return a.std_message
+End
+
+Function/S Assertion_getFullMessage(a)
+    STRUCT Assertion &a
+
+    String msg = Assertion_getMessage(a)
+    String std_msg = Assertion_getStdMessage(a)
+
+    String msg_out = msg
+    if (isStringExists(std_msg))
+        if (isStringExists(msg_out))
+            sprintf msg_out, "%s : %s", std_msg, msg_out
+        else
+            msg_out = std_msg
+        endif
+    endif
+    return msg_out
 End
 
 Function/S Assertion_getTypeName(a)
