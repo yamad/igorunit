@@ -4,11 +4,12 @@ Assertions
 The following assertions are available. The naming and structure of
 assertions are based on the `googletest`_ framework.
 
-Each type of assertion has two variants--a fatal (ASSERT_*) and a
-non-fatal (EXPECT_*) variant. Both variants signal test failure if the
-assertion fails. However, a failed ASSERT_* assertion aborts execution
-of the containing test immediately. By contrast, a failed EXPECT_*
-assertion allows the containing test to continue executing.
+Each type of assertion has two variants--a fatal (``ASSERT_*``) and
+a non-fatal (``EXPECT_*``) variant. Both variants signal test
+failure if the assertion fails. However, a failed ASSERT_* assertion
+aborts execution of the containing test immediately. By contrast, a
+failed EXPECT_* assertion allows the containing test to continue
+executing.
 
 The EXPECT_* variant is usually *preferred*. However, the ASSERT_*
 variant should be used when it doesn't make sense to continue the
@@ -23,8 +24,9 @@ the optional parameter *fail_msg*::
 Note that *fail_msg* can be added to any assertion. For clarity, in
 the tables below, *fail_msg* is not included in the assertion
 signatures even though it is available. Thus, for example,
-*ASSERT(condition)* actually has the signature *ASSERT(condition,
-[fail_msg])*.
+``ASSERT(condition)`` actually has the signature ``ASSERT(condition,
+[fail_msg])``.
+
 
 .. _googletest: http://code.google.com/p/googletest
 
@@ -105,16 +107,16 @@ The following assertions compare two numerical values.
 +------------------------------------------+------------------------------------------+--------------------+
 .. END RECEIVE ORGTBL var_assert
 
-For assertions that include the *tolerance* parameter, if a tolerance
-is specified the values are equal if the difference between the
-expected and actual values is less than or equal to the tolerance.
+For assertions that include the *tolerance* optional parameter, the
+values are equal if the difference between the expected and actual
+values is less than or equal to the tolerance.
 
-Two NaNs are considered equal, as are two +Infs or two
--Infs. Obviously, +Inf and -Inf are not equal.
+Two ``NaN`` values are considered equal, as are two ``+Inf`` values or
+two ``-Inf`` values. Obviously, ``+Inf`` and ``-Inf`` are not equal.
 
 A similar set of assertions to the above can be used to compare
-complex numbers (*_*_C). Both real and imaginary parts must be equal
-for an equality test to succeed.
+complex numbers (``*_*_C``). Both real and imaginary parts must be
+equal for an equality test to succeed.
 
 .. #+ORGTBL: SEND complex_assert orgtbl-to-rst
 .. | Fatal assertion                            | Non-fatal assertion                        | Verifies           |
@@ -158,15 +160,15 @@ The following assertions compare two string values.
 +------------------------------------+------------------------------------+--------------------------------------------------+
 .. END RECEIVE ORGTBL string_assert
 
-A NULL string and an empty string are considered different. Two NULL
-strings are equal.
+A ``NULL`` string and an empty string are considered different. Two
+``NULL`` strings are equal.
 
-Note that *CASE* indicates that the assertion is case **insensitive**.
+Note that ``CASE`` indicates that the assertion is *case-insensitive*.
 
 Ignoring tests
 --------------
 
-A test can be ignored by adding the IGNORE_TEST assertion::
+A test can be ignored by adding the ``IGNORE_TEST`` assertion::
 
   IGNORE_TEST()
 
@@ -175,5 +177,90 @@ flagged as ignored. Ignored tests do not count towards test failure or
 error counts. This can be useful to temporarily "comment out" a
 troublesome test.
 
-Note that IGNORE_TEST must be called before any fatal assertions. It
-is best to make IGNORE_TEST the first line of a test.
+Note that ``IGNORE_TEST`` must be called before any fatal
+assertions. It is best to make ``IGNORE_TEST`` the first line of a
+test.
+
+Returning from an assertion
+---------------------------
+
+.. note:: This section is useful mostly to IgorUnit developers. In
+   general, IgorUnit client code will not be interested in assertion
+   return codes.
+
+All assertions return an assertion result code, which is a Variable
+with one of the following values:
+
+  * ``ASSERTION_UNKNOWN``
+  * ``ASSERTION_SUCCESS``
+  * ``ASSERTION_FAILURE``
+  * ``ASSERTION_IGNORETEST``
+
+Of course, because fatal assertions abort when they fail, only
+non-fatal assertions can return ``ASSERTION_FAILURE``.
+
+The results of assertions are automatically saved by IgorUnit, so in
+the vast majority of cases, you don't need or want to inspect the
+assertion result at all. A bare assertion is the common case, and
+usually what you want::
+
+  EXPECT_EQ(1, 2)               // common case, don't capture returned value
+
+However, assertion results may be useful in some rare cases with
+complicated control flow. For instance, to test whether ``EXPECT_EQ``
+is working correctly, one might write the following test::
+
+  // EXPECT_EQ fails when values are not equal
+  Function utest_EXPECT_EQ_fails_neq()
+      Variable assert_status
+      String msg = "EXPECT_EQ thinks 1 and 2 are equal!"
+      assert_status = EXPECT_EQ(1, 2)
+      if (assert_status == ASSERTION_FAILURE)
+          SUCCEED(fail_msg=msg)
+      else
+          FAIL(fail_msg=msg)
+      endif
+  End
+
+Here, the test should succeed when ``EXPECT_EQ`` signals a
+failure. This is the opposite of normal behavior, so we have to handle
+the result of the assertion ourselves. ``SUCCEED`` does exactly what
+we want and signals test success even if there are other failing
+assertions in the test.
+
+Note that this techinque is really only useful for testing the
+assertions themselves. It is not a general way to test for the
+opposite of an assertion. For instance, we could (stupidly) mimic the
+test in ``EXPECT_NEQ`` (values are not equal) using assertion result
+codes. This test succeeds if 1 and 2 are different::
+
+  // worst version. DON'T DO THIS!
+  Variable rc = EXPECT_EQ(1, 2)
+  if (rc == ASSERTION_FAILURE)     // 1 and 2 are not equal
+      SUCCEED()
+  endif
+
+This is, however, the worst way to write this test. In general, if you
+find yourself using assertion results, you are probably doing
+something wrong. An improved version (but not the best) would be to
+forget about assertion result codes and test for ``1 == 2``
+directly. Any of the following will work::
+
+  // better versions
+  if (1 == 2)
+      FAIL()
+  endif
+
+  if (1 != 2)
+      SUCCEED()
+  endif
+
+  ASSERT_TRUE(1 != 2)
+  ASSERT_FALSE(1 == 2)
+
+The best solution, of course, is to just use ``EXPECT_NEQ``
+directly. This is concise, clear, and comes with more useful
+diagnostic messages when things go wrong::
+
+  // best version
+  EXPECT_NEQ(1, 2)
