@@ -856,12 +856,17 @@ Function/S MSG_EXPECTED_ERROR(expected, actual, msg)
     return msg_out
 End
 
-Function/S MSG_STR_EXPECTED_ERROR(expected, actual, msg)
+Static Strconstant NULL_STRING_SUB = "<NULL>"
+Static Function/S MSG_STR_EXPECTED_ERROR(expected, actual, msg)
     String expected, actual
     String msg
 
-    expected = SelectString(isStringNull(expected), "NULL", expected)
-    actual = SelectString(isStringNull(actual), "NULL", actual)
+    if (isStringNull(expected))
+        expected = NULL_STRING_SUB
+    endif
+    if (isStringNull(actual))
+        actual = NULL_STRING_SUB
+    endif
 
     String msg_out
     sprintf msg_out, "expected <\"%s\">, but was <\"%s\">", expected, actual
@@ -872,7 +877,9 @@ Function/S MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, msg)
     String expected, actual
     String msg
 
-    expected = SelectString(isStringNull(expected), "NULL", expected)
+    if (isStringNull(expected))
+        expected = NULL_STRING_SUB
+    endif
 
     String msg_out
     sprintf msg_out, "expected different:<\"%s\">, but was same", expected

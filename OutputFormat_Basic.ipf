@@ -101,7 +101,9 @@ Function/S OFBasic_AssertionSummary(of, to, assertion)
     String stack_info = Assertion_getStack(assertion)
     Variable linenum = Assertion_getLineNumber(assertion)
 
-    message = SelectString(isStringExists(message), message + ", ", message)
+    if (isStringExists(message))
+        message = message + ", "
+    endif
 
     String summary
     sprintf summary, "\t%s(%s), %sat line %d\r", type, param_list, message, linenum
