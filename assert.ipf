@@ -60,7 +60,7 @@ Function EXPECT_TRUE(condition, [fail_msg])
     endif
 
     Variable passed = TEST_TRUE(condition, a)
-    fail_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true", fail_msg)
+    Assertion_setStdMessage(a, MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true"))
 
     return ASSERT_BASE(passed, fail_msg, a)
 End
@@ -77,7 +77,7 @@ Function ASSERT_TRUE(condition, [fail_msg])
     endif
 
     Variable passed = TEST_TRUE(condition, a)
-    fail_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true", fail_msg)
+    Assertion_setStdMessage(a, MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true"))
 
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
     if (assert_status == ASSERTION_FAILURE)
@@ -121,7 +121,7 @@ Function EXPECT_FALSE(condition, [fail_msg])
     endif
 
     Variable passed = !TEST_TRUE(condition, a)
-    fail_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false", fail_msg)
+    Assertion_setStdMessage(a, MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false"))
 
     ASSERT_BASE(passed, fail_msg, a)
 End
@@ -138,7 +138,7 @@ Function ASSERT_FALSE(condition, [fail_msg])
     endif
 
     Variable passed = !TEST_TRUE(condition, a)
-    fail_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false", fail_msg)
+    Assertion_setStdMessage(a, MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false"))
 
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
     if (assert_status == ASSERTION_FAILURE)
@@ -187,9 +187,9 @@ Function EXPECT_EQ(expected, actual, [tol, fail_msg])
     endif
     if (ParamIsDefault(tol))
         tol = 0
-        fail_msg = MSG_OPERATOR_ERROR(expected, actual, "not ==", fail_msg)
+        Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(expected, actual, "not =="))
     else
-        fail_msg = MSG_OPERATOR_TOL_ERROR(expected, actual, "not ==", fail_msg, tol)
+        Assertion_setStdMessage(a, MSG_OPERATOR_TOL_ERROR(expected, actual, "not ==", tol))
     endif
 
     Variable passed = TEST_EQ(expected, actual, tol, a)
@@ -211,7 +211,7 @@ Function ASSERT_EQ(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(expected, actual, "not ==", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(expected, actual, "not =="))
 
     Variable passed = TEST_EQ(expected, actual, tol, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -237,10 +237,9 @@ Function EXPECT_NE(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(expected, actual, "not !=", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(expected, actual, "not !="))
 
     Variable passed = !TEST_EQ(expected, actual, tol, a)
-    Assertion_setMessage(a, fail_msg)
     return ASSERT_BASE(passed, fail_msg, a)
 End
 
@@ -259,11 +258,9 @@ Function ASSERT_NE(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(expected, actual, "not !=", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(expected, actual, "not !="))
 
     Variable passed = !TEST_EQ(expected, actual, tol, a)
-    Assertion_setMessage(a, fail_msg)
-
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
@@ -294,7 +291,7 @@ Function EXPECT_LT(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not <", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(val1, val2, "not <"))
 
     Variable passed = TEST_LT(val1, val2, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -310,7 +307,7 @@ Function ASSERT_LT(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not <", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(val1, val2, "not <"))
 
     Variable passed = TEST_LT(val1, val2, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -346,7 +343,7 @@ Function EXPECT_LE(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not <=", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(val1, val2, "not <="))
 
     Variable passed = TEST_LE(val1, val2, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -362,7 +359,7 @@ Function ASSERT_LE(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not <=", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(val1, val2, "not <="))
 
     Variable passed = TEST_LE(val1, val2, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -395,7 +392,7 @@ Function EXPECT_GT(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not >", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(val1, val2, "not >"))
 
     Variable passed = TEST_GT(val1, val2, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -411,7 +408,7 @@ Function ASSERT_GT(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not >", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(val1, val2, "not >"))
 
     Variable passed = TEST_GT(val1, val2, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -447,7 +444,7 @@ Function EXPECT_GE(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not >=", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(val1, val2, "not >="))
 
     Variable passed = TEST_GE(val1, val2, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -463,7 +460,7 @@ Function ASSERT_GE(val1, val2, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_OPERATOR_ERROR(val1, val2, "not >=", fail_msg)
+    Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(val1, val2, "not >="))
 
     Variable passed = TEST_GE(val1, val2, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -515,7 +512,8 @@ Function EXPECT_EQ_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_ERROR(Num_complexToString(expected), Num_complexToString(actual), fail_msg)
+    String std_msg = MSG_STR_EXPECTED_ERROR(Num_complexToString(expected), Num_complexToString(actual))
+    Assertion_setStdMessage(a, std_msg)
 
     Variable passed = TEST_EQ_C(expected, actual, tol, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -536,7 +534,8 @@ Function ASSERT_EQ_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_ERROR(Num_complexToString(expected), Num_complexToString(actual), fail_msg)
+    String std_msg = MSG_STR_EXPECTED_ERROR(Num_complexToString(expected), Num_complexToString(actual))
+    Assertion_setStdMessage(a, std_msg)
 
     Variable passed = TEST_EQ_C(expected, actual, tol, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -562,10 +561,10 @@ Function EXPECT_NE_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(Num_complexToString(expected), Num_complexToString(actual), fail_msg)
+    String std_msg = MSG_STR_EXPECTED_DIFF_ERROR(Num_complexToString(expected), Num_complexToString(actual))
+    Assertion_setStdMessage(a, std_msg)
 
     Variable passed = !TEST_EQ_C(expected, actual, tol, a)
-    Assertion_setMessage(a, fail_msg)
     return ASSERT_BASE(passed, fail_msg, a)
 End
 
@@ -584,11 +583,10 @@ Function ASSERT_NE_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(Num_complexToString(expected), Num_complexToString(actual), fail_msg)
+    String std_msg = MSG_STR_EXPECTED_DIFF_ERROR(Num_complexToString(expected), Num_complexToString(actual))
+    Assertion_setStdMessage(a, std_msg)
 
     Variable passed = !TEST_EQ_C(expected, actual, tol, a)
-    Assertion_setMessage(a, fail_msg)
-
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
     if (assert_status == ASSERTION_FAILURE)
         AbortOnValue 1, ASSERTION_FAILURE
@@ -632,7 +630,7 @@ Function EXPECT_STREQ(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_ERROR(expected, actual, fail_msg)
+    Assertion_setStdMessage(a, MSG_STR_EXPECTED_ERROR(expected, actual))
 
     Variable passed = TEST_STREQ(expected, actual, TRUE, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -649,7 +647,7 @@ Function ASSERT_STREQ(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_ERROR(expected, actual, fail_msg)
+    Assertion_setStdMessage(a, MSG_STR_EXPECTED_ERROR(expected, actual))
 
     Variable passed = TEST_STREQ(expected, actual, TRUE, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -671,7 +669,7 @@ Function EXPECT_STRNE(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, fail_msg)
+    Assertion_setStdMessage(a, MSG_STR_EXPECTED_DIFF_ERROR(expected, actual))
 
     Variable passed = !TEST_STREQ(expected, actual, TRUE, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -688,7 +686,7 @@ Function ASSERT_STRNE(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, fail_msg)
+    Assertion_setStdMessage(a, MSG_STR_EXPECTED_DIFF_ERROR(expected, actual))
 
     Variable passed = !TEST_STREQ(expected, actual, TRUE, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -710,7 +708,7 @@ Function EXPECT_STRCASEEQ(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_ERROR(expected, actual, fail_msg)
+    Assertion_setStdMessage(a, MSG_STR_EXPECTED_ERROR(expected, actual))
 
     Variable passed = TEST_STREQ(expected, actual, FALSE, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -727,7 +725,7 @@ Function ASSERT_STRCASEEQ(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_ERROR(expected, actual, fail_msg)
+    Assertion_setStdMessage(a, MSG_STR_EXPECTED_ERROR(expected, actual))
 
     Variable passed = TEST_STREQ(expected, actual, FALSE, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -749,7 +747,7 @@ Function EXPECT_STRCASENE(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, fail_msg)
+    Assertion_setStdMessage(a, MSG_STR_EXPECTED_DIFF_ERROR(expected, actual))
 
     Variable passed = !TEST_STREQ(expected, actual, FALSE, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -766,7 +764,7 @@ Function ASSERT_STRCASENE(expected, actual, [fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    fail_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, fail_msg)
+    Assertion_setStdMessage(a, MSG_STR_EXPECTED_DIFF_ERROR(expected, actual))
 
     Variable passed = !TEST_STREQ(expected, actual, FALSE, a)
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
@@ -785,6 +783,8 @@ Function EXPECT_SUCCEED([fail_msg])
 
     STRUCT Assertion a
     Assertion_initAuto(a)
+    Assertion_setStdMessage(a, "Unconditional Success")
+
     return ASSERT_BASE(TRUE, fail_msg, a)
 End
 
@@ -797,6 +797,7 @@ Function SUCCEED([fail_msg])
 
     STRUCT Assertion a
     Assertion_initAuto(a)
+    Assertion_setStdMessage(a, "Forced Success")
 
     ASSERT_BASE(TRUE, fail_msg, a)
     AbortOnValue 1, ASSERTION_SUCCESS
@@ -812,6 +813,7 @@ Function EXPECT_FAIL([fail_msg])
 
     STRUCT Assertion a
     Assertion_initAuto(a)
+    Assertion_setStdMessage(a, "Unconditional Failure")
     return ASSERT_BASE(FALSE, fail_msg, a)
 End
 
@@ -824,6 +826,7 @@ Function FAIL([fail_msg])
 
     STRUCT Assertion a
     Assertion_initAuto(a)
+    Assertion_setStdMessage(a, "Forced Failure")
 
     ASSERT_BASE(FALSE, fail_msg, a)
     AbortOnValue 1, ASSERTION_FAILURE
@@ -839,27 +842,23 @@ Function IGNORE_TEST([fail_msg])
 
     STRUCT Assertion a
     Assertion_initAuto(a)
+    Assertion_setStdMessage(a, "Ignored Test")
 
     AbortOnValue 1, ASSERTION_IGNORETEST
     return ASSERTION_IGNORETEST
 End
 
-Function/S MSG_EXPECTED_ERROR(expected, actual, msg)
+Static Function/S MSG_EXPECTED_ERROR(expected, actual)
     Variable expected, actual
-    String msg
 
     String msg_out
     sprintf msg_out, "expected <%g>, but was <%g>", expected, actual
-    if (isStringExists(msg))
-        msg_out = msg + ", " + msg_out
-    endif
     return msg_out
 End
 
 Static Strconstant NULL_STRING_SUB = "<NULL>"
-Static Function/S MSG_STR_EXPECTED_ERROR(expected, actual, msg)
+Static Function/S MSG_STR_EXPECTED_ERROR(expected, actual)
     String expected, actual
-    String msg
 
     if (isStringNull(expected))
         expected = NULL_STRING_SUB
@@ -870,12 +869,11 @@ Static Function/S MSG_STR_EXPECTED_ERROR(expected, actual, msg)
 
     String msg_out
     sprintf msg_out, "expected <\"%s\">, but was <\"%s\">", expected, actual
-    return MSG_FORMAT(msg_out, msg)
+    return msg_out
 End
 
-Function/S MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, msg)
+Static Function/S MSG_STR_EXPECTED_DIFF_ERROR(expected, actual)
     String expected, actual
-    String msg
 
     if (isStringNull(expected))
         expected = NULL_STRING_SUB
@@ -883,47 +881,34 @@ Function/S MSG_STR_EXPECTED_DIFF_ERROR(expected, actual, msg)
 
     String msg_out
     sprintf msg_out, "expected different:<\"%s\">, but was same", expected
-    return MSG_FORMAT(msg_out, msg)
+    return msg_out
 End
 
-Function/S MSG_OPERATOR_ERROR(expected, actual, op_str, msg)
+Static Function/S MSG_OPERATOR_ERROR(expected, actual, op_str)
     Variable expected, actual
-    String op_str, msg
+    String op_str
 
     String msg_out
     sprintf msg_out, "[%g] %s [%g]", expected, op_str, actual
-    return MSG_FORMAT(msg_out, msg)
+    return msg_out
 End
 
-Function/S MSG_OPERATOR_TOL_ERROR(expected, actual, op_str, msg, tolerance)
+Static Function/S MSG_OPERATOR_TOL_ERROR(expected, actual, op_str, tolerance)
     Variable expected, actual
     String op_str
-    String msg
     Variable tolerance
 
     String msg_out
     sprintf msg_out, "[%g] %s [%g] within [%g] delta", expected, op_str, actual, tolerance
-    return MSG_FORMAT(msg_out, msg)
+    return msg_out
 End
 
-Function/S MSG_PREDICATE_ERROR(condition_str, suffix, msg)
-    String condition_str, suffix, msg
+Static Function/S MSG_PREDICATE_ERROR(condition_str, suffix)
+    String condition_str, suffix
 
     String msg_out
     sprintf msg_out, "%s %s", condition_str, suffix
-    return MSG_FORMAT(msg_out, msg)
-End
-
-Function/S MSG_FORMAT(std_msg, msg)
-    String std_msg, msg
-
-    if (!isStringExists(msg))
-        return std_msg
-    else
-        String msg_out
-        sprintf msg_out, "%s : %s", std_msg, msg
-        return msg_out
-    endif
+    return msg_out
 End
 
 #endif
