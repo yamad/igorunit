@@ -99,13 +99,14 @@ Function TR_init(tr)
     SetDimLabel 1, 5, func_name_idx, tr.test_outcomes
     SetDimLabel 1, 6, msg_idx, tr.test_outcomes
 
-    Make/FREE/N=(ASSERTWAVE_BLOCK_SIZE,6) tr.assertions
+    Make/FREE/N=(ASSERTWAVE_BLOCK_SIZE,7) tr.assertions
     SetDimLabel 1, 0, test_idx, tr.assertions
     SetDimLabel 1, 1, assert_type, tr.assertions
     SetDimLabel 1, 2, result_code, tr.assertions
     SetDimLabel 1, 3, params_string_idx, tr.assertions
     SetDimLabel 1, 4, msg_string_idx, tr.assertions
-    SetDimLabel 1, 5, stack_string_idx, tr.assertions
+    SetDimLabel 1, 5, stdmsg_string_idx, tr.assertions
+    SetDimLabel 1, 6, stack_string_idx, tr.assertions
 
     tr.test_outcomes[][%test_idx] = -1
     tr.assertions[][%test_idx] = -1
@@ -293,6 +294,7 @@ Function TR_addAssertionOutcome(tr, test, assertion, result_code)
     tr.assertions[i][%params_string_idx] = TR_storeString(tr, Assertion_getParams(assertion))
     tr.assertions[i][%stack_string_idx] = TR_storeString(tr, Assertion_getStack(assertion))
     tr.assertions[i][%msg_string_idx] = TR_storeString(tr, Assertion_getMessage(assertion))
+    tr.assertions[i][%stdmsg_string_idx] = TR_storeString(tr, Assertion_getStdMessage(assertion))
 
     tr.assertion_count += 1
     return i
@@ -467,8 +469,10 @@ Function TR_getAssertByIndex(tr, assert_idx, output_assert)
     String param_list = TR_getStoredString(tr, tr.assertions[assert_idx][%params_string_idx])
     String stack_info = TR_getStoredString(tr, tr.assertions[assert_idx][%stack_string_idx])
     String message = TR_getStoredString(tr, tr.assertions[assert_idx][%msg_string_idx])
+    String std_message = TR_getStoredString(tr, tr.assertions[assert_idx][%stdmsg_string_idx])
 
     Assertion_set(output_assert, assert_type, param_list, stack_info, message)
+    Assertion_setStdMessage(output_assert, std_message)
     Assertion_setResult(output_assert, result_code)
     Assertion_setTestIndex(output_assert, test_idx)
     return 0
