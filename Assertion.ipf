@@ -7,10 +7,10 @@
 #define IGORUNIT_ASSERTION
 
 // Assertion Status/Result Codes
-Constant ASSERTION_UNKNOWN = 0
+Constant ASSERTION_UNKNOWN = -1
+Constant ASSERTION_FAILURE = 0
 Constant ASSERTION_SUCCESS = 1
-Constant ASSERTION_FAILURE = 2
-Constant ASSERTION_IGNORETEST = 3
+Constant ASSERTION_IGNORETEST = 2
 
 // Assertion Type Codes (ATC_*)
 Constant ATC_ASSERT_UNKNOWN = 0
