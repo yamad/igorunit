@@ -19,6 +19,9 @@
 
 Strconstant IGORUNIT_DF = "root:Packages:IgorUnit" // Path to package data folder
 
+Static Strconstant AUTODISCOVER_PREFIX = "utest_"
+Static Strconstant GROUP_SEP = "__"
+
 // -- Automatically run initialization when compiled --
 Menu "Macros", dynamic
     IgorUnit_init()
@@ -64,7 +67,21 @@ Function/S IgorUnit_getCallingStack()
 End
 
 Function/S IgorUnit_autoDiscoverTests()
-    return FunctionList("utest*", ";", "KIND:2")
+    return FunctionList(AUTODISCOVER_PREFIX+"*", ";", "KIND:2")
+End
+
+Function IgorUnit_addAutoDiscoverList(ts, func_list)
+    STRUCT TestSuite &ts
+    String func_list
+
+    Variable list_len = List_getLength(func_list)
+    Variable prefix_len = strlen(AUTODISCOVER_PREFIX)
+    Variable i
+    for (i=0; i<list_len; i+=1)
+        String curr_func = List_getItem(func_list, i)
+        String curr_name = curr_func[prefix_len,strlen(curr_func)-1]
+        TS_addTestByName(ts, curr_func, curr_name, curr_func)
+    endfor
 End
 
 Function IgorUnit_runAllTests()
@@ -72,12 +89,7 @@ Function IgorUnit_runAllTests()
     TS_init(ts)
 
     String test_list = IgorUnit_autoDiscoverTests()
-    Variable list_len = List_getLength(test_list)
-    Variable i
-    for (i=0; i<list_len; i+=1)
-        String curr_test = List_getItem(test_list, i)
-        TS_addTestByName(ts, curr_test, curr_test, curr_test)
-    endfor
+    IgorUnit_addAutoDiscoverList(ts, test_list)
     return TS_runSuite(ts)
 End
 
