@@ -395,14 +395,14 @@ Function utest_STREQ()
 	message = "Should pass"
 	EXPECT_STREQ("a", "a", fail_msg= message)
 	EXPECT_STREQ("", "", fail_msg= message)
-	EXPECT_STREQ(nullSVAR1, nullSVAR2, fail_msg= message)
+//	EXPECT_STREQ(nullSVAR1, nullSVAR2, fail_msg= message)
 	EXPECT_STREQ("A", "A", fail_msg= message)
 	EXPECT_STREQ("AbCdEfG", "AbCdEfG", fail_msg= message)
 
 	// Assertions that should pass
 	message = "Should pass"
 	ASSERT_STREQ("a", "a", fail_msg= message)
-	ASSERT_STREQ(nullSVAR1, nullSVAR2, fail_msg= message)
+//	ASSERT_STREQ(nullSVAR1, nullSVAR2, fail_msg= message)
 	ASSERT_STREQ("", "", fail_msg= message)
 	ASSERT_STREQ("A", "A", fail_msg= message)
 	ASSERT_STREQ("AbCdEfG", "AbCdEfG", fail_msg= message)
@@ -412,8 +412,8 @@ Function utest_STREQ()
 	EXPECT_STREQ("a", "b", fail_msg= message)
 	EXPECT_STREQ("a", "A", fail_msg= message)
 	EXPECT_STREQ("A", "a", fail_msg= message)
-	EXPECT_STREQ(nullSVAR1, "", fail_msg= message)
-	EXPECT_STREQ(nullSVAR1, "abcd", fail_msg= message)
+//	EXPECT_STREQ(nullSVAR1, "", fail_msg= message)
+//	EXPECT_STREQ(nullSVAR1, "abcd", fail_msg= message)
 	EXPECT_STREQ("AbCdEfG", "bCdE", fail_msg= message)
 
 	ASSERT_STREQ("AbCdEfG", "bCdE", fail_msg= message + "(fatally)")
@@ -431,8 +431,8 @@ Function utest_STRNE()
 	EXPECT_STRNE("a", "b", fail_msg= message)
 	EXPECT_STRNE("a", "A", fail_msg= message)
 	EXPECT_STRNE("A", "a", fail_msg= message)
-	EXPECT_STRNE(nullSVAR1, "", fail_msg= message)
-	EXPECT_STRNE(nullSVAR1, "abcd", fail_msg= message)
+//	EXPECT_STRNE(nullSVAR1, "", fail_msg= message)
+//	EXPECT_STRNE(nullSVAR1, "abcd", fail_msg= message)
 	EXPECT_STRNE("AbCdEfG", "bCdE", fail_msg= message)
 
 	// Assertions that should pass
@@ -440,15 +440,15 @@ Function utest_STRNE()
 	ASSERT_STRNE("a", "b", fail_msg= message)
 	ASSERT_STRNE("a", "A", fail_msg= message)
 	ASSERT_STRNE("A", "a", fail_msg= message)
-	ASSERT_STRNE(nullSVAR1, "", fail_msg= message)
-	ASSERT_STRNE(nullSVAR1, "abcd", fail_msg= message)
+//	ASSERT_STRNE(nullSVAR1, "", fail_msg= message)
+//	ASSERT_STRNE(nullSVAR1, "abcd", fail_msg= message)
 	ASSERT_STRNE("AbCdEfG", "bCdE", fail_msg= message)
 
 	// Assertions that should fail
 	message = "Should fail"
 	EXPECT_STRNE("a", "a", fail_msg= message)
 	EXPECT_STRNE("", "", fail_msg= message)
-	EXPECT_STRNE(nullSVAR1, nullSVAR2, fail_msg= message)
+//	EXPECT_STRNE(nullSVAR1, nullSVAR2, fail_msg= message)
 	EXPECT_STRNE("A", "A", fail_msg= message)
 	EXPECT_STRNE("AbCdEfG", "AbCdEfG", fail_msg= message)
 
@@ -468,7 +468,7 @@ static Function test_STRCASEIEQ()
 	EXPECT_STRCASEEQ("a", "a", fail_msg= message)
 	EXPECT_STRCASEEQ("", "", fail_msg= message)
 	EXPECT_STRCASEEQ("A", "A", fail_msg= message)
-	EXPECT_STRCASEEQ(nullSVAR1, nullSVAR2, fail_msg= message)
+//	EXPECT_STRCASEEQ(nullSVAR1, nullSVAR2, fail_msg= message)
 	EXPECT_STRCASEEQ("AbCdEfG", "AbCdEfG", fail_msg= message)
 
 	// Assertions that should pass
@@ -476,7 +476,7 @@ static Function test_STRCASEIEQ()
 	ASSERT_STRCASEEQ("a", "a", fail_msg= message)
 	ASSERT_STRCASEEQ("", "", fail_msg= message)
 	ASSERT_STRCASEEQ("A", "A", fail_msg= message)
-	ASSERT_STRCASEEQ(nullSVAR1, nullSVAR2, fail_msg= message)
+//	ASSERT_STRCASEEQ(nullSVAR1, nullSVAR2, fail_msg= message)
 	ASSERT_STRCASEEQ("AbCdEfG", "AbCdEfG", fail_msg= message)
 
 	// Assertions that should fail
@@ -485,8 +485,8 @@ static Function test_STRCASEIEQ()
 	EXPECT_STRCASEEQ("a", "A", fail_msg= message)
 	EXPECT_STRCASEEQ("A", "a", fail_msg= message)
 	EXPECT_STRCASEEQ("AbCdEfG", "bCdE", fail_msg= message)
-	EXPECT_STRCASEEQ(nullSVAR1, "", fail_msg= message)
-	EXPECT_STRCASEEQ(nullSVAR1, "abcd", fail_msg= message)
+//	EXPECT_STRCASEEQ(nullSVAR1, "", fail_msg= message)
+//	EXPECT_STRCASEEQ(nullSVAR1, "abcd", fail_msg= message)
 	ASSERT_STRCASEEQ("AbCdEfG", "bCdE", fail_msg= message + "(fatally)")
 	EXPECT_STRCASEEQ("AbCdEfG", "bCdE", fail_msg= "***Should not be executed at all in the first place***")
 End
@@ -501,15 +501,15 @@ static Function test_STRCASENE()
 	message = "Should pass"
 	EXPECT_STRCASENE("a", "b", fail_msg= message)
 	EXPECT_STRCASENE("AbCdEfG", "bCdE", fail_msg= message)
-	EXPECT_STRCASENE(nullSVAR1, "", fail_msg= message)
-	EXPECT_STRCASENE(nullSVAR1, "abcd", fail_msg= message)
+//	EXPECT_STRCASENE(nullSVAR1, "", fail_msg= message)
+//	EXPECT_STRCASENE(nullSVAR1, "abcd", fail_msg= message)
 
 	// Assertions that should pass
 	message = "Should pass"
 	ASSERT_STRCASENE("a", "b", fail_msg= message)
 	ASSERT_STRCASENE("AbCdEfG", "bCdE", fail_msg= message)
-	ASSERT_STRCASENE(nullSVAR1, "", fail_msg= message)
-	ASSERT_STRCASENE(nullSVAR1, "abcd", fail_msg= message)
+//	ASSERT_STRCASENE(nullSVAR1, "", fail_msg= message)
+//	ASSERT_STRCASENE(nullSVAR1, "abcd", fail_msg= message)
 
 	// Assertions that should fail
 	message = "Should fail"
@@ -518,7 +518,7 @@ static Function test_STRCASENE()
 	EXPECT_STRCASENE("a", "a", fail_msg= message)
 	EXPECT_STRCASENE("", "", fail_msg= message)
 	EXPECT_STRCASENE("A", "A", fail_msg= message)
-	EXPECT_STRCASENE(nullSVAR1, nullSVAR2, fail_msg= message)
+//	EXPECT_STRCASENE(nullSVAR1, nullSVAR2, fail_msg= message)
 	EXPECT_STRCASENE("AbCdEfG", "AbCdEfG", fail_msg= message)
 
 	ASSERT_STRCASENE("a", "a", fail_msg= message + "(fatally)")
