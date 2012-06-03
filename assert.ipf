@@ -60,7 +60,8 @@ Function EXPECT_TRUE(condition, [fail_msg])
     endif
 
     Variable passed = TEST_TRUE(condition, a)
-    Assertion_setStdMessage(a, MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true"))
+    String std_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true")
+    Assertion_setStdMessage(a, std_msg)
 
     return ASSERT_BASE(passed, fail_msg, a)
 End
@@ -77,7 +78,8 @@ Function ASSERT_TRUE(condition, [fail_msg])
     endif
 
     Variable passed = TEST_TRUE(condition, a)
-    Assertion_setStdMessage(a, MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true"))
+    String std_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not true")
+    Assertion_setStdMessage(a, std_msg)
 
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
     if (assert_status == ASSERTION_FAILURE)
@@ -121,7 +123,8 @@ Function EXPECT_FALSE(condition, [fail_msg])
     endif
 
     Variable passed = !TEST_TRUE(condition, a)
-    Assertion_setStdMessage(a, MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false"))
+    String std_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false")
+    Assertion_setStdMessage(a, std_msg)
 
     ASSERT_BASE(passed, fail_msg, a)
 End
@@ -138,7 +141,8 @@ Function ASSERT_FALSE(condition, [fail_msg])
     endif
 
     Variable passed = !TEST_TRUE(condition, a)
-    Assertion_setStdMessage(a, MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false"))
+    String std_msg = MSG_PREDICATE_ERROR(Assertion_getParams(a), "is not false")
+    Assertion_setStdMessage(a, std_msg)
 
     Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
     if (assert_status == ASSERTION_FAILURE)
@@ -182,15 +186,17 @@ Function EXPECT_EQ(expected, actual, [tol, fail_msg])
     STRUCT Assertion a
     Assertion_initAuto(a)
 
+    String std_msg
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
     if (ParamIsDefault(tol))
         tol = 0
-        Assertion_setStdMessage(a, MSG_OPERATOR_ERROR(expected, actual, "not =="))
+        std_msg = MSG_OPERATOR_ERROR(expected, actual, "not ==")
     else
-        Assertion_setStdMessage(a, MSG_OPERATOR_TOL_ERROR(expected, actual, "not ==", tol))
+        std_msg = MSG_OPERATOR_TOL_ERROR(expected, actual, "not ==", tol)
     endif
+    Assertion_setStdMessage(a, std_msg)
 
     Variable passed = TEST_EQ(expected, actual, tol, a)
     return ASSERT_BASE(passed, fail_msg, a)
@@ -512,7 +518,9 @@ Function EXPECT_EQ_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    String std_msg = MSG_STR_EXPECTED_ERROR(Num_complexToString(expected), Num_complexToString(actual))
+    String expected_str = Num_complexToString(expected)
+    String actual_str = Num_complexToString(actual)
+    String std_msg = MSG_STR_EXPECTED_ERROR(expected_str, actual_str)
     Assertion_setStdMessage(a, std_msg)
 
     Variable passed = TEST_EQ_C(expected, actual, tol, a)
@@ -534,7 +542,9 @@ Function ASSERT_EQ_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    String std_msg = MSG_STR_EXPECTED_ERROR(Num_complexToString(expected), Num_complexToString(actual))
+    String expected_str = Num_complexToString(expected)
+    String actual_str = Num_complexToString(actual)
+    String std_msg = MSG_STR_EXPECTED_ERROR(expected_str, actual_str)
     Assertion_setStdMessage(a, std_msg)
 
     Variable passed = TEST_EQ_C(expected, actual, tol, a)
@@ -561,7 +571,9 @@ Function EXPECT_NE_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    String std_msg = MSG_STR_EXPECTED_DIFF_ERROR(Num_complexToString(expected), Num_complexToString(actual))
+    String expected_str = Num_complexToString(expected)
+    String actual_str = Num_complexToString(actual)
+    String std_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected_str, actual_str)
     Assertion_setStdMessage(a, std_msg)
 
     Variable passed = !TEST_EQ_C(expected, actual, tol, a)
@@ -583,7 +595,9 @@ Function ASSERT_NE_C(expected, actual, [tol, fail_msg])
     if (ParamIsDefault(fail_msg))
         fail_msg = ""
     endif
-    String std_msg = MSG_STR_EXPECTED_DIFF_ERROR(Num_complexToString(expected), Num_complexToString(actual))
+    String expected_str = Num_complexToString(expected)
+    String actual_str = Num_complexToString(actual)
+    String std_msg = MSG_STR_EXPECTED_DIFF_ERROR(expected_str, actual_str)
     Assertion_setStdMessage(a, std_msg)
 
     Variable passed = !TEST_EQ_C(expected, actual, tol, a)
