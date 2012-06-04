@@ -166,12 +166,12 @@ End
 
 Function/S getGroupSetupName(groupname)
     String groupname
-    return groupname + "_setup"
+    return "setup_" + groupname
 End
 
 Function/S getGroupTeardownName(groupname)
     String groupname
-    return groupname + "_teardown"
+    return "teardown_" + groupname
 End
 
 Function TSR_createTestDataFolder(tsr, name)
