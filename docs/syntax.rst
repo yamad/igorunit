@@ -14,10 +14,14 @@ parameters::
 where <TEST_NAME> is an arbitrary string (following the rules for Igor
 function names).
 
+Test autodiscovery
+------------------
+
 Tests can be autodiscovered, if your test function names start with
-"utest_" (short for *unit test*). If a function name does not start
-with "utest_", the function can still be included in test suites
+"utest\_" (short for *unit test*). If a function name does not start
+with "utest\_", the function can still be included in test suites
 manually.
+
 
 Writing the test body
 ---------------------
