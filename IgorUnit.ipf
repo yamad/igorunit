@@ -75,13 +75,29 @@ Function IgorUnit_addAutoDiscoverList(ts, func_list)
     String func_list
 
     Variable list_len = List_getLength(func_list)
-    Variable prefix_len = strlen(AUTODISCOVER_PREFIX)
     Variable i
     for (i=0; i<list_len; i+=1)
         String curr_func = List_getItem(func_list, i)
-        String curr_name = curr_func[prefix_len,strlen(curr_func)-1]
-        TS_addTestByName(ts, curr_func, curr_name, curr_func)
+        IgorUnit_addAutoDiscoverTest(ts, curr_func)
     endfor
+End
+
+Function IgorUnit_addAutoDiscoverTest(ts, func_name)
+    STRUCT TestSuite &ts
+    String func_name
+
+    String group_name = ""
+    String test_name = ""
+    IgorUnit_splitFuncName(func_name, group_name, test_name)
+    TS_addTestByName(ts, group_name, test_name, func_name)
+End
+
+Function IgorUnit_splitFuncName(func_name, group_name, test_name)
+    String func_name
+    String &group_name, &test_name
+
+    String func_re = "(?:"+AUTODISCOVER_PREFIX+")?(?:([\\w\\d_]+)"+GROUP_SEP+")?([\\w\\d_]+)"
+    SplitString/E=func_re func_name, group_name, test_name
 End
 
 Function IgorUnit_runAllTests()
