@@ -8,11 +8,12 @@
 
 #include "UnitTest"
 
+Strconstant DEFAULT_GROUP = "DEFAULT"
+
 Structure TestSuite
     String groups
     Wave/T tests
     Variable test_count
-    Variable group_count
 EndStructure
 
 Function TS_persist(ts, to_dfref)
@@ -28,7 +29,6 @@ Function TS_persist(ts, to_dfref)
     Duplicate/O/T ts.tests, to_dfref:tests
 
     Variable/G to_dfref:test_count = ts.test_count
-    Variable/G to_dfref:group_count = ts.group_count
 End
 
 Function TS_load(ts, from_dfref)
@@ -37,21 +37,18 @@ Function TS_load(ts, from_dfref)
 
     SVAR groups = from_dfref:groups
     NVAR test_count = from_dfref:test_count
-    NVAR group_count = from_dfref:group_count
 
     Duplicate/O/T from_dfref:tests, ts.tests
 
     ts.groups = groups
     ts.test_count = test_count
-    ts.group_count = group_count
 End
 
 Static Constant TEST_BLOCK_SIZE=25
 Function TS_init(ts)
     STRUCT TestSuite &ts
     ts.test_count = 0
-    ts.group_count = 0
-    ts.groups = ""
+    ts.groups = DEFAULT_GROUP
     Make/FREE/T/N=(TEST_BLOCK_SIZE, 3) ts.tests
     SetDimLabel 1, 0, test_name, ts.tests
     SetDimLabel 1, 1, func_name, ts.tests
@@ -65,17 +62,20 @@ End
 
 Function TS_getGroupCount(ts)
     STRUCT TestSuite &ts
-    return ts.group_count
+    return List_getLength(ts.groups)
 End
 
 Function TS_addGroup(ts, groupname)
     STRUCT TestSuite &ts
     String groupname
 
+    if (!isStringExists(groupname))
+        groupname = DEFAULT_GROUP
+    endif
+
     if (!TS_hasGroup(ts, groupname))
         ts.groups = List_addItem(ts.groups, groupname)
     endif
-    ts.group_count += 1
     return TS_getGroupIndex(ts, groupname)
 End
 
@@ -160,6 +160,9 @@ Function/S TS_getGroupNameByIndex(ts, group_idx)
     Variable group_idx
 
     String groupname = List_getItem(ts.groups, group_idx)
+    if (isStringsEqual(DEFAULT_GROUP, groupname))
+        groupname = ""
+    endif
     return groupname
 End
 
@@ -224,6 +227,9 @@ Function TS_getGroupIndex(ts, groupname)
     STRUCT TestSuite &ts
     String groupname
 
+    if (!isStringExists(groupname))
+        groupname = DEFAULT_GROUP
+    endif
     return WhichListItem(groupname, ts.groups, ";")
 End
 
