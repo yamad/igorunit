@@ -5,11 +5,11 @@
 
 #include "Assertion"
 
-Constant TEST_UNKNOWN = -1
-Constant TEST_FAILURE = 0
-Constant TEST_SUCCESS = 1
-Constant TEST_ERROR = 2
-Constant TEST_IGNORE = 3
+Constant TEST_UNKNOWN = 1
+Constant TEST_FAILURE = 2
+Constant TEST_SUCCESS = 3
+Constant TEST_ERROR = 4
+Constant TEST_IGNORE = 5
 
 Function ASSERT_BASE(condition, fail_msg, assertion)
     Variable condition

@@ -24,6 +24,17 @@ Function utest_TRUE_failures()
 	EXPECT_TRUE(0, fail_msg="***Should not be executed at all in the first place***")
 End
 
+// ASSERT_EQ should fatally abort on failure
+Function utest_Assert__ASSERT_EQ_aborts()
+    try
+        ASSERT_EQ(1, 2)
+    catch
+        if (V_AbortCode == ASSERTION_FAILURE)
+            SUCCEED()
+        endif
+    endtry
+End
+
 // Test EXPECT_FALSE and ASSERT_FALSE
 Function utest_FALSE()
 	// Assertions that should fail.
