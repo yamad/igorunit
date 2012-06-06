@@ -49,10 +49,11 @@ Function TS_init(ts)
     STRUCT TestSuite &ts
     ts.test_count = 0
     ts.groups = DEFAULT_GROUP
-    Make/FREE/T/N=(TEST_BLOCK_SIZE, 3) ts.tests
+    Make/FREE/T/N=(TEST_BLOCK_SIZE, 4) ts.tests
     SetDimLabel 1, 0, test_name, ts.tests
     SetDimLabel 1, 1, func_name, ts.tests
-    SetDimLabel 1, 2, group_idx, ts.tests
+    SetDimLabel 1, 2, doc_string, ts.tests
+    SetDimLabel 1, 3, group_idx, ts.tests
 End
 
 Function TS_getTestCount(ts)
@@ -92,6 +93,7 @@ Function TS_addTest(ts, test)
     if (!TS_hasTest(ts, test.groupname, test.testname))
         ts.tests[ts.test_count][%test_name] = test.testname
         ts.tests[ts.test_count][%func_name] = test.funcname
+        ts.tests[ts.test_count][%doc_string] = test.docstring
         ts.tests[ts.test_count][%group_idx] = num2str(group_idx)
         ts.test_count += 1
     endif
@@ -104,6 +106,7 @@ Function TS_addTestByName(ts, groupname, testname, funcname)
 
     STRUCT UnitTest test
     UnitTest_init(test, groupname, testname, funcname)
+    UnitTest_autosetDocString(test)
     return TS_addTest(ts, test)
 End
 
@@ -116,7 +119,9 @@ Function TS_getTest(ts, test_idx, output_test)
     String groupname = TS_getTestGroupNameByIndex(ts, test_idx)
     String testname = TS_getTestNameByIndex(ts, test_idx)
     String funcname = TS_getTestFuncNameByIndex(ts, test_idx)
+    String docstring = TS_getTestDocStringByIndex(ts, test_idx)
     UnitTest_set(output_test, groupname, testname, funcname)
+    UnitTest_setDocString(output_test, docstring)
     UnitTest_setIndex(output_test, test_idx)
 End
 
@@ -243,6 +248,12 @@ Function/S TS_getTestFuncNameByIndex(ts, test_idx)
     STRUCT TestSuite &ts
     Variable test_idx
     return ts.tests[test_idx][%func_name]
+End
+
+Function/S TS_getTestDocStringByIndex(ts, test_idx)
+    STRUCT TestSuite &ts
+    Variable test_idx
+    return ts.tests[test_idx][%doc_string]
 End
 
 Function/S TS_getTestGroupNameByIndex(ts, test_idx)

@@ -51,6 +51,11 @@ Function/S TO_getFuncname(to)
     return UnitTest_getFuncname(to.test)
 End
 
+Function/S TO_getDocString(to)
+    STRUCT TestOutcome &to
+    return UnitTest_getDocString(to.test)
+End
+
 Function TO_getIndex(to)
     STRUCT TestOutcome &to
     return UnitTest_getIndex(to.test)

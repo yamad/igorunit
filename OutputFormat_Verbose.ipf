@@ -70,11 +70,20 @@ Function/S OFVerbose_TestOutcomeSummary(of, to)
     String testname = TO_getTestname(to)
     String funcname = TO_getFuncname(to)
     String filename = TO_getFilename(to)
+    String docstring = TO_getDocString(to)
     Variable linenum = TO_getLineNumber(to)
     String message = TO_getMessage(to)
 
     String defect_summary
-    sprintf defect_summary, "%s, %s (%s) in %s at line %d\r", groupname, testname, funcname, filename, linenum
+    sprintf defect_summary, "%s (%s) in %s at line %d\r", testname, funcname, filename, linenum
+
+    if (isStringExists(groupname))
+        sprintf defect_summary, "%s, %s", groupname, defect_summary
+    endif
+
+    if (isStringExists(docstring))
+        sprintf defect_summary, "%s  %s\r", defect_summary, docstring
+    endif
 
     if (isStringExists(message))
         String msg_line

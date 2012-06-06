@@ -90,14 +90,15 @@ Static Constant STRINGSTORE_BLOCK_SIZE = 300
 Function TR_init(tr)
     STRUCT TestResult &tr
 
-    Make/FREE/N=(TESTWAVE_BLOCK_SIZE,7) tr.test_outcomes
+    Make/FREE/N=(TESTWAVE_BLOCK_SIZE,8) tr.test_outcomes
     SetDimLabel 1, 0, test_idx, tr.test_outcomes
     SetDimLabel 1, 1, result_code, tr.test_outcomes
     SetDimLabel 1, 2, test_duration, tr.test_outcomes
     SetDimLabel 1, 3, group_name_idx, tr.test_outcomes
     SetDimLabel 1, 4, test_name_idx, tr.test_outcomes
     SetDimLabel 1, 5, func_name_idx, tr.test_outcomes
-    SetDimLabel 1, 6, msg_idx, tr.test_outcomes
+    SetDimLabel 1, 6, doc_string_idx, tr.test_outcomes
+    SetDimLabel 1, 7, msg_idx, tr.test_outcomes
 
     Make/FREE/N=(ASSERTWAVE_BLOCK_SIZE,7) tr.assertions
     SetDimLabel 1, 0, test_idx, tr.assertions
@@ -187,6 +188,7 @@ Static Function TR_addTestOutcome(tr, test, result_code, duration, message)
     tr.test_outcomes[i][%group_name_idx] = TR_storeString(tr, UnitTest_getGroupname(test))
     tr.test_outcomes[i][%test_name_idx] = TR_storeString(tr, UnitTest_getTestname(test))
     tr.test_outcomes[i][%func_name_idx] = TR_storeString(tr, UnitTest_getFuncname(test))
+    tr.test_outcomes[i][%doc_string_idx] = TR_storeString(tr, UnitTest_getDocString(test))
     tr.test_outcomes[i][%msg_idx] = TR_storeString(tr, message)
     tr.test_count += 1
     return i
@@ -449,11 +451,13 @@ Function TR_getTestOutcomeByIndex(tr, to_idx, to_out)
     String group_name = TR_getStoredString(tr, tr.test_outcomes[to_idx][%group_name_idx])
     String test_name = TR_getStoredString(tr, tr.test_outcomes[to_idx][%test_name_idx])
     String func_name = TR_getStoredString(tr, tr.test_outcomes[to_idx][%func_name_idx])
+    String doc_string = TR_getStoredString(tr, tr.test_outcomes[to_idx][%doc_string_idx])
     String message = TR_getStoredString(tr, tr.test_outcomes[to_idx][%msg_idx])
 
     STRUCT UnitTest test
     UnitTest_init(test, group_name, test_name, func_name)
     UnitTest_setIndex(test, test_idx)
+    UnitTest_setDocString(test, doc_string)
     TO_init(to_out, test, duration, result_code, message)
     return 0
 End
