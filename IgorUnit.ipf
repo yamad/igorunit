@@ -117,14 +117,4 @@ Function TS_runSuite(ts)
     return TSR_runAllTests(tsr)
 End
 
-Function utest_TestTest()
-//    ASSERT(1 == 2)
-    IGNORE_TEST()
-    EXPECT_FALSE(1 == 2)
-    EXPECT_TRUE(1 == -1)
-    EXPECT_TRUE(2 != 1)
-    EXPECT_EQ(1, 1, tol=0)
-//    ASSERT(1 == 2)
-End
-
 #endif
