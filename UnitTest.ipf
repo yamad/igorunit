@@ -70,8 +70,8 @@ End
 
 Function UnitTest_autosetDocString(test)
     STRUCT UnitTest &test
-    String first_re = "^\\s*//\\s*(.*?)\\r"
-    String doc_str = Func_getDocString(test.funcname)
+    String first_re = "^\\s*//[\\t ]*([^\\r]*)\\r?"
+    String doc_str = Func_getPostDocString(test.funcname)
     test.docstring = String_getRegexMatch(doc_str, first_re)
 End
 
