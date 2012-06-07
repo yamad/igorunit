@@ -8,6 +8,7 @@ Static Strconstant OF_DEFAULT_PREFIX = "OFnull"
 
 Structure OutputFormat
     String name
+    FUNCREF OFnull_GroupStart groupstart_func
     FUNCREF OFnull_TestStart teststart_func
     FUNCREF OFnull_TestSuccess testsuccess_func
     FUNCREF OFnull_TestFailure testfail_func
@@ -49,6 +50,11 @@ Function OF_setFuncPointers(of, prefix)
     String prefix
 
     String funcname
+    funcname = prefix+"_GroupStart"
+    if (isFunctionExists(funcname))
+        FUNCREF OFnull_Groupstart of.groupstart_func = $(funcname)
+    endif
+
     funcname = prefix+"_TestStart"
     if (isFunctionExists(funcname))
         FUNCREF OFnull_TestStart of.teststart_func = $(funcname)
@@ -111,6 +117,9 @@ Function OF_persist(of, to_dfref)
     String/G to_dfref:name = of.name
 
     String funcinfo
+    funcinfo = FuncRefInfo(of.groupstart_func)
+    String/G to_dfref:groupstart_func = Dict_getItem(funcinfo, "NAME")
+
     funcinfo = FuncRefInfo(of.teststart_func)
     String/G to_dfref:teststart_func = Dict_getItem(funcinfo, "NAME")
 
@@ -149,6 +158,7 @@ Function OF_load(of, from_dfref)
     SVAR name = from_dfref:name
     of.name = name
 
+    SVAR groupstart_func = from_dfref:groupstart_func
     SVAR teststart_func = from_dfref:teststart_func
     SVAR testsuccess_func = from_dfref:testsuccess_func
     SVAR testfail_func = from_dfref:testfail_func
@@ -160,6 +170,7 @@ Function OF_load(of, from_dfref)
     SVAR to_summ_func = from_dfref:to_summ_func
     SVAR assert_summ_func = from_dfref:assert_summ_func
 
+    FUNCREF OFnull_GroupStart of.groupstart_func = $(groupstart_func)
     FUNCREF OFnull_TestStart of.teststart_func = $(teststart_func)
     FUNCREF OFnull_TestSuccess of.testsuccess_func = $(testsuccess_func)
     FUNCREF OFnull_TestFailure of.testfail_func = $(testfail_func)
@@ -187,6 +198,12 @@ Function/S OutputFormat_getFuncName(verbosity, func_suffix)
     Variable verbosity
     String func_suffix
     return OutputFormat_getPrefix(verbosity) +"_"+ func_suffix
+End
+
+Function/S OF_GroupStart(of, groupname)
+    STRUCT OutputFormat &of
+    String groupname
+    return of.groupstart_func(of, groupname)
 End
 
 Function/S OF_TestStart(of, test)
@@ -251,6 +268,12 @@ Function/S OF_AssertionSummary(of, to, assertion)
     STRUCT TestOutcome &to
     STRUCT Assertion &assertion
     return of.assert_summ_func(of, to, assertion)
+End
+
+Function/S OFnull_GroupStart(of, groupname)
+    STRUCT OutputFormat &of
+    String groupname
+    return ""
 End
 
 Function/S OFnull_TestStart(of, test)

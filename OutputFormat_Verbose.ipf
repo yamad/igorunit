@@ -7,13 +7,26 @@ Function OFVerbose_init(of)
     OF_setFuncPointers(of, "OFVerbose")
 End
 
+Function/S OFVerbose_GroupStart(of, groupname)
+    STRUCT OutputFormat &of
+    String groupname
+
+    return groupname + "\r"
+End
+
 Function/S OFVerbose_TestStart(of, test)
     STRUCT OutputFormat &of
     STRUCT UnitTest &test
 
     String result_line
-    String funcname = UnitTest_getFuncname(test)
-    sprintf result_line, "%s %s ", funcname, formatVerboseDashes(funcname)
+    String test_id = ""
+    String docstring = UnitTest_getDocString(test)
+    if (isStringExists(docstring))
+        test_id = docstring
+    else
+        test_id = UnitTest_getFuncname(test)
+    endif
+    sprintf result_line, "  %s %s ", test_id, formatVerboseDashes(test_id)
     return result_line
 End
 

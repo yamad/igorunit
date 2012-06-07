@@ -23,6 +23,7 @@ Structure TestListener
     FUNCREF TLnull_addTestSuccess testsuccess_func
     FUNCREF TLnull_addTestError testerror_func
     FUNCREF TLnull_addTestIgnore testignore_func
+    FUNCREF TLnull_addGroupStart groupstart_func
     FUNCREF TLnull_addTestStart teststart_func
     FUNCREF TLnull_addTestEnd testend_func
     FUNCREF TLnull_addAssertSuccess assertsuccess_func
@@ -58,6 +59,9 @@ Function TL_persist(tl, to_dfref)
 
     funcinfo = FuncRefInfo(tl.testignore_func)
     String/G to_dfref:testignore_func = Dict_getItem(funcinfo, "NAME")
+
+    funcinfo = FuncRefInfo(tl.groupstart_func)
+    String/G to_dfref:groupstart_func = Dict_getItem(funcinfo, "NAME")
 
     funcinfo = FuncRefInfo(tl.teststart_func)
     String/G to_dfref:teststart_func = Dict_getItem(funcinfo, "NAME")
@@ -95,6 +99,7 @@ Function TL_load(tl, from_dfref)
     SVAR testsuccess_func = from_dfref:testsuccess_func
     SVAR testerror_func = from_dfref:testerror_func
     SVAR testignore_func = from_dfref:testignore_func
+    SVAR groupstart_func = from_dfref:groupstart_func
     SVAR teststart_func = from_dfref:teststart_func
     SVAR testend_func = from_dfref:testend_func
     SVAR assertsuccess_func = from_dfref:assertsuccess_func
@@ -107,6 +112,7 @@ Function TL_load(tl, from_dfref)
     FUNCREF TLnull_addTestSuccess tl.testsuccess_func = $(testsuccess_func)
     FUNCREF TLnull_addTestError tl.testerror_func = $(testerror_func)
     FUNCREF TLnull_addTestIgnore tl.testignore_func = $(testignore_func)
+    FUNCREF TLnull_addGroupStart tl.groupstart_func = $(groupstart_func)
     FUNCREF TLnull_addTestStart tl.teststart_func = $(teststart_func)
     FUNCREF TLnull_addTestEnd tl.testend_func = $(testend_func)
     FUNCREF TLnull_addAssertSuccess tl.assertsuccess_func = $(assertsuccess_func)
@@ -149,6 +155,10 @@ Function TL_setFuncPointers(tl, prefix)
     funcname = prefix+"_addTestIgnore"
     if (isFunctionExists(funcname))
         FUNCREF TLnull_addTestIgnore tl.testignore_func = $(funcname)
+    endif
+    funcname = prefix+"_addGroupStart"
+    if (isFunctionExists(funcname))
+        FUNCREF TLnull_addGroupStart tl.groupstart_func = $(funcname)
     endif
     funcname = prefix+"_addTestStart"
     if (isFunctionExists(funcname))
@@ -231,6 +241,13 @@ Function TL_addTestIgnore(tl, tr, to)
     return tl.testignore_func(tl, tr, to)
 End
 
+Function TL_addGroupStart(tl, tr, groupname)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    String groupname
+    return tl.groupstart_func(tl, tr, groupname)
+End
+
 Function TL_addTestStart(tl, tr, test)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
@@ -300,6 +317,12 @@ Function TLnull_addTestIgnore(tl, tr, to)
     STRUCT TestListener &tl
     STRUCT TestResult &tr
     STRUCT TestOutcome &to
+End
+
+Function TLnull_addGroupStart(tl, tr, groupname)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    String groupname
 End
 
 Function TLnull_addTestStart(tl, tr, test)

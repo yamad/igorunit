@@ -71,6 +71,17 @@ Function TLTP_addTestIgnore(tl, tr, to)
     TL_output(tl, OF_TestIgnore(of, to))
 End
 
+Function TLTP_addGroupStart(tl, tr, groupname)
+    STRUCT TestListener &tl
+    STRUCT TestResult &tr
+    String groupname
+
+    STRUCT OutputFormat of
+    OutputFormat_factory(tl.verbosity, of)
+
+    TL_output(tl, OF_GroupStart(of, groupname))
+End
+
 Function TLTP_addTestStart(tl, tr, test)
     STRUCT TestListener &tl
     STRUCT TestResult &tr

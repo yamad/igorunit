@@ -169,6 +169,12 @@ Function TR_isAllPassed(tr)
     return FALSE
 End
 
+Function TR_addGroupStart(tr, groupname)
+    STRUCT TestResult &tr
+    String groupname
+    TR_notifyGroupStart(tr, groupname)
+End
+
 Static Function TR_addTestOutcome(tr, test, result_code, duration, message)
     STRUCT TestResult &tr
     STRUCT UnitTest &test
@@ -312,6 +318,16 @@ Function TR_addTestSuiteEnd(tr, ts)
     STRUCT TestResult &tr
     STRUCT TestSuite &ts
     TR_notifyTestSuiteEnd(tr, ts)
+End
+
+Function TR_notifyGroupStart(tr, groupname)
+    STRUCT TestResult &tr
+    String groupname
+
+    Variable i
+    for (i=0; i<tr.listener_count; i+=1)
+        TL_addGroupStart(tr.test_listeners[i], tr, groupname)
+    endfor
 End
 
 Function TR_notifyTestStart(tr, test)

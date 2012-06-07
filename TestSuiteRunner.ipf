@@ -224,6 +224,7 @@ Function TSR_getNextGroup(tsr)
     STRUCT TestSuiteRunner &tsr
     tsr.curr_group_idx += 1
     tsr.curr_grouptest_idx = 0
+    TR_addGroupStart(tsr.test_result, TS_getGroupNameByIndex(tsr.test_suite, tsr.curr_group_idx))
     return TSR_getCurrentGroup(tsr)
 End
 
