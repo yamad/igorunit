@@ -132,8 +132,7 @@ Function TS_getTestByName(ts, groupname, testname, output_test)
 
     Variable group_idx = TS_getGroupIndex(ts, groupname)
     Variable dimtest_idx = FindDimLabel(ts.tests, 1, "test_name")
-    String group_test_idxs = Wave_NumsToList(TS_getGroupTestIndices(ts, group_idx))
-    Extract/O/FREE/INDX ts.tests, idxs, (q == dimtest_idx && List_hasItem(group_test_idxs, ts.tests[p][%group_idx]) && isStringsEqual(ts.tests[p][%test_name], testname))
+    Extract/O/FREE/INDX ts.tests, idxs, (q == dimtest_idx && group_idx == str2num(ts.tests[p][%group_idx]) && isStringsEqual(ts.tests[p][%test_name], testname))
     Wave results = Wave_convert2DToRowIndices(idxs, ts.tests)
     if (Wave_getRowCount(results) == 0)
         return -1
