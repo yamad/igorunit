@@ -81,7 +81,10 @@ Function utest_EQ()
 	ASSERT_EQ(kTOLd * 0.999, 0, tol=kTOLd, fail_msg="Should pass")	// due to tolerance
 	ASSERT_EQ(1234567890e256, 1234567890e256, tol=kTOLd, fail_msg="Should pass")
 	ASSERT_EQ(1000.43 - 1000.0, .43, tol=kTOLd, fail_msg="Should pass")	// due to tolerance
+End
 
+Function utest_EQ_failures()
+    // Assertions that should fail
 	EXPECT_EQ(kTOLd * 0.999, 0, tol=kTOLd/2, fail_msg="Should fail")
 	EXPECT_EQ(-kTOLd * 0.999, 0, tol=kTOLd/2, fail_msg="Should fail")
 	EXPECT_EQ(inf, nan, tol=kTOLd, fail_msg="Should fail")
