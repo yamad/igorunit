@@ -34,7 +34,6 @@ help system for more information on installing Igor packages.
 Dependencies
 ------------
 
- * Git_ (for obtaining the code)
  * `Igor Pro 6.2 <http://www.wavemetrics.com>`_ or higher
  * igorutils_
 
