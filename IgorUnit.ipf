@@ -5,10 +5,6 @@
 #ifndef IGORUNIT_INCLUDE
 #define IGORUNIT_INCLUDE
 
-#include "booleanutils"
-#include "numutils"
-#include "waveutils"
-#include "listutils"
 #include "funcutils"
 #include "stringutils"
 #include "datafolderutils"
@@ -115,6 +111,16 @@ Function TS_runSuite(ts)
     STRUCT TestSuiteRunner tsr
     TSR_init(tsr, ts)
     return TSR_runAllTests(tsr)
+End
+
+Function IgorUnit_runSingleTest(funcname)
+    // Run a single unit test by function name
+    String funcname
+
+    STRUCT TestSuite ts
+    TS_init(ts)
+    IgorUnit_addAutoDiscoverTest(ts, funcname)
+    return TS_runSuite(ts)
 End
 
 #endif
