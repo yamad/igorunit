@@ -788,6 +788,68 @@ Function ASSERT_STRCASENE(expected, actual, [fail_msg])
     return assert_status
 End
 
+Function TEST_WAVEEQ(expected, actual, tolerance, assertion)
+    Wave expected
+    Wave actual
+    Variable tolerance
+    STRUCT Assertion &assertion
+
+    if (equalWaves(expected, actual, 3, tolerance))
+        return TRUE
+    endif
+    return FALSE
+End
+
+Function EXPECT_WAVEEQ(expected, actual, [tol, fail_msg])
+    Wave expected
+    Wave actual
+    Variable tol
+    String fail_msg
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    String std_msg
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+    if (ParamIsDefault(tol))
+        tol = 0
+        std_msg = MSG_WAVE_OPERATOR_ERROR(expected, actual, "!=")
+    else
+        std_msg = MSG_WAVE_OPERATOR_TOL_ERROR(expected, actual, "!=", tol)
+    endif
+    Assertion_setStdMessage(a, std_msg)
+
+    Variable passed = TEST_WAVEEQ(expected, actual, tol, a)
+    return ASSERT_BASE(passed, fail_msg, a)
+End
+
+Function ASSERT_WAVEEQ(expected, actual, [tol, fail_msg])
+	Wave expected
+	Wave actual
+	Variable tol
+    String fail_msg
+
+    STRUCT Assertion a
+    Assertion_initAuto(a)
+
+    if (ParamIsDefault(tol))
+        tol = 0
+    endif
+    if (ParamIsDefault(fail_msg))
+        fail_msg = ""
+    endif
+    Assertion_setStdMessage(a, MSG_WAVE_OPERATOR_ERROR(expected, actual, "!="))
+
+    Variable passed = TEST_WAVEEQ(expected, actual, tol, a)
+    Variable assert_status = ASSERT_BASE(passed, fail_msg, a)
+    if (assert_status == ASSERTION_FAILURE)
+        AbortOnValue 1, ASSERTION_FAILURE
+    endif
+    return assert_status
+End
+
 Function EXPECT_SUCCEED([fail_msg])
     String fail_msg
 
@@ -917,6 +979,44 @@ Static Function/S MSG_OPERATOR_TOL_ERROR(expected, actual, op_str, tolerance)
     return msg_out
 End
 
+Static Strconstant NULL_WAVE_SUB = "NULL-WAVE"
+Static Function/S MSG_WAVE_OPERATOR_ERROR(expected, actual, op_str)
+    Variable expected, actual
+    String op_str
+
+    String expect_nm = NULL_WAVE_SUB
+    String actual_nm = NULL_WAVE_SUB
+    if (WaveExists(expected))
+        expect_nm = GetWavesDataFolder(expected, 2)
+    endif
+    if (WaveExists(actual))
+        actual_nm = GetWavesDataFolder(actual, 2)
+    endif
+
+    String msg_out
+    sprintf msg_out, "Wave<%s> %s Wave<%s>", expect_nm, op_str, actual_nm
+    return msg_out
+End
+
+Static Function/S MSG_WAVE_OPERATOR_TOL_ERROR(expected, actual, op_str, tolerance)
+    Wave expected, actual
+    String op_str
+    Variable tolerance
+
+    String expect_nm = NULL_WAVE_SUB
+    String actual_nm = NULL_WAVE_SUB
+    if (WaveExists(expected))
+        expect_nm = GetWavesDataFolder(expected, 2)
+    endif
+    if (WaveExists(actual))
+        actual_nm = GetWavesDataFolder(actual, 2)
+    endif
+
+    String msg_out
+    sprintf msg_out, "Wave<%s> %s Wave<%s> within [%g] delta", expect_nm, op_str, actual_nm, tolerance
+    return msg_out
+End
+
 Static Function/S MSG_PREDICATE_ERROR(condition_str, suffix)
     String condition_str, suffix
 
@@ -924,5 +1024,4 @@ Static Function/S MSG_PREDICATE_ERROR(condition_str, suffix)
     sprintf msg_out, "%s %s", condition_str, suffix
     return msg_out
 End
-
 #endif

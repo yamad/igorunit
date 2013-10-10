@@ -471,6 +471,24 @@ Function utest_STRNE()
 	EXPECT_STRNE("a", "a", fail_msg= "***Should not be executed at all in the first place***")
 End
 
+Function utest_WAVEEQ()
+    Make/N=10 wv1
+    Make/N=10 wv2
+    Make/T wv3
+    Make/T wv4
+
+    wv1 = 0
+    wv2 = 0
+    EXPECT_WAVEEQ(wv1, wv2)
+
+    wv1 = 0
+    wv2 = 1
+
+    wv3 = "true"
+    wv4 = "true"
+    EXPECT_WAVEEQ(wv3, wv4)
+End
+
 static Function test_STRCASEIEQ()
 	String message
 

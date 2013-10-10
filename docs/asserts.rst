@@ -41,7 +41,7 @@ Also, unconditional success (SUCCEED) and failure (FAIL) assertions
 are available. These are useful when control flow is needed to
 determine whether a test is successful or not.
 
-.. #+ORGTBL: SEND basic_assert orgtbl-to-rst
+.. #+ORGTBL: SEND basic_assert orgtbl-to-rst :no-escape t
 .. | Fatal assertion         | Non-fatal assertion     | Verifies              |
 .. |-------------------------+-------------------------+-----------------------|
 .. | SUCCEED() [1]_ [2]_     | EXPECT_SUCCEED()        | unconditional success |
@@ -82,7 +82,7 @@ Variable comparison
 
 The following assertions compare two numerical values.
 
-.. #+ORGTBL: SEND var_assert orgtbl-to-rst
+.. #+ORGTBL: SEND var_assert orgtbl-to-rst :no-escape t
 .. | Fatal assertion                          | Non-fatal assertion                      | Verifies           |
 .. |------------------------------------------+------------------------------------------+--------------------|
 .. | ASSERT_EQ(expected, actual, [tolerance]) | EXPECT_EQ(expected, actual, [tolerance]) | expected == actual |
@@ -120,7 +120,7 @@ A similar set of assertions to the above can be used to compare
 complex numbers (``*_*_C``). Both real and imaginary parts must be
 equal for an equality test to succeed.
 
-.. #+ORGTBL: SEND complex_assert orgtbl-to-rst
+.. #+ORGTBL: SEND complex_assert orgtbl-to-rst :no-escape t
 .. | Fatal assertion                            | Non-fatal assertion                        | Verifies           |
 .. |--------------------------------------------+--------------------------------------------+--------------------|
 .. | ASSERT_EQ_C(expected, actual, [tolerance]) | EXPECT_EQ_C(expected, actual, [tolerance]) | expected == actual |
@@ -141,7 +141,7 @@ String comparison
 
 The following assertions compare two string values.
 
-.. #+ORGTBL: SEND string_assert orgtbl-to-rst
+.. #+ORGTBL: SEND string_assert orgtbl-to-rst :no-escape t
 .. | Fatal assertion                    | Non-fatal assertion                | Verifies                                         |
 .. |------------------------------------+------------------------------------+--------------------------------------------------|
 .. | ASSERT_STREQ(expected, actual)     | EXPECT_STREQ(expected, actual)     | strings have the same content                    |
@@ -166,6 +166,29 @@ A ``NULL`` string and an empty string are considered different. Two
 ``NULL`` strings are equal.
 
 Note that ``CASE`` indicates that the assertion is *case-insensitive*.
+
+
+Wave comparison
+---------------
+
+The following assertions compare two waves
+
+.. #+ORGTBL: SEND wave_assert orgtbl-to-rst :no-escape t
+.. | Fatal assertion                  | Non-fatal assertion              | Verifies                            |
+.. |----------------------------------+----------------------------------+-------------------------------------|
+.. | ASSERT_WAVEEQ(expected, actual)  | EXPECT_WAVEEQ(expected, actual)  | numerical waves have the same data  |
+.. | ASSERT_WAVENEQ(expected, actual) | EXPECT_WAVENEQ(expected, actual) | numerical waves have different data |
+.. BEGIN RECEIVE ORGTBL wave_assert
++----------------------------------+----------------------------------+-------------------------------------+
+| Fatal assertion                  | Non-fatal assertion              | Verifies                            |
++==================================+==================================+=====================================+
+| ASSERT_WAVEEQ(expected, actual)  | EXPECT_WAVEEQ(expected, actual)  | numerical waves have the same data  |
++----------------------------------+----------------------------------+-------------------------------------+
+| ASSERT_WAVENEQ(expected, actual) | EXPECT_WAVENEQ(expected, actual) | numerical waves have different data |
++----------------------------------+----------------------------------+-------------------------------------+
+.. END RECEIVE ORGTBL wave_assert
+
+
 
 Ignoring tests
 --------------
